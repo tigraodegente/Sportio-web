@@ -48,9 +48,12 @@ export default function LoginPage() {
   return (
     <div>
       {/* Mobile logo */}
-      <div className="lg:hidden flex items-center gap-2 mb-8">
-        <Coins className="w-8 h-8 text-emerald-600" />
-        <span className="text-2xl font-bold text-slate-900">Sportio</span>
+      <div className="lg:hidden flex items-center gap-3 mb-8">
+        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-emerald-800 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/20">
+          <Coins className="w-6 h-6 text-white drop-shadow-sm" />
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
+        </div>
+        <span className="text-2xl font-bold text-slate-900 tracking-tight">Sportio</span>
       </div>
 
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Bem-vindo de volta</h2>
@@ -72,7 +75,7 @@ export default function LoginPage() {
           <div className="w-full border-t border-slate-200" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-slate-50 text-slate-500">ou entre com email</span>
+          <span className="px-4 bg-white text-slate-500">ou entre com email</span>
         </div>
       </div>
 
@@ -115,7 +118,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button type="submit" size="lg" loading={loading} className="w-full">
+        <Button type="submit" size="lg" loading={loading} className="w-full font-bold tracking-wide">
           Entrar
         </Button>
       </form>
@@ -126,6 +129,18 @@ export default function LoginPage() {
           Cadastre-se gratis
         </Link>
       </p>
+
+      {/* Trust badges */}
+      <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-4 text-xs text-slate-400">
+        <span className="flex items-center gap-1">
+          <Lock className="w-3 h-3" />
+          Dados protegidos
+        </span>
+        <span className="w-1 h-1 rounded-full bg-slate-300" />
+        <span>SSL 256-bit</span>
+        <span className="w-1 h-1 rounded-full bg-slate-300" />
+        <span>100% seguro</span>
+      </div>
     </div>
   );
 }

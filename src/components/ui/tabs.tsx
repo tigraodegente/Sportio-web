@@ -27,16 +27,16 @@ export function Tabs({ tabs, defaultTab, onChange, children, className }: TabsPr
 
   return (
     <div className={className}>
-      <div className="flex gap-1 border-b border-slate-200 overflow-x-auto">
+      <div className="flex gap-1 p-1 bg-slate-100 rounded-xl overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleChange(tab.id)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px",
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all duration-200",
               activeTab === tab.id
-                ? "border-emerald-600 text-emerald-600"
-                : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             )}
           >
             {tab.icon}
@@ -44,7 +44,7 @@ export function Tabs({ tabs, defaultTab, onChange, children, className }: TabsPr
           </button>
         ))}
       </div>
-      <div className="mt-4">{children(activeTab)}</div>
+      <div className="mt-5">{children(activeTab)}</div>
     </div>
   );
 }

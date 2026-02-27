@@ -150,6 +150,48 @@
   }
 }
 
+@keyframes coin-bounce {
+  0%, 100% {
+    transform: translateY(0) rotateY(0deg);
+  }
+  25% {
+    transform: translateY(-2px) rotateY(90deg);
+  }
+  50% {
+    transform: translateY(0) rotateY(180deg);
+  }
+  75% {
+    transform: translateY(-1px) rotateY(270deg);
+  }
+}
+
+@keyframes shimmer-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.6));
+  }
+}
+
+@keyframes heart-beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 /* ============================================
    Tailwind v4 Theme Extensions
    ============================================ */
@@ -161,6 +203,10 @@
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
   --animate-spin-slow: spin-slow 8s linear infinite;
+  --animate-coin-bounce: coin-bounce 2s ease-in-out infinite;
+  --animate-shimmer-bar: shimmer-bar 2s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-heart-beat: heart-beat 0.3s ease-in-out;
 }
 
 /* ============================================

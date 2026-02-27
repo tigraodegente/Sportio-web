@@ -2,13 +2,30 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Search, MapPin, Calendar, Users, Coins } from "lucide-react";
+import { Plus, Search, MapPin, Calendar, Users, Coins, Trophy, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
 import { Select } from "@/components/ui/select";
+
+const sportEmojiMap: Record<string, string> = {
+  "Beach Tennis": "\u{1F3D6}\uFE0F",
+  "CrossFit": "\u{1F3CB}\uFE0F",
+  "Futebol": "\u26BD",
+  "E-Sports": "\u{1F3AE}",
+  "Corrida": "\u{1F3C3}",
+  "Volei": "\u{1F3D0}",
+};
+
+const sportGradientMap: Record<string, string> = {
+  "bg-yellow-500": "from-yellow-400 to-amber-500",
+  "bg-red-500": "from-red-400 to-rose-600",
+  "bg-green-500": "from-green-400 to-emerald-600",
+  "bg-purple-500": "from-purple-400 to-violet-600",
+  "bg-blue-500": "from-blue-400 to-indigo-600",
+};
 
 const mockTournaments = [
   {
@@ -158,58 +175,108 @@ export default function TournamentsPage() {
         ]}
       >
         {() => (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mockTournaments.map((tournament) => (
-              <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>
-                <Card hover className="h-full">
-                  {/* Sport color bar */}
-                  <div className={`h-1 -mt-6 -mx-6 mb-4 rounded-t-xl ${tournament.sportColor}`} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mockTournaments.map((tournament) => {
+              const fillPercent = Math.round((tournament.participants / tournament.maxParticipants) * 100);
+              const sportEmoji = sportEmojiMap[tournament.sport] || "\u{1F3C6}";
+              const gradient = sportGradientMap[tournament.sportColor] || "from-emerald-400 to-emerald-600";
 
-                  <div className="flex items-start justify-between mb-3">
-                    <Badge variant={statusMap[tournament.status]?.variant}>
-                      {statusMap[tournament.status]?.label}
-                    </Badge>
-                    <Badge>{tournament.level}</Badge>
-                  </div>
+              return (
+                <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>
+                  <Card hover className="h-full overflow-hidden">
+                    {/* Sport color bar - thicker with gradient */}
+                    <div className={`h-1.5 -mt-5 sm:-mt-6 -mx-5 sm:-mx-6 mb-4 rounded-t-2xl bg-gradient-to-r ${gradient}`} />
 
-                  <h3 className="font-semibold text-slate-900 mb-1 line-clamp-2">
-                    {tournament.name}
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-3">{tournament.sport}</p>
+                    <div className="flex items-start justify-between mb-3">
+                      <Badge variant={statusMap[tournament.status]?.variant}>
+                        {statusMap[tournament.status]?.label}
+                      </Badge>
+                      <Badge>{tournament.level}</Badge>
+                    </div>
 
-                  <div className="space-y-2 text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-slate-400" />
-                      {tournament.city}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-slate-400" />
-                      {tournament.startDate}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-slate-400" />
-                      {tournament.participants}/{tournament.maxParticipants} participantes
-                    </div>
-                  </div>
+                    <h3 className="font-bold text-base text-slate-900 mb-1.5 line-clamp-2 leading-snug">
+                      {tournament.name}
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-3 flex items-center gap-1.5">
+                      <span className="text-base leading-none">{sportEmoji}</span>
+                      {tournament.sport}
+                    </p>
 
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                    <div>
-                      <p className="text-xs text-slate-500">Inscricao</p>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {tournament.entryFee > 0 ? `${tournament.entryFee} GCoins` : "Gratis"}
-                      </p>
+                    <div className="space-y-2 text-sm text-slate-600">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                        {tournament.city}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                        {tournament.startDate}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-slate-400 shrink-0" />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span>{tournament.participants}/{tournament.maxParticipants} participantes</span>
+                            <span className="text-xs text-slate-400 font-medium">{fillPercent}%</span>
+                          </div>
+                          {/* Participant progress bar */}
+                          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                fillPercent === 100
+                                  ? "bg-gradient-to-r from-red-400 to-red-500"
+                                  : fillPercent >= 75
+                                    ? "bg-gradient-to-r from-amber-400 to-amber-500"
+                                    : "bg-gradient-to-r from-emerald-400 to-emerald-500"
+                              }`}
+                              style={{ width: `${fillPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-slate-500">Premiacao</p>
-                      <p className="text-sm font-semibold text-amber-600 flex items-center gap-1">
-                        <Coins className="w-3.5 h-3.5" />
-                        {tournament.prizePool.toLocaleString()}
-                      </p>
+
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          tournament.entryFee > 0
+                            ? "bg-slate-100"
+                            : "bg-emerald-50"
+                        }`}>
+                          <Ticket className={`w-4 h-4 ${
+                            tournament.entryFee > 0
+                              ? "text-slate-500"
+                              : "text-emerald-600"
+                          }`} />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500">Inscricao</p>
+                          {tournament.entryFee > 0 ? (
+                            <p className="text-sm font-semibold text-slate-900">
+                              {tournament.entryFee} GCoins
+                            </p>
+                          ) : (
+                            <span className="inline-block px-2 py-0.5 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-full ring-1 ring-emerald-200/50">
+                              Gratis
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500">Premiacao</p>
+                          <p className="text-sm font-semibold text-amber-600">
+                            {tournament.prizePool.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
+                          <Trophy className="w-4 h-4 text-amber-500" />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
+                  </Card>
+                </Link>
+              );
+            })}
           </div>
         )}
       </Tabs>

@@ -89,7 +89,7 @@ function HeroSection() {
         <div className="mx-auto max-w-4xl text-center">
           {/* Badge */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400 animate-fade-in">
-            <Zap className="h-4 w-4" />
+            <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
             <span>Plataforma #1 de esportes no Brasil</span>
           </div>
 
@@ -109,14 +109,14 @@ function HeroSection() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row animate-slide-up animate-delay-200">
             <a
               href="/register"
-              className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:from-emerald-500 hover:to-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-1"
             >
               Criar Conta Grátis
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </a>
             <a
               href="#como-funciona"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-600 px-8 py-4 text-lg font-semibold text-slate-300 transition-all duration-300 hover:border-slate-400 hover:text-white hover:bg-white/5"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 backdrop-blur-sm px-8 py-4 text-lg font-bold text-white transition-all duration-300 hover:border-white/40 hover:bg-white/10"
             >
               <Play className="h-5 w-5" />
               Saiba Mais
@@ -657,7 +657,7 @@ function CTASection() {
 
           <a
             href="/register"
-            className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-10 py-5 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
+            className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 px-10 py-5 text-lg font-bold text-white shadow-xl shadow-emerald-500/25 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/30 hover:-translate-y-1"
           >
             Criar Minha Conta Grátis
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
