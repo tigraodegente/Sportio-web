@@ -69,7 +69,7 @@ const USER_TYPE_ICON_MAP: Record<string, LucideIcon> = {
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0a0f1a] pt-24 pb-16 sm:pt-32 sm:pb-20 lg:min-h-screen lg:flex lg:items-center lg:py-0">
+    <section className="relative overflow-hidden bg-[#0a0f1a] pt-28 pb-20 sm:pt-36 sm:pb-28 lg:min-h-screen lg:flex lg:items-center lg:py-0">
       {/* Animated gradient orbs */}
       <div className="absolute inset-0">
         <div className="absolute top-[-20%] left-[-10%] h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] rounded-full bg-emerald-600/20 blur-[120px] animate-float" />
@@ -125,13 +125,13 @@ function HeroSection() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.15] mb-5">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6">
               Transforme{" "}
               <span className="text-gradient-hero">Esporte</span>
               {" "}em Renda Real
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl text-slate-400 mb-8 max-w-xl leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-slate-400 mb-10 max-w-xl leading-relaxed">
               Junte-se a <span className="text-white font-semibold">12.500+ atletas</span> que já transformam paixão em lucro real. Ganhe <span className="text-amber-400 font-semibold">GCoins</span> competindo no que você ama.
             </p>
 
@@ -210,7 +210,7 @@ function HeroSection() {
         </div>
 
         {/* Stats bar */}
-        <div className="mt-10 sm:mt-16 lg:mt-24">
+        <div className="mt-14 sm:mt-20 lg:mt-24">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
             {[
               { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-emerald-400 to-emerald-600" },
@@ -249,7 +249,7 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section id="como-funciona" className="relative py-16 sm:py-24 lg:py-28 bg-white overflow-hidden">
+    <section id="como-funciona" className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
@@ -314,14 +314,14 @@ function HowItWorksSection() {
 
 function GCoinsEconomySection() {
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-[#0a0f1a] overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#0a0f1a] overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-emerald-600/10 blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="text-center mb-10 sm:mb-16">
+        <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 mb-4 sm:mb-6">
             <BadgeDollarSign className="h-4 w-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-300">Economia digital</span>
@@ -424,7 +424,7 @@ function SportsGridSection() {
   };
 
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 mb-4 sm:mb-6">
@@ -439,29 +439,26 @@ function SportsGridSection() {
           </p>
         </div>
 
-        {/* Mobile: compact list */}
-        <div className="space-y-3 sm:hidden">
+        {/* Mobile: compact 3-col icon grid */}
+        <div className="grid grid-cols-3 gap-3 sm:hidden">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
             const colors = sportColors[sport.color] || sportColors["text-emerald-500"];
             return (
               <div
                 key={sport.id}
-                className={cn("flex items-center gap-4 rounded-2xl border bg-white p-4 shadow-sm", colors.border)}
+                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white p-4 shadow-sm", colors.border)}
               >
-                <div className={cn("shrink-0 flex h-11 w-11 items-center justify-center rounded-xl", colors.bg)}>
-                  <IconComponent className={cn("h-5 w-5", colors.text)} />
+                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-2", colors.bg)}>
+                  <IconComponent className={cn("h-6 w-6", colors.text)} />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-gray-900">{sport.name}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-1">{sport.description}</p>
-                </div>
+                <h3 className="text-xs font-bold text-gray-900 leading-tight">{sport.name}</h3>
               </div>
             );
           })}
         </div>
 
-        {/* Desktop: grid */}
+        {/* Desktop: grid with descriptions */}
         <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
@@ -511,7 +508,7 @@ function UserTypesSection() {
   };
 
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-[#0a0f1a] overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#0a0f1a] overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-1/3 left-0 h-72 w-72 rounded-full bg-purple-600/10 blur-[100px]" />
         <div className="absolute bottom-1/3 right-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[100px]" />
@@ -531,7 +528,8 @@ function UserTypesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Mobile: compact 2-col grid */}
+        <div className="grid grid-cols-2 gap-3 sm:hidden">
           {USER_TYPES.map((userType) => {
             const IconComponent = USER_TYPE_ICON_MAP[userType.icon] || Users;
             const colors = typeColors[userType.color] || typeColors["text-emerald-500"];
@@ -539,21 +537,39 @@ function UserTypesSection() {
               <a
                 key={userType.id}
                 href={userType.href}
-                className="group flex items-start gap-4 sm:block rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 sm:p-8 transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:-translate-y-1 sm:hover:-translate-y-2 hover:shadow-2xl"
+                className="group flex flex-col items-center text-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 transition-all duration-300 hover:bg-white/10"
               >
-                <div className={cn("shrink-0 sm:mb-6 inline-flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br shadow-lg", colors.gradient)}>
-                  <IconComponent className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+                <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", colors.gradient)}>
+                  <IconComponent className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-sm font-bold text-white leading-tight">{userType.name}</h3>
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Desktop: full cards */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {USER_TYPES.map((userType) => {
+            const IconComponent = USER_TYPE_ICON_MAP[userType.icon] || Users;
+            const colors = typeColors[userType.color] || typeColors["text-emerald-500"];
+            return (
+              <a
+                key={userType.id}
+                href={userType.href}
+                className="group rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-2xl"
+              >
+                <div className={cn("mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg", colors.gradient)}>
+                  <IconComponent className="h-7 w-7 text-white" />
                 </div>
 
-                <div className="min-w-0">
-                  <h3 className="text-base sm:text-xl font-bold text-white sm:mb-3">{userType.name}</h3>
-                  <p className="text-sm sm:text-base text-slate-400 leading-relaxed mt-1 sm:mb-6">{userType.description}</p>
+                <h3 className="text-xl font-bold text-white mb-3">{userType.name}</h3>
+                <p className="text-slate-400 leading-relaxed mb-6">{userType.description}</p>
 
-                  <span className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 transition-all group-hover:gap-3">
-                    Saiba mais
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                </div>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 transition-all group-hover:gap-3">
+                  Saiba mais
+                  <ArrowRight className="h-4 w-4" />
+                </span>
               </a>
             );
           })}
@@ -593,7 +609,7 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-white overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
@@ -651,7 +667,7 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
@@ -730,7 +746,7 @@ function FAQSection() {
   ];
 
   return (
-    <section className="relative py-16 sm:py-24 lg:py-28 bg-gray-50 overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gray-50 overflow-hidden">
       <div className="relative mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3">
