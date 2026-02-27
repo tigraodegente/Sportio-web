@@ -1,9 +1,63 @@
 import { z } from "zod";
 import { eq, ilike, desc, sql } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { users, userRoles, userSports, followers, sports } from "@/server/db/schema";
+import bcrypt from "bcryptjs";
 
 export const userRouter = createTRPCRouter({
+  // Register new user
+  register: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(2).max(255),
+        email: z.string().email(),
+        password: z.string().min(8),
+        roles: z.array(
+          z.enum(["athlete", "organizer", "brand", "fan", "bettor", "referee", "trainer", "nutritionist", "photographer", "arena_owner"])
+        ).min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.db.query.users.findFirst({
+        where: eq(users.email, input.email),
+      });
+
+      if (existing) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Este email ja esta cadastrado",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(input.password, 12);
+
+      const [user] = await ctx.db
+        .insert(users)
+        .values({
+          name: input.name,
+          email: input.email,
+          password: hashedPassword,
+        })
+        .returning();
+
+      if (!user) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Erro ao criar conta",
+        });
+      }
+
+      for (const role of input.roles) {
+        await ctx.db
+          .insert(userRoles)
+          .values({ userId: user.id, role })
+          .onConflictDoNothing();
+      }
+
+      return { id: user.id, email: user.email };
+    }),
+
   // Get current user profile
   me: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.query.users.findFirst({

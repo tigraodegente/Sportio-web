@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Coins, Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Heart, Target, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
 const roles = [
   { id: "athlete", label: "Atleta", icon: Trophy, description: "Competir em torneios e ganhar GCoins" },
@@ -16,12 +20,17 @@ const roles = [
   { id: "referee", label: "Arbitro", icon: Shield, description: "Validar partidas e resultados" },
 ];
 
+type RoleId = "athlete" | "organizer" | "brand" | "fan" | "bettor" | "referee";
+
 export default function RegisterPage() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+
+  const registerMutation = trpc.user.register.useMutation();
 
   const toggleRole = (roleId: string) => {
     setSelectedRoles((prev) =>
@@ -35,9 +44,41 @@ export default function RegisterPage() {
       setStep(2);
       return;
     }
+
     setLoading(true);
-    // TODO: Create account via tRPC/NextAuth
-    setTimeout(() => setLoading(false), 1000);
+
+    try {
+      await registerMutation.mutateAsync({
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        roles: selectedRoles as RoleId[],
+      });
+
+      const result = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.success("Conta criada! Faca login para continuar.");
+        router.push("/login");
+      } else {
+        toast.success("Conta criada com sucesso!");
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erro ao criar conta";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   return (
@@ -62,7 +103,7 @@ export default function RegisterPage() {
       {step === 1 ? (
         <>
           {/* Google Signup */}
-          <Button variant="outline" size="lg" className="w-full mb-6">
+          <Button variant="outline" size="lg" className="w-full mb-6" onClick={handleGoogleSignIn}>
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />

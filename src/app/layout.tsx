@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import { TRPCProvider } from "@/lib/trpc-provider";
 import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -51,9 +54,14 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="min-h-screen bg-white text-gray-900 antialiased">
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SessionProvider>
+          <TRPCProvider>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <Toaster richColors position="top-right" />
+          </TRPCProvider>
+        </SessionProvider>
       </body>
     </html>
   );
