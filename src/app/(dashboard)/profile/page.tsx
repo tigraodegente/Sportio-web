@@ -84,21 +84,21 @@ export default function ProfilePage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-4 border-t border-slate-100">
           <div className="text-center">
-            <p className="text-xl font-bold text-slate-900">{profile.stats.followers.toLocaleString()}</p>
+            <p className="text-lg sm:text-xl font-bold text-slate-900">{profile.stats.followers.toLocaleString()}</p>
             <p className="text-xs text-slate-500">Seguidores</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-slate-900">{profile.stats.following}</p>
+            <p className="text-lg sm:text-xl font-bold text-slate-900">{profile.stats.following}</p>
             <p className="text-xs text-slate-500">Seguindo</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-slate-900">{profile.stats.tournaments}</p>
+            <p className="text-lg sm:text-xl font-bold text-slate-900">{profile.stats.tournaments}</p>
             <p className="text-xs text-slate-500">Torneios</p>
           </div>
           <div className="text-center">
-            <p className="text-xl font-bold text-amber-600">{profile.stats.gcoins.toLocaleString()}</p>
+            <p className="text-lg sm:text-xl font-bold text-amber-600">{profile.stats.gcoins.toLocaleString()}</p>
             <p className="text-xs text-slate-500">GCoins</p>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function ProfilePage() {
         {(tab) => (
           <>
             {tab === "sports" && (
-              <div className="grid sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {profile.sports.map((sport) => (
                   <Card key={sport.name} hover>
                     <div className="flex items-center justify-between mb-3">

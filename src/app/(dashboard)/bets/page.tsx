@@ -46,7 +46,7 @@ export default function BetsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatsCard title="Taxa de Acerto" value="67%" changeType="positive" change="+5% este mes" icon={<Target className="w-5 h-5" />} />
         <StatsCard title="Lucro Total" value="1.280" changeType="positive" change="GCoins ganhos" icon={<TrendingUp className="w-5 h-5" />} />
         <StatsCard title="Total de Palpites" value="48" changeType="neutral" change="32 ganhos, 16 perdidos" icon={<Swords className="w-5 h-5" />} />
@@ -61,8 +61,8 @@ export default function BetsPage() {
         </div>
         <div className="space-y-3">
           {liveMatches.map((match) => (
-            <div key={match.id} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="flex-1">
+            <div key={match.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="flex-1 min-w-0">
                 <p className="text-xs text-slate-500 mb-1">{match.tournament} &middot; {match.sport}</p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 text-right">
@@ -104,16 +104,16 @@ export default function BetsPage() {
                 .filter((b) => tab === "all" || b.result === tab)
                 .map((bet) => (
                   <div key={bet.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       {resultIcons[bet.result as keyof typeof resultIcons]}
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{bet.match}</p>
-                        <p className="text-xs text-slate-500">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate">{bet.match}</p>
+                        <p className="text-xs text-slate-500 truncate">
                           Palpite: {bet.prediction} &middot; Odds {bet.odds}x &middot; {bet.date}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p className="text-sm font-semibold text-slate-900">{bet.amount} GC</p>
                       <p className={`text-xs ${bet.result === "won" ? "text-green-600" : bet.result === "lost" ? "text-red-600" : "text-blue-600"}`}>
                         {bet.result === "won" ? `+${bet.potentialWin} GC` : bet.result === "lost" ? "Perdeu" : `Potencial: +${bet.potentialWin}`}

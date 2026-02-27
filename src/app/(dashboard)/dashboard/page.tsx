@@ -36,7 +36,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatsCard
           title="GCoins (Real)"
           value="1.250,00"
@@ -83,13 +83,13 @@ export default function DashboardPage() {
                   key={t.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
                 >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{t.name}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-900 truncate">{t.name}</p>
                     <p className="text-xs text-slate-500">
                       {t.sport} &middot; {t.date}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <Badge variant={statusMap[t.status]?.variant}>
                       {statusMap[t.status]?.label}
                     </Badge>
@@ -118,8 +118,8 @@ export default function DashboardPage() {
                   key={bet.id}
                   className="flex items-center justify-between p-3 rounded-lg bg-slate-50"
                 >
-                  <div>
-                    <p className="text-sm font-medium text-slate-900">{bet.match}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-900 truncate">{bet.match}</p>
                     <p className="text-xs text-slate-500">
                       {bet.amount} GCoins &middot; Odds {bet.odds}x
                     </p>

@@ -48,7 +48,7 @@ export default function GCoinsPage() {
       </div>
 
       {/* Balance Cards */}
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-emerald-600 to-emerald-800 text-white border-0">
           <p className="text-emerald-200 text-sm">GCoins Reais</p>
           <p className="text-3xl font-bold mt-1">1.250,00</p>
@@ -76,7 +76,7 @@ export default function GCoinsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatsCard title="Ganho este mes" value="2.840" changeType="positive" change="+32% vs mes anterior" icon={<TrendingUp className="w-5 h-5" />} />
         <StatsCard title="Gasto este mes" value="250" changeType="negative" change="Em inscricoes e palpites" icon={<ArrowDownRight className="w-5 h-5" />} />
         <StatsCard title="Transferencias" value="3" changeType="neutral" change="Enviadas este mes" icon={<Send className="w-5 h-5" />} />
@@ -102,9 +102,9 @@ export default function GCoinsPage() {
                 .filter((t) => tab === "all" || t.type === tab)
                 .map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${
                           tx.amount > 0 ? "bg-green-100" : "bg-red-100"
                         }`}
                       >
@@ -114,14 +114,14 @@ export default function GCoinsPage() {
                           <ArrowDownRight className="w-5 h-5 text-red-600" />
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{tx.description}</p>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate">{tx.description}</p>
                         <p className="text-xs text-slate-500">
                           {categoryLabels[tx.category] || tx.category} &middot; {tx.date}
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p
                         className={`text-sm font-semibold ${
                           tx.amount > 0 ? "text-green-600" : "text-red-600"
@@ -144,7 +144,7 @@ export default function GCoinsPage() {
       <Modal isOpen={showBuyModal} onClose={() => setShowBuyModal(false)} title="Comprar GCoins">
         <div className="space-y-4">
           <p className="text-sm text-slate-500">Selecione o valor que deseja comprar:</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[100, 250, 500, 1000, 2500, 5000].map((amount) => (
               <button
                 key={amount}

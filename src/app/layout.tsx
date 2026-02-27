@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { TRPCProvider } from "@/lib/trpc-provider";
-import { Header } from "@/components/shared/header";
-import { Footer } from "@/components/shared/footer";
+import { LayoutWrapper } from "@/components/shared/layout-wrapper";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -56,9 +55,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-white text-gray-900 antialiased">
         <SessionProvider>
           <TRPCProvider>
-            <Header />
-            <main>{children}</main>
-            <Footer />
+            <LayoutWrapper>{children}</LayoutWrapper>
             <Toaster richColors position="top-right" />
           </TRPCProvider>
         </SessionProvider>

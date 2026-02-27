@@ -56,7 +56,7 @@ export default function CreateTournamentPage() {
           <CardContent className="mt-4 space-y-4">
             <Input label="Nome do Torneio" placeholder="Ex: Copa Beach Tennis SP 2025" required />
             <Textarea label="Descricao" placeholder="Descreva seu torneio..." rows={4} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select label="Esporte" options={sportOptions} placeholder="Selecione" required />
               <Select
                 label="Formato"
@@ -87,11 +87,11 @@ export default function CreateTournamentPage() {
         <Card>
           <CardTitle>Participantes e Premiacao</CardTitle>
           <CardContent className="mt-4 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Minimo de Participantes" type="number" min={2} defaultValue={4} />
               <Input label="Maximo de Participantes" type="number" min={2} max={256} defaultValue={32} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Taxa de Inscricao (GCoins)" type="number" min={0} defaultValue={0} />
               <Input label="Premiacao Total (GCoins)" type="number" min={0} defaultValue={0} />
             </div>
@@ -108,12 +108,12 @@ export default function CreateTournamentPage() {
                 <span className="text-sm text-slate-700">Torneio Online</span>
               </label>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input label="Cidade" placeholder="Ex: Sao Paulo" />
               <Input label="Estado" placeholder="Ex: SP" />
             </div>
             <Input label="Endereco" placeholder="Endereco do local" />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Input label="Data Inicio" type="date" />
               <Input label="Data Fim" type="date" />
               <Input label="Prazo Inscricao" type="date" />
