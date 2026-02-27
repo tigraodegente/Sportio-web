@@ -20,7 +20,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-slate-100">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-8 lg:px-10">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md shadow-emerald-500/20">
             <Coins className="h-5 w-5" />
@@ -67,7 +67,7 @@ export function Header() {
           mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0 border-t-0"
         )}
       >
-        <div className="space-y-0.5 px-4 py-3">
+        <div className="space-y-0.5 px-6 py-3">
           {navLinks.map((link) => (
             <Link
               key={link.href}
