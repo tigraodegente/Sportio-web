@@ -32,15 +32,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile || pnpm install
 
+      - name: Load environment variables
+        run: |
+          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          elif [ -f .env ]; then
+            grep -E '^DATABASE_URL=' .env >> $GITHUB_ENV
+            echo "Loaded DATABASE_URL from .env file"
+          else
+            echo "ERROR: DATABASE_URL not found" && exit 1
+          fi
+
       - name: Push schema to database
         run: pnpm db:push
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Seed database
         run: pnpm db:seed
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Success
         run: echo "Database setup completed successfully!"
