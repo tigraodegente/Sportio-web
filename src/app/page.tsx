@@ -111,7 +111,7 @@ function HeroSection() {
         ))}
       </div>
 
-      <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left content */}
           <div>
@@ -252,7 +252,7 @@ function HowItWorksSection() {
     <section id="como-funciona" className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 mb-4 sm:mb-6">
             <Rocket className="h-4 w-4 text-emerald-600" />
@@ -320,7 +320,7 @@ function GCoinsEconomySection() {
         <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-12 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 mb-4 sm:mb-6">
             <BadgeDollarSign className="h-4 w-4 text-amber-400" />
@@ -425,7 +425,7 @@ function SportsGridSection() {
 
   return (
     <section className="relative py-20 sm:py-28 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 mb-4 sm:mb-6">
             <Sparkles className="h-4 w-4 text-blue-600" />
@@ -447,7 +447,7 @@ function SportsGridSection() {
             return (
               <div
                 key={sport.id}
-                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white py-5 px-3 shadow-sm", colors.border)}
+                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white py-5 px-4 shadow-sm", colors.border)}
               >
                 <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-3", colors.bg)}>
                   <IconComponent className={cn("h-6 w-6", colors.text)} />
@@ -514,7 +514,7 @@ function UserTypesSection() {
         <div className="absolute bottom-1/3 right-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[100px]" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-2 mb-4 sm:mb-6">
             <Users className="h-4 w-4 text-purple-400" />
@@ -612,7 +612,7 @@ function TestimonialsSection() {
     <section className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 mb-4 sm:mb-6">
             <Star className="h-4 w-4 text-amber-600" />
@@ -673,7 +673,7 @@ function CTASection() {
         <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-4xl px-5 sm:px-6 lg:px-8 text-center">
+      <div className="relative mx-auto max-w-4xl px-6 sm:px-8 lg:px-10 text-center">
         <div className="mb-6 sm:mb-8 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-sm shadow-2xl">
           <Coins className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
         </div>
@@ -682,7 +682,7 @@ function CTASection() {
           Comece a Ganhar com Seu Esporte Hoje
         </h2>
 
-        <p className="text-sm sm:text-xl text-white/80 mb-8 sm:mb-10 max-w-2xl mx-auto">
+        <p className="text-base sm:text-xl text-white/80 mb-8 sm:mb-10 max-w-2xl mx-auto">
           Cadastro gratuito, sem cartão de crédito. Ganhe GCoins instantaneamente.
         </p>
 
@@ -747,7 +747,7 @@ function FAQSection() {
 
   return (
     <section className="relative py-20 sm:py-28 lg:py-32 bg-gray-50 overflow-hidden">
-      <div className="relative mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-3xl px-6 sm:px-8 lg:px-10">
         <div className="text-center mb-10 sm:mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
             Perguntas <span className="text-gradient-primary">Frequentes</span>
