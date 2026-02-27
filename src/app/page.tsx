@@ -94,13 +94,13 @@ function HeroSection() {
           </div>
 
           {/* Main Headline */}
-          <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-slide-up">
+          <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-slide-up">
             Transforme Esporte em{" "}
             <span className="text-gradient-hero">Renda Real</span>
           </h1>
 
           {/* Subtitle */}
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-slate-300 sm:text-xl animate-slide-up animate-delay-100">
+          <p className="mx-auto mb-10 max-w-2xl text-base text-slate-300 sm:text-xl animate-slide-up animate-delay-100">
             A plataforma esportiva que transforma paixão em lucro real.
             Junte-se a mais de 12.500 atletas que já estão ganhando.
           </p>
@@ -127,7 +127,7 @@ function HeroSection() {
         {/* Stats Bar */}
         <div className="mt-16 sm:mt-20 animate-slide-up animate-delay-300">
           <div className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 sm:gap-8">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-8">
               {[
                 { value: "12.500+", label: "Atletas", icon: Users },
                 { value: "850", label: "Torneios/mês", icon: Trophy },
@@ -138,7 +138,7 @@ function HeroSection() {
                   <div className="mb-2 flex justify-center">
                     <stat.icon className="h-6 w-6 text-emerald-400" />
                   </div>
-                  <div className="text-2xl font-bold text-white sm:text-3xl">
+                  <div className="text-xl font-bold text-white sm:text-3xl">
                     {stat.value}
                   </div>
                   <div className="mt-1 text-sm text-slate-400">
@@ -187,14 +187,14 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section id="como-funciona" className="bg-white py-20 sm:py-24">
+    <section id="como-funciona" className="bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
             Simples e rápido
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             Como Funciona
           </h2>
           <p className="text-lg text-gray-600">
@@ -203,7 +203,7 @@ function HowItWorksSection() {
         </div>
 
         {/* Steps */}
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-4 sm:mt-16 sm:gap-8 lg:grid-cols-4">
           {steps.map((step, index) => (
             <div key={step.number} className="relative text-center">
               {/* Connector line (hidden on mobile and last item) */}
@@ -243,14 +243,14 @@ function HowItWorksSection() {
 
 function GCoinsEconomySection() {
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-20 sm:py-24">
+    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-amber-600">
             Economia digital
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             A Economia do Sportio
           </h2>
           <p className="text-lg text-gray-600">
@@ -261,7 +261,7 @@ function GCoinsEconomySection() {
         {/* Cards */}
         <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* GCoins Reais Card */}
-          <div className="group relative overflow-hidden rounded-2xl border border-emerald-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10 sm:p-10">
+          <div className="group relative overflow-hidden rounded-xl border border-emerald-200 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-lg hover:shadow-emerald-500/10 lg:p-10">
             {/* Decorative gradient */}
             <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:h-40 group-hover:w-40 group-hover:bg-emerald-500/10" />
 
@@ -306,7 +306,7 @@ function GCoinsEconomySection() {
           </div>
 
           {/* GCoins Gamificação Card */}
-          <div className="group relative overflow-hidden rounded-2xl border border-amber-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 sm:p-10">
+          <div className="group relative overflow-hidden rounded-xl border border-amber-200 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-lg hover:shadow-amber-500/10 lg:p-10">
             {/* Decorative gradient */}
             <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-amber-500/5 blur-2xl transition-all duration-500 group-hover:h-40 group-hover:w-40 group-hover:bg-amber-500/10" />
 
@@ -361,14 +361,14 @@ function GCoinsEconomySection() {
 
 function SportsGridSection() {
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
             Variedade para todos
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             13 Esportes Para Você
           </h2>
           <p className="text-lg text-gray-600">
@@ -378,18 +378,18 @@ function SportsGridSection() {
         </div>
 
         {/* Sports Grid */}
-        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-2 gap-3 sm:mt-16 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
             return (
               <div
                 key={sport.id}
-                className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
+                className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-6 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
               >
                 {/* Icon */}
                 <div
                   className={cn(
-                    "mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110",
+                    "mb-3 flex h-10 w-10 items-center justify-center rounded-lg transition-transform duration-300 sm:mb-4 sm:h-12 sm:w-12 sm:rounded-xl group-hover:scale-110",
                     sport.color === "text-emerald-500" && "bg-emerald-100",
                     sport.color === "text-amber-500" && "bg-amber-100",
                     sport.color === "text-blue-500" && "bg-blue-100",
@@ -409,12 +409,12 @@ function SportsGridSection() {
                 </div>
 
                 {/* Name */}
-                <h3 className="mb-1 text-lg font-semibold text-gray-900">
+                <h3 className="mb-1 text-base font-semibold text-gray-900 sm:text-lg">
                   {sport.name}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm leading-relaxed text-gray-500 line-clamp-2">
+                <p className="text-xs leading-relaxed text-gray-500 line-clamp-2 sm:text-sm">
                   {sport.description}
                 </p>
               </div>
@@ -432,14 +432,14 @@ function SportsGridSection() {
 
 function UserTypesSection() {
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-20 sm:py-24">
+    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
             Para cada perfil
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             Há um Lugar para Você no Sportio
           </h2>
           <p className="text-lg text-gray-600">
@@ -457,7 +457,7 @@ function UserTypesSection() {
               <a
                 key={userType.id}
                 href={userType.href}
-                className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
+                className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
               >
                 {/* Decorative corner accent */}
                 <div
@@ -548,14 +548,14 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
             Depoimentos
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             Quem Já Está Ganhando
           </h2>
           <p className="text-lg text-gray-600">
@@ -568,7 +568,7 @@ function TestimonialsSection() {
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.author}
-              className="relative rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-md"
+              className="relative rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-md"
             >
               {/* Quote mark decorative */}
               <div className="absolute -top-3 left-8 text-5xl font-serif text-emerald-200 select-none">
@@ -622,7 +622,7 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 py-20 sm:py-24">
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 py-12 sm:py-20 lg:py-24">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -left-20 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
@@ -723,14 +723,14 @@ function FAQSection() {
   ];
 
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-20 sm:py-24">
+    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
             Tire suas dúvidas
           </span>
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             Perguntas Frequentes
           </h2>
           <p className="text-lg text-gray-600">

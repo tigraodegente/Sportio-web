@@ -41,11 +41,11 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <button className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+          <Link href="/login" className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
             Entrar
-          </button>
+          </Link>
           <Link
-            href="#cadastro"
+            href="/register"
             className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/25"
           >
             Criar Conta Grátis
@@ -79,11 +79,15 @@ export function Header() {
             </Link>
           ))}
           <div className="mt-3 flex flex-col gap-2 border-t border-gray-100 pt-3">
-            <button className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50">
-              Entrar
-            </button>
             <Link
-              href="#cadastro"
+              href="/login"
+              className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50"
+              onClick={() => setMobileOpen(false)}
+            >
+              Entrar
+            </Link>
+            <Link
+              href="/register"
               className="rounded-lg bg-emerald-500 px-3 py-2.5 text-center text-sm font-semibold text-white"
               onClick={() => setMobileOpen(false)}
             >

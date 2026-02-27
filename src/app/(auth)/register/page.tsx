@@ -166,7 +166,7 @@ export default function RegisterPage() {
         </>
       ) : (
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-2 gap-2 mb-6 sm:gap-3">
             {roles.map((role) => {
               const Icon = role.icon;
               const isSelected = selectedRoles.includes(role.id);
@@ -176,15 +176,15 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => toggleRole(role.id)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-center",
+                    "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center sm:gap-2 sm:p-4",
                     isSelected
                       ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                       : "border-slate-200 hover:border-slate-300 text-slate-600"
                   )}
                 >
-                  <Icon className="w-6 h-6" />
-                  <span className="text-sm font-medium">{role.label}</span>
-                  <span className="text-xs opacity-70">{role.description}</span>
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <span className="text-xs font-medium sm:text-sm">{role.label}</span>
+                  <span className="text-[10px] leading-tight opacity-70 sm:text-xs">{role.description}</span>
                 </button>
               );
             })}
