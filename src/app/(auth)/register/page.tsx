@@ -84,9 +84,12 @@ export default function RegisterPage() {
   return (
     <div>
       {/* Mobile logo */}
-      <div className="lg:hidden flex items-center gap-2 mb-8">
-        <Coins className="w-8 h-8 text-emerald-600" />
-        <span className="text-2xl font-bold text-slate-900">Sportio</span>
+      <div className="lg:hidden flex items-center gap-3 mb-8">
+        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-emerald-800 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/20">
+          <Coins className="w-6 h-6 text-white drop-shadow-sm" />
+          <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
+        </div>
+        <span className="text-2xl font-bold text-slate-900 tracking-tight">Sportio</span>
       </div>
 
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Crie sua conta</h2>
@@ -96,8 +99,28 @@ export default function RegisterPage() {
 
       {/* Progress steps */}
       <div className="flex items-center gap-2 mb-8">
-        <div className={cn("h-1 flex-1 rounded-full", step >= 1 ? "bg-emerald-600" : "bg-slate-200")} />
-        <div className={cn("h-1 flex-1 rounded-full", step >= 2 ? "bg-emerald-600" : "bg-slate-200")} />
+        <div className="flex items-center gap-2 flex-1">
+          <div className={cn(
+            "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
+            step >= 1
+              ? "bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/20"
+              : "bg-slate-100 text-slate-400 border border-slate-200"
+          )}>1</div>
+          <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
+            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-emerald-500 to-emerald-600" : "w-0")} />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 flex-1">
+          <div className={cn(
+            "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
+            step >= 2
+              ? "bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/20"
+              : "bg-slate-100 text-slate-400 border border-slate-200"
+          )}>2</div>
+          <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
+            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-emerald-500 to-emerald-600" : "w-0")} />
+          </div>
+        </div>
       </div>
 
       {step === 1 ? (
@@ -118,7 +141,7 @@ export default function RegisterPage() {
               <div className="w-full border-t border-slate-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-slate-50 text-slate-500">ou cadastre com email</span>
+              <span className="px-4 bg-white text-slate-500">ou cadastre com email</span>
             </div>
           </div>
 
@@ -178,8 +201,8 @@ export default function RegisterPage() {
                   className={cn(
                     "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center sm:gap-2 sm:p-4",
                     isSelected
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                      : "border-slate-200 hover:border-slate-300 text-slate-600"
+                      ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-500/10 ring-1 ring-emerald-600/20"
+                      : "border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-600"
                   )}
                 >
                   <Icon className="w-5 h-5 sm:w-6 sm:h-6" />

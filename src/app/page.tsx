@@ -30,12 +30,13 @@ import {
   Play,
   Sun,
   Circle,
+  Sparkles,
+  BadgeDollarSign,
+  Crown,
+  Rocket,
+  Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-
-// ============================================
-// Icon Mapping
-// ============================================
 
 const SPORT_ICON_MAP: Record<string, LucideIcon> = {
   Goal: Target,
@@ -63,87 +64,334 @@ const USER_TYPE_ICON_MAP: Record<string, LucideIcon> = {
 };
 
 // ============================================
-// HERO Section
+// HERO Section - Completely Redesigned
 // ============================================
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 pt-24 pb-16 sm:pt-32 sm:pb-20">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-amber-500/10 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
+    <section className="relative overflow-hidden bg-[#0a0f1a] pt-28 pb-20 sm:pt-36 sm:pb-28 lg:min-h-screen lg:flex lg:items-center lg:py-0">
+      {/* Animated gradient orbs */}
+      <div className="absolute inset-0">
+        <div className="absolute top-[-20%] left-[-10%] h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] rounded-full bg-emerald-600/20 blur-[120px] animate-float" />
+        <div className="absolute bottom-[-20%] right-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-amber-500/15 blur-[100px] animate-float" style={{ animationDelay: "1.5s" }} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-400 animate-fade-in">
-            <Zap className="h-4 w-4" />
-            <span>Plataforma #1 de esportes no Brasil</span>
+      {/* Grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
+        }}
+      />
+
+      {/* Floating sport icons - hidden on mobile */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+        {[
+          { icon: "⚽", top: "15%", left: "8%", delay: "0s", size: "text-4xl" },
+          { icon: "🎾", top: "25%", right: "12%", delay: "1s", size: "text-3xl" },
+          { icon: "🏀", bottom: "30%", left: "15%", delay: "2s", size: "text-3xl" },
+          { icon: "🏆", top: "10%", right: "30%", delay: "2.5s", size: "text-3xl" },
+        ].map((item, i) => (
+          <div
+            key={i}
+            className={cn("absolute opacity-20 animate-float", item.size)}
+            style={{
+              top: item.top,
+              left: item.left,
+              right: item.right,
+              bottom: item.bottom,
+              animationDelay: item.delay,
+              animationDuration: "6s",
+            }}
+          >
+            {item.icon}
+          </div>
+        ))}
+      </div>
+
+      <div className="relative mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left content */}
+          <div>
+            {/* Badge */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="text-xs sm:text-sm font-medium text-emerald-300">Plataforma #1 de esportes no Brasil</span>
+            </div>
+
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6">
+              Transforme{" "}
+              <span className="text-gradient-hero">Esporte</span>
+              {" "}em Renda Real
+            </h1>
+
+            <p className="text-base sm:text-lg lg:text-xl text-slate-400 mb-10 max-w-xl leading-relaxed">
+              Junte-se a <span className="text-white font-semibold">12.500+ atletas</span> que já transformam paixão em lucro real. Ganhe <span className="text-amber-400 font-semibold">GCoins</span> competindo no que você ama.
+            </p>
+
+            {/* CTA */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href="/register"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-400 px-6 py-3.5 sm:px-8 sm:py-4 text-base sm:text-lg font-bold text-white shadow-2xl shadow-emerald-500/30 transition-all duration-300 hover:shadow-emerald-500/50 hover:-translate-y-1 overflow-hidden"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-emerald-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                <span className="relative flex items-center gap-2">
+                  Começar Grátis
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </a>
+              <a
+                href="#como-funciona"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm px-6 py-3.5 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+              >
+                <Play className="h-5 w-5" />
+                Como Funciona
+              </a>
+            </div>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-slide-up">
-            Transforme Esporte em{" "}
-            <span className="text-gradient-hero">Renda Real</span>
-          </h1>
+          {/* Right side - Stats cards floating (desktop only) */}
+          <div className="relative hidden lg:block">
+            <div className="relative h-[500px]">
+              <div className="absolute top-8 left-8 right-8 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                    <Trophy className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-400">Torneio Finalizado</p>
+                    <p className="text-xl font-bold text-white">Copa Sportio SP</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center">
+                    <p className="text-2xl font-bold text-emerald-400">R$ 5.000</p>
+                    <p className="text-xs text-slate-400 mt-1">Premiação</p>
+                  </div>
+                  <div className="flex-1 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 text-center">
+                    <p className="text-2xl font-bold text-amber-400">128</p>
+                    <p className="text-xs text-slate-400 mt-1">Atletas</p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Subtitle */}
-          <p className="mx-auto mb-10 max-w-2xl text-base text-slate-300 sm:text-xl animate-slide-up animate-delay-100">
-            A plataforma esportiva que transforma paixão em lucro real.
-            Junte-se a mais de 12.500 atletas que já estão ganhando.
-          </p>
+              <div className="absolute bottom-16 -left-4 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 shadow-2xl animate-float" style={{ animationDelay: "1s" }}>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                    <Coins className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">+250 GCoins</p>
+                    <p className="text-xs text-emerald-400">Vitória no torneio!</p>
+                  </div>
+                </div>
+              </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row animate-slide-up animate-delay-200">
-            <a
-              href="/register"
-              className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
-            >
-              Criar Conta Grátis
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </a>
-            <a
-              href="#como-funciona"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-600 px-8 py-4 text-lg font-semibold text-slate-300 transition-all duration-300 hover:border-slate-400 hover:text-white hover:bg-white/5"
-            >
-              <Play className="h-5 w-5" />
-              Saiba Mais
-            </a>
+              <div className="absolute bottom-8 right-0 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 shadow-2xl animate-float" style={{ animationDelay: "2s" }}>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                    <Crown className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">#3 Ranking</p>
+                    <p className="text-xs text-purple-400">Beach Tennis SP</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Stats Bar */}
-        <div className="mt-16 sm:mt-20 animate-slide-up animate-delay-300">
-          <div className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-8">
-              {[
-                { value: "12.500+", label: "Atletas", icon: Users },
-                { value: "850", label: "Torneios/mês", icon: Trophy },
-                { value: "500k+", label: "Usuários", icon: Target },
-                { value: "13", label: "Esportes", icon: Medal },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="mb-2 flex justify-center">
-                    <stat.icon className="h-6 w-6 text-emerald-400" />
+        {/* Stats bar */}
+        <div className="mt-14 sm:mt-20 lg:mt-24">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+            {[
+              { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-emerald-400 to-emerald-600" },
+              { value: "850+", label: "Torneios/mês", icon: Trophy, color: "from-amber-400 to-amber-600" },
+              { value: "R$ 2M+", label: "Em Premiações", icon: CircleDollarSign, color: "from-blue-400 to-blue-600" },
+              { value: "13", label: "Modalidades", icon: Medal, color: "from-purple-400 to-purple-600" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 sm:p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+              >
+                <div className={cn("mx-auto mb-3 flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                </div>
+                <div className="text-2xl sm:text-3xl font-black text-white">{stat.value}</div>
+                <div className="mt-1 text-xs sm:text-sm text-slate-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// HOW IT WORKS Section - Redesigned
+// ============================================
+
+function HowItWorksSection() {
+  const steps = [
+    { number: "01", title: "Crie sua conta", description: "Cadastro rápido em segundos, 100% gratuito", icon: UserPlus, color: "from-emerald-400 to-emerald-600" },
+    { number: "02", title: "Escolha o esporte", description: "13 modalidades disponíveis para você", icon: Medal, color: "from-blue-400 to-blue-600" },
+    { number: "03", title: "Participe e Compita", description: "Torneios, desafios e competições diárias", icon: Trophy, color: "from-purple-400 to-purple-600" },
+    { number: "04", title: "Ganhe GCoins", description: "Converta seus GCoins em dinheiro via PIX", icon: Coins, color: "from-amber-400 to-amber-600" },
+  ];
+
+  return (
+    <section id="como-funciona" className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
+
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 mb-4 sm:mb-6">
+            <Rocket className="h-4 w-4 text-emerald-600" />
+            <span className="text-sm font-semibold text-emerald-700">Simples e rápido</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
+            Como <span className="text-gradient-primary">Funciona</span>
+          </h2>
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
+            Em 4 passos simples você começa a ganhar com seu esporte favorito
+          </p>
+        </div>
+
+        <div className="space-y-4 sm:hidden">
+          {steps.map((step) => (
+            <div key={step.number} className="flex items-start gap-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className={cn("shrink-0 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", step.color)}>
+                <step.icon className="h-7 w-7 text-white" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Passo {step.number}</span>
+                <h3 className="text-lg font-bold text-gray-900 mt-1">{step.title}</h3>
+                <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          {steps.map((step, index) => (
+            <div key={step.number} className="group relative">
+              {index < steps.length - 1 && (
+                <div className="absolute top-12 left-[calc(50%+3rem)] hidden h-[2px] w-[calc(100%-6rem)] bg-gradient-to-r from-gray-200 to-gray-100 lg:block" />
+              )}
+
+              <div className="relative rounded-3xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2 hover:border-gray-200 overflow-hidden">
+                <span className="absolute -top-2 -right-1 text-7xl font-black text-gray-50 select-none group-hover:text-emerald-50 transition-colors">
+                  {step.number}
+                </span>
+
+                <div className={cn("relative mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg transition-transform duration-300 group-hover:scale-110", step.color)}>
+                  <step.icon className="h-8 w-8 text-white" />
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-gray-500 leading-relaxed">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// GCOINS ECONOMY Section - Redesigned
+// ============================================
+
+function GCoinsEconomySection() {
+  return (
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#0a0f1a] overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-emerald-600/10 blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[120px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 mb-4 sm:mb-6">
+            <BadgeDollarSign className="h-4 w-4 text-amber-400" />
+            <span className="text-sm font-semibold text-amber-300">Economia digital</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
+            A Economia do <span className="text-gradient-hero">Sportio</span>
+          </h2>
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
+            Dois tipos de GCoins para maximizar seus ganhos e recompensas
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          {/* GCoins Reais */}
+          <div className="group relative rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 backdrop-blur-sm p-7 sm:p-10 transition-all duration-500 hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/10">
+            <div className="flex items-center gap-4 mb-6 sm:mb-8">
+              <div className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30">
+                <CircleDollarSign className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">GCoins Reais</h3>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 mt-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  Dinheiro de verdade
+                </span>
+              </div>
+            </div>
+
+            <p className="text-base text-slate-300 mb-6 sm:mb-8 leading-relaxed">
+              Ganhe dinheiro de verdade praticando esporte. Converta GCoins para sua conta via <span className="text-emerald-400 font-semibold">PIX instantâneo</span>.
+            </p>
+
+            <div className="space-y-4">
+              {["Vitórias em torneios", "Prêmios de competições", "Assinaturas de torcedores", "Saque via PIX instantâneo"].map((item) => (
+                <div key={item} className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20">
+                    <Check className="h-4 w-4 text-emerald-400" />
                   </div>
-                  <div className="text-xl font-bold text-white sm:text-3xl">
-                    {stat.value}
+                  <span className="text-base text-slate-300">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* GCoins Gamificação */}
+          <div className="group relative rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm p-7 sm:p-10 transition-all duration-500 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/10">
+            <div className="flex items-center gap-4 mb-6 sm:mb-8">
+              <div className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30">
+                <Gift className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">GCoins Gamificação</h3>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-300 mt-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  Recompensas e vantagens
+                </span>
+              </div>
+            </div>
+
+            <p className="text-base text-slate-300 mb-6 sm:mb-8 leading-relaxed">
+              Ganhe recompensas por participar da comunidade. Troque por <span className="text-amber-400 font-semibold">produtos exclusivos</span> e vantagens especiais.
+            </p>
+
+            <div className="space-y-4">
+              {["Engajamento social", "Desafios técnicos", "Rankings especiais", "Troque por produtos exclusivos"].map((item) => (
+                <div key={item} className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/20">
+                    <Check className="h-4 w-4 text-amber-400" />
                   </div>
-                  <div className="mt-1 text-sm text-slate-400">
-                    {stat.label}
-                  </div>
+                  <span className="text-base text-slate-300">{item}</span>
                 </div>
               ))}
             </div>
@@ -155,268 +403,87 @@ function HeroSection() {
 }
 
 // ============================================
-// HOW IT WORKS Section
-// ============================================
-
-function HowItWorksSection() {
-  const steps = [
-    {
-      number: "1",
-      title: "Cadastre-se",
-      description: "Crie sua conta grátis em segundos",
-      icon: UserPlus,
-    },
-    {
-      number: "2",
-      title: "Escolha seu esporte",
-      description: "Futebol, beach tennis, corrida e mais",
-      icon: Medal,
-    },
-    {
-      number: "3",
-      title: "Participe",
-      description: "Torneios, desafios e competições",
-      icon: Trophy,
-    },
-    {
-      number: "4",
-      title: "Ganhe GCoins",
-      description: "Converta em dinheiro real via PIX",
-      icon: Coins,
-    },
-  ];
-
-  return (
-    <section id="como-funciona" className="bg-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
-            Simples e rápido
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Como Funciona
-          </h2>
-          <p className="text-lg text-gray-600">
-            Em 4 passos simples você começa a ganhar com seu esporte favorito
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div className="mt-12 grid grid-cols-2 gap-4 sm:mt-16 sm:gap-8 lg:grid-cols-4">
-          {steps.map((step, index) => (
-            <div key={step.number} className="relative text-center">
-              {/* Connector line (hidden on mobile and last item) */}
-              {index < steps.length - 1 && (
-                <div className="absolute top-10 left-[calc(50%+2rem)] hidden h-0.5 w-[calc(100%-4rem)] bg-gradient-to-r from-emerald-300 to-emerald-100 lg:block" />
-              )}
-
-              {/* Step circle */}
-              <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-emerald-100" />
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500 text-xl font-bold text-white shadow-lg shadow-emerald-500/25">
-                  {step.number}
-                </div>
-              </div>
-
-              {/* Icon */}
-              <div className="mb-4 flex justify-center">
-                <step.icon className="h-6 w-6 text-emerald-600" />
-              </div>
-
-              {/* Content */}
-              <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                {step.title}
-              </h3>
-              <p className="text-gray-600">{step.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================
-// GCOINS ECONOMY Section
-// ============================================
-
-function GCoinsEconomySection() {
-  return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-amber-600">
-            Economia digital
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            A Economia do Sportio
-          </h2>
-          <p className="text-lg text-gray-600">
-            Dois tipos de GCoins para maximizar seus ganhos e recompensas
-          </p>
-        </div>
-
-        {/* Cards */}
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* GCoins Reais Card */}
-          <div className="group relative overflow-hidden rounded-xl border border-emerald-200 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-lg hover:shadow-emerald-500/10 lg:p-10">
-            {/* Decorative gradient */}
-            <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-emerald-500/5 blur-2xl transition-all duration-500 group-hover:h-40 group-hover:w-40 group-hover:bg-emerald-500/10" />
-
-            <div className="relative">
-              {/* Icon + Badge */}
-              <div className="mb-6 flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-100">
-                  <CircleDollarSign className="h-7 w-7 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    GCoins Reais
-                  </h3>
-                  <span className="inline-block rounded-full bg-emerald-100 px-3 py-0.5 text-xs font-semibold text-emerald-700">
-                    Dinheiro de verdade
-                  </span>
-                </div>
-              </div>
-
-              <p className="mb-6 text-gray-600">
-                Ganhe dinheiro de verdade praticando seu esporte favorito.
-                Converta GCoins Reais diretamente para sua conta via PIX.
-              </p>
-
-              {/* Bullet points */}
-              <ul className="space-y-3">
-                {[
-                  "Vitórias em torneios",
-                  "Prêmios de competições",
-                  "Assinaturas de torcedores",
-                  "Saque via PIX instantâneo",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                    </div>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* GCoins Gamificação Card */}
-          <div className="group relative overflow-hidden rounded-xl border border-amber-200 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-lg hover:shadow-amber-500/10 lg:p-10">
-            {/* Decorative gradient */}
-            <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-amber-500/5 blur-2xl transition-all duration-500 group-hover:h-40 group-hover:w-40 group-hover:bg-amber-500/10" />
-
-            <div className="relative">
-              {/* Icon + Badge */}
-              <div className="mb-6 flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-amber-100">
-                  <Gift className="h-7 w-7 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    GCoins Gamificação
-                  </h3>
-                  <span className="inline-block rounded-full bg-amber-100 px-3 py-0.5 text-xs font-semibold text-amber-700">
-                    Recompensas e vantagens
-                  </span>
-                </div>
-              </div>
-
-              <p className="mb-6 text-gray-600">
-                Ganhe recompensas e vantagens exclusivas por participar
-                ativamente da comunidade Sportio.
-              </p>
-
-              {/* Bullet points */}
-              <ul className="space-y-3">
-                {[
-                  "Engajamento social",
-                  "Desafios técnicos",
-                  "Rankings especiais",
-                  "Troque por produtos",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100">
-                      <Check className="h-3.5 w-3.5 text-amber-600" />
-                    </div>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================
-// SPORTS GRID Section
+// SPORTS GRID Section - Redesigned
 // ============================================
 
 function SportsGridSection() {
+  const sportColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
+    "text-emerald-500": { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", gradient: "from-emerald-400 to-emerald-600" },
+    "text-amber-500": { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200", gradient: "from-amber-400 to-amber-600" },
+    "text-blue-500": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-400 to-blue-600" },
+    "text-red-500": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
+    "text-yellow-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-yellow-600" },
+    "text-orange-500": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
+    "text-purple-500": { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", gradient: "from-purple-400 to-purple-600" },
+    "text-orange-600": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
+    "text-cyan-500": { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200", gradient: "from-cyan-400 to-cyan-600" },
+    "text-lime-500": { bg: "bg-lime-50", text: "text-lime-600", border: "border-lime-200", gradient: "from-lime-400 to-lime-600" },
+    "text-pink-500": { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200", gradient: "from-pink-400 to-pink-600" },
+    "text-red-600": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
+    "text-teal-500": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", gradient: "from-teal-400 to-teal-600" },
+  };
+
   return (
-    <section className="bg-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
-            Variedade para todos
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            13 Esportes Para Você
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 mb-4 sm:mb-6">
+            <Sparkles className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-semibold text-blue-700">13 modalidades</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
+            Encontre Seu <span className="text-gradient-primary">Esporte</span>
           </h2>
-          <p className="text-lg text-gray-600">
-            Do futebol ao e-sports, encontre a modalidade perfeita para o seu
-            estilo
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
+            Do futebol ao e-sports, encontre a modalidade perfeita para seu estilo
           </p>
         </div>
 
-        {/* Sports Grid */}
-        <div className="mt-12 grid grid-cols-2 gap-3 sm:mt-16 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+        {/* Mobile: compact 3-col icon grid */}
+        <div className="grid grid-cols-3 gap-4 sm:hidden">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
+            const colors = sportColors[sport.color] || sportColors["text-emerald-500"];
             return (
               <div
                 key={sport.id}
-                className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-6 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
+                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white py-5 px-4 shadow-sm", colors.border)}
               >
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "mb-3 flex h-10 w-10 items-center justify-center rounded-lg transition-transform duration-300 sm:mb-4 sm:h-12 sm:w-12 sm:rounded-xl group-hover:scale-110",
-                    sport.color === "text-emerald-500" && "bg-emerald-100",
-                    sport.color === "text-amber-500" && "bg-amber-100",
-                    sport.color === "text-blue-500" && "bg-blue-100",
-                    sport.color === "text-red-500" && "bg-red-100",
-                    sport.color === "text-yellow-500" && "bg-yellow-100",
-                    sport.color === "text-orange-500" && "bg-orange-100",
-                    sport.color === "text-purple-500" && "bg-purple-100",
-                    sport.color === "text-orange-600" && "bg-orange-100",
-                    sport.color === "text-cyan-500" && "bg-cyan-100",
-                    sport.color === "text-lime-500" && "bg-lime-100",
-                    sport.color === "text-pink-500" && "bg-pink-100",
-                    sport.color === "text-red-600" && "bg-red-100",
-                    sport.color === "text-teal-500" && "bg-teal-100"
-                  )}
-                >
-                  <IconComponent className={cn("h-6 w-6", sport.color)} />
+                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-3", colors.bg)}>
+                  <IconComponent className={cn("h-6 w-6", colors.text)} />
                 </div>
+                <h3 className="text-sm font-bold text-gray-900 leading-tight">{sport.name}</h3>
+              </div>
+            );
+          })}
+        </div>
 
-                {/* Name */}
-                <h3 className="mb-1 text-base font-semibold text-gray-900 sm:text-lg">
-                  {sport.name}
-                </h3>
-
-                {/* Description */}
-                <p className="text-xs leading-relaxed text-gray-500 line-clamp-2 sm:text-sm">
-                  {sport.description}
-                </p>
+        {/* Desktop: grid with descriptions */}
+        <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          {SPORTS.map((sport) => {
+            const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
+            const colors = sportColors[sport.color] || sportColors["text-emerald-500"];
+            return (
+              <div
+                key={sport.id}
+                className={cn(
+                  "group relative rounded-2xl border bg-white p-6 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl cursor-pointer",
+                  colors.border,
+                  "hover:border-transparent"
+                )}
+              >
+                <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100", colors.gradient)} />
+                <div className="relative">
+                  <div className={cn("mb-4 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500", colors.bg, "group-hover:bg-white/20")}>
+                    <IconComponent className={cn("h-6 w-6 transition-colors duration-500", colors.text, "group-hover:text-white")} />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 mb-1 group-hover:text-white transition-colors duration-500">
+                    {sport.name}
+                  </h3>
+                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 group-hover:text-white/80 transition-colors duration-500">
+                    {sport.description}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -427,85 +494,79 @@ function SportsGridSection() {
 }
 
 // ============================================
-// USER TYPES Section
+// USER TYPES Section - Redesigned
 // ============================================
 
 function UserTypesSection() {
+  const typeColors: Record<string, { gradient: string; light: string }> = {
+    "text-emerald-500": { gradient: "from-emerald-400 to-emerald-600", light: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+    "text-blue-500": { gradient: "from-blue-400 to-blue-600", light: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+    "text-purple-500": { gradient: "from-purple-400 to-purple-600", light: "bg-purple-500/10 text-purple-400 border-purple-500/20" },
+    "text-red-500": { gradient: "from-red-400 to-red-600", light: "bg-red-500/10 text-red-400 border-red-500/20" },
+    "text-amber-500": { gradient: "from-amber-400 to-amber-600", light: "bg-amber-500/10 text-amber-400 border-amber-500/20" },
+    "text-slate-500": { gradient: "from-slate-400 to-slate-600", light: "bg-slate-500/10 text-slate-400 border-slate-500/20" },
+  };
+
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
-            Para cada perfil
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Há um Lugar para Você no Sportio
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#0a0f1a] overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/3 left-0 h-72 w-72 rounded-full bg-purple-600/10 blur-[100px]" />
+        <div className="absolute bottom-1/3 right-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[100px]" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-2 mb-4 sm:mb-6">
+            <Users className="h-4 w-4 text-purple-400" />
+            <span className="text-sm font-semibold text-purple-300">Para cada perfil</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
+            Há um Lugar Para <span className="text-gradient-hero">Você</span>
           </h2>
-          <p className="text-lg text-gray-600">
-            Seja atleta, organizador, marca, fã, palpiteiro ou árbitro - o
-            Sportio tem algo especial para você
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
+            Seja atleta, organizador ou fã — o Sportio tem algo especial para você
           </p>
         </div>
 
-        {/* User Type Cards */}
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Mobile: compact 2-col grid */}
+        <div className="grid grid-cols-2 gap-4 sm:hidden">
           {USER_TYPES.map((userType) => {
-            const IconComponent =
-              USER_TYPE_ICON_MAP[userType.icon] || Users;
+            const IconComponent = USER_TYPE_ICON_MAP[userType.icon] || Users;
+            const colors = typeColors[userType.color] || typeColors["text-emerald-500"];
             return (
               <a
                 key={userType.id}
                 href={userType.href}
-                className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:-translate-y-1 hover:shadow-md hover:border-gray-200"
+                className="group flex flex-col items-center text-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 hover:bg-white/10"
               >
-                {/* Decorative corner accent */}
-                <div
-                  className={cn(
-                    "absolute -top-10 -right-10 h-24 w-24 rounded-full opacity-10 transition-all duration-500 group-hover:opacity-20",
-                    userType.color === "text-emerald-500" && "bg-emerald-500",
-                    userType.color === "text-blue-500" && "bg-blue-500",
-                    userType.color === "text-purple-500" && "bg-purple-500",
-                    userType.color === "text-red-500" && "bg-red-500",
-                    userType.color === "text-amber-500" && "bg-amber-500",
-                    userType.color === "text-slate-500" && "bg-slate-500"
-                  )}
-                />
+                <div className={cn("mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", colors.gradient)}>
+                  <IconComponent className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-sm font-bold text-white leading-tight">{userType.name}</h3>
+              </a>
+            );
+          })}
+        </div>
 
-                {/* Icon */}
-                <div
-                  className={cn(
-                    "mb-5 flex h-14 w-14 items-center justify-center rounded-xl",
-                    userType.color === "text-emerald-500" && "bg-emerald-100",
-                    userType.color === "text-blue-500" && "bg-blue-100",
-                    userType.color === "text-purple-500" && "bg-purple-100",
-                    userType.color === "text-red-500" && "bg-red-100",
-                    userType.color === "text-amber-500" && "bg-amber-100",
-                    userType.color === "text-slate-500" && "bg-slate-100"
-                  )}
-                >
-                  <IconComponent
-                    className={cn("h-7 w-7", userType.color)}
-                  />
+        {/* Desktop: full cards */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {USER_TYPES.map((userType) => {
+            const IconComponent = USER_TYPE_ICON_MAP[userType.icon] || Users;
+            const colors = typeColors[userType.color] || typeColors["text-emerald-500"];
+            return (
+              <a
+                key={userType.id}
+                href={userType.href}
+                className="group rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 transition-all duration-500 hover:bg-white/10 hover:border-white/20 hover:-translate-y-2 hover:shadow-2xl"
+              >
+                <div className={cn("mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg", colors.gradient)}>
+                  <IconComponent className="h-7 w-7 text-white" />
                 </div>
 
-                {/* Name */}
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                  {userType.name}
-                </h3>
+                <h3 className="text-xl font-bold text-white mb-3">{userType.name}</h3>
+                <p className="text-slate-400 leading-relaxed mb-6">{userType.description}</p>
 
-                {/* Description */}
-                <p className="mb-4 text-gray-600 leading-relaxed">
-                  {userType.description}
-                </p>
-
-                {/* Link */}
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1 text-sm font-semibold transition-all duration-300 group-hover:gap-2",
-                    userType.color
-                  )}
-                >
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 transition-all group-hover:gap-3">
                   Saiba mais
                   <ArrowRight className="h-4 w-4" />
                 </span>
@@ -519,93 +580,77 @@ function UserTypesSection() {
 }
 
 // ============================================
-// TESTIMONIALS Section
+// TESTIMONIALS Section - Redesigned
 // ============================================
 
 function TestimonialsSection() {
   const testimonials = [
     {
-      quote:
-        "Comecei jogando torneios de futebol e hoje tiro R$ 2.000 por mês competindo e apostando.",
+      quote: "Comecei jogando torneios de futebol e hoje tiro R$ 2.000 por mês competindo e fazendo palpites.",
       author: "João Silva",
       role: "Atleta de Futebol",
-      rating: 5,
+      earnings: "R$ 2.000/mês",
+      color: "from-emerald-400 to-emerald-600",
     },
     {
-      quote:
-        "Organizei 12 torneios e lucrei R$ 15 mil em três meses. Tudo automatizado.",
+      quote: "Organizei 12 torneios e lucrei R$ 15 mil em três meses. Tudo automatizado pela plataforma.",
       author: "Maria Santos",
       role: "Organizadora",
-      rating: 5,
+      earnings: "R$ 15.000",
+      color: "from-blue-400 to-blue-600",
     },
     {
-      quote:
-        "Ganhei prêmios só por torcer e comentar no app. É viciante!",
+      quote: "Ganhei prêmios só por torcer e comentar no app. Melhor plataforma esportiva que já usei!",
       author: "Pedro Costa",
       role: "Fã/Torcedor",
-      rating: 5,
+      earnings: "500+ GCoins",
+      color: "from-amber-400 to-amber-600",
     },
   ];
 
   return (
-    <section className="bg-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
-            Depoimentos
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Quem Já Está Ganhando
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-white overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
+
+      <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-2 mb-4 sm:mb-6">
+            <Star className="h-4 w-4 text-amber-600" />
+            <span className="text-sm font-semibold text-amber-700">Depoimentos reais</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
+            Quem Já Está <span className="text-gradient-accent">Ganhando</span>
           </h2>
-          <p className="text-lg text-gray-600">
-            Veja o que nossos usuários estão dizendo sobre o Sportio
-          </p>
         </div>
 
-        {/* Testimonial Cards */}
-        <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
-          {testimonials.map((testimonial) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          {testimonials.map((t) => (
             <div
-              key={testimonial.author}
-              className="relative rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 sm:rounded-2xl sm:p-8 hover:shadow-md"
+              key={t.author}
+              className="group relative rounded-3xl border border-gray-100 bg-white p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2"
             >
-              {/* Quote mark decorative */}
-              <div className="absolute -top-3 left-8 text-5xl font-serif text-emerald-200 select-none">
-                &ldquo;
-              </div>
-
-              {/* Stars */}
-              <div className="mb-4 flex gap-1">
-                {Array.from({ length: testimonial.rating }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="h-5 w-5 fill-amber-400 text-amber-400"
-                  />
+              <div className="flex gap-1 mb-5 sm:mb-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
 
-              {/* Quote */}
-              <blockquote className="mb-6 text-gray-700 leading-relaxed">
-                &ldquo;{testimonial.quote}&rdquo;
+              <blockquote className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8">
+                &ldquo;{t.quote}&rdquo;
               </blockquote>
 
-              {/* Author */}
+              <div className={cn("inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-4 py-2 mb-5 sm:mb-6", t.color)}>
+                <Coins className="h-4 w-4 text-white" />
+                <span className="text-sm font-bold text-white">{t.earnings}</span>
+              </div>
+
               <div className="flex items-center gap-3">
-                {/* Avatar placeholder */}
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-lg font-bold text-emerald-600">
-                  {testimonial.author
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-lg font-bold text-white", t.color)}>
+                  {t.author.split(" ").map((n) => n[0]).join("")}
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">
-                    {testimonial.author}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {testimonial.role}
-                  </div>
+                  <div className="text-base font-bold text-gray-900">{t.author}</div>
+                  <div className="text-sm text-gray-500">{t.role}</div>
                 </div>
               </div>
             </div>
@@ -617,66 +662,50 @@ function TestimonialsSection() {
 }
 
 // ============================================
-// CTA Section
+// CTA Section - Redesigned
 // ============================================
 
 function CTASection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 py-12 sm:py-20 lg:py-24">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -left-20 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-amber-500/10 blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          {/* GCoin icon */}
-          <div className="mb-8 flex justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500/20 animate-pulse-glow">
-              <Coins className="h-8 w-8 text-emerald-400" />
-            </div>
+      <div className="relative mx-auto max-w-4xl px-6 sm:px-8 lg:px-10 text-center">
+        <div className="mb-6 sm:mb-8 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl sm:rounded-3xl bg-white/20 backdrop-blur-sm shadow-2xl">
+          <Coins className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+        </div>
+
+        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white mb-5 sm:mb-6 leading-tight">
+          Comece a Ganhar com Seu Esporte Hoje
+        </h2>
+
+        <p className="text-base sm:text-xl text-white/80 mb-8 sm:mb-10 max-w-2xl mx-auto">
+          Cadastro gratuito, sem cartão de crédito. Ganhe GCoins instantaneamente.
+        </p>
+
+        <a
+          href="/register"
+          className="group inline-flex items-center gap-2 sm:gap-3 rounded-2xl bg-white px-7 py-4 sm:px-10 sm:py-5 text-base sm:text-lg font-bold text-emerald-600 shadow-2xl transition-all duration-300 hover:shadow-white/30 hover:-translate-y-1"
+        >
+          Criar Minha Conta Grátis
+          <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+        </a>
+
+        <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-5 sm:gap-8 text-white/70">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">Dados seguros</span>
           </div>
-
-          <h2 className="mb-6 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-            Comece a Ganhar com Seu Esporte Hoje
-          </h2>
-
-          <p className="mb-10 text-lg text-slate-300">
-            Cadastro em segundos &bull; Sem cartão de crédito &bull; Ganhe
-            GCoins instantaneamente
-          </p>
-
-          <a
-            href="/register"
-            className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-10 py-5 text-lg font-semibold text-white shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5"
-          >
-            Criar Minha Conta Grátis
-            <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </a>
-
-          {/* Trust badges */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-emerald-400" />
-              <span>Dados seguros</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-emerald-400" />
-              <span>PIX instantâneo</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-emerald-400" />
-              <span>12.500+ atletas</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">PIX instantâneo</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span className="text-xs sm:text-sm">12.500+ atletas</span>
           </div>
         </div>
       </div>
@@ -685,72 +714,58 @@ function CTASection() {
 }
 
 // ============================================
-// FAQ Section
+// FAQ Section - Redesigned
 // ============================================
 
 function FAQSection() {
   const faqs = [
     {
       question: "O que é o Sportio?",
-      answer:
-        "O Sportio é a plataforma esportiva mais completa do Brasil. Conectamos atletas, organizadores, marcas, fãs e árbitros em um ecossistema digital onde você pode competir em torneios, ganhar GCoins (nossa moeda digital), acompanhar estatísticas e transformar sua paixão pelo esporte em renda real. Suportamos 13 modalidades esportivas, desde futebol até e-sports.",
+      answer: "O Sportio é a plataforma esportiva mais completa do Brasil. Conectamos atletas, organizadores, marcas, fãs e árbitros em um ecossistema digital onde você pode competir em torneios, ganhar GCoins e transformar sua paixão pelo esporte em renda real.",
     },
     {
       question: "O que são GCoins?",
-      answer:
-        "GCoins são a moeda digital do Sportio. Existem dois tipos: GCoins Reais, que podem ser convertidos em dinheiro real via PIX (ganhos através de vitórias em torneios, prêmios e assinaturas de torcedores), e GCoins de Gamificação, que são recompensas por engajamento na plataforma (curtidas, comentários, desafios técnicos) e podem ser trocados por produtos e vantagens exclusivas.",
+      answer: "GCoins são a moeda digital do Sportio. Existem dois tipos: GCoins Reais (convertidos em dinheiro via PIX) e GCoins de Gamificação (recompensas por engajamento, trocáveis por produtos exclusivos).",
     },
     {
       question: "Como ganho dinheiro no Sportio?",
-      answer:
-        "Existem várias formas de ganhar dinheiro no Sportio: participe e vença torneios para ganhar GCoins Reais; organize torneios e lucre com inscrições e patrocínios; construa uma base de torcedores que assinem seu perfil; dê palpites certeiros em competições; e como marca, conecte-se com atletas para patrocínios. Os GCoins Reais podem ser sacados via PIX a qualquer momento.",
+      answer: "Participe e vença torneios, organize eventos, construa uma base de torcedores, dê palpites certeiros e como marca, patrocine atletas. Os GCoins Reais podem ser sacados via PIX a qualquer momento.",
     },
     {
       question: "É seguro usar o Sportio?",
-      answer:
-        "Sim! A segurança é prioridade no Sportio. Utilizamos criptografia de ponta a ponta para proteger seus dados, autenticação em duas etapas, e todas as transações financeiras são protegidas por protocolos bancários seguros. Seu dinheiro em GCoins Reais está sempre disponível para saque, e nosso suporte está disponível 24/7 para qualquer dúvida.",
+      answer: "Sim! Utilizamos criptografia de ponta a ponta, autenticação em duas etapas, e todas as transações financeiras são protegidas por protocolos bancários seguros. Suporte 24/7 disponível.",
     },
     {
       question: "Quais esportes são suportados?",
-      answer:
-        "Atualmente o Sportio suporta 13 modalidades esportivas: Futebol, Beach Tennis, Corrida, CrossFit, Vôlei, Futevôlei, E-Sports, Basquete, Natação, Tênis, Skate, Lutas (MMA, Jiu-Jitsu, Boxe) e Ciclismo. Estamos constantemente expandindo nossa lista de esportes baseando-nos no feedback da comunidade.",
+      answer: "13 modalidades: Futebol, Beach Tennis, Corrida, CrossFit, Vôlei, Futevôlei, E-Sports, Basquete, Natação, Tênis, Skate, Lutas e Ciclismo. Estamos sempre expandindo!",
     },
     {
-      question: "Preciso pagar para usar o Sportio?",
-      answer:
-        "Não! Criar uma conta no Sportio é 100% gratuito. Você pode participar de torneios gratuitos, interagir na comunidade e ganhar GCoins de Gamificação sem custo. Alguns torneios premium podem ter taxa de inscrição, mas esses valores são revertidos em premiação. Não existe mensalidade ou taxa escondida para usar a plataforma.",
+      question: "Preciso pagar para usar?",
+      answer: "Não! Criar uma conta é 100% gratuito. Participe de torneios gratuitos, interaja na comunidade e ganhe GCoins sem custo. Não existe mensalidade ou taxa escondida.",
     },
   ];
 
   return (
-    <section className="bg-gradient-to-b from-gray-50 to-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-4 inline-block text-sm font-semibold uppercase tracking-wider text-emerald-600">
-            Tire suas dúvidas
-          </span>
-          <h2 className="mb-4 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Perguntas Frequentes
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-gray-50 overflow-hidden">
+      <div className="relative mx-auto max-w-3xl px-6 sm:px-8 lg:px-10">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
+            Perguntas <span className="text-gradient-primary">Frequentes</span>
           </h2>
-          <p className="text-lg text-gray-600">
-            Tudo o que você precisa saber para começar no Sportio
-          </p>
         </div>
 
-        {/* FAQ Items */}
-        <div className="mx-auto mt-16 max-w-3xl divide-y divide-gray-200">
+        <div className="space-y-4">
           {faqs.map((faq) => (
-            <details key={faq.question} className="group">
-              <summary className="flex cursor-pointer items-center justify-between py-6 text-left transition-colors hover:text-emerald-600 [&::-webkit-details-marker]:hidden">
-                <span className="pr-6 text-lg font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors">
+            <details key={faq.question} className="group rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-md open:shadow-lg open:border-emerald-200">
+              <summary className="flex cursor-pointer items-center justify-between p-5 sm:p-6 [&::-webkit-details-marker]:hidden">
+                <span className="pr-4 text-base sm:text-lg font-bold text-gray-900 group-open:text-emerald-600 transition-colors">
                   {faq.question}
                 </span>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gray-200 transition-all duration-300 group-open:rotate-180 group-open:border-emerald-500 group-open:bg-emerald-50">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-100">
                   <ChevronDown className="h-4 w-4 text-gray-500 group-open:text-emerald-600" />
                 </span>
               </summary>
-              <div className="pb-6 pr-12 text-gray-600 leading-relaxed">
+              <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-base text-gray-600 leading-relaxed">
                 {faq.answer}
               </div>
             </details>
@@ -762,7 +777,7 @@ function FAQSection() {
 }
 
 // ============================================
-// Main Page Component (Server Component)
+// Main Page
 // ============================================
 
 export default function HomePage() {
