@@ -183,7 +183,7 @@ export default function TournamentsPage() {
 
               return (
                 <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>
-                  <Card hover className="h-full overflow-hidden">
+                  <Card hover className="h-full overflow-hidden group">
                     {/* Sport color bar - thicker with gradient */}
                     <div className={`h-1.5 -mt-5 sm:-mt-6 -mx-5 sm:-mx-6 mb-4 rounded-t-2xl bg-gradient-to-r ${gradient}`} />
 
@@ -191,29 +191,37 @@ export default function TournamentsPage() {
                       <Badge variant={statusMap[tournament.status]?.variant}>
                         {statusMap[tournament.status]?.label}
                       </Badge>
-                      <Badge>{tournament.level}</Badge>
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-xs font-bold text-slate-600 ring-1 ring-slate-200/50">
+                        {tournament.level}
+                      </span>
                     </div>
 
-                    <h3 className="font-bold text-base text-slate-900 mb-1.5 line-clamp-2 leading-snug">
+                    <h3 className="font-bold text-lg text-slate-900 mb-1.5 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
                       {tournament.name}
                     </h3>
-                    <p className="text-sm text-slate-500 mb-3 flex items-center gap-1.5">
+                    <p className="text-sm text-slate-500 mb-4 flex items-center gap-1.5">
                       <span className="text-base leading-none">{sportEmoji}</span>
-                      {tournament.sport}
+                      <span className="font-medium">{tournament.sport}</span>
                     </p>
 
-                    <div className="space-y-2 text-sm text-slate-600">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                        {tournament.city}
+                    <div className="space-y-2.5 text-sm text-slate-600">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
+                        <span>{tournament.city}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
-                        {tournament.startDate}
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
+                        <span>{tournament.startDate}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-slate-400 shrink-0" />
-                        <div className="flex-1">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                          <Users className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <span>{tournament.participants}/{tournament.maxParticipants} participantes</span>
                             <span className="text-xs text-slate-400 font-medium">{fillPercent}%</span>
@@ -264,7 +272,7 @@ export default function TournamentsPage() {
                       <div className="flex items-center gap-2.5">
                         <div className="text-right">
                           <p className="text-xs text-slate-500">Premiacao</p>
-                          <p className="text-sm font-semibold text-amber-600">
+                          <p className="text-sm font-bold text-amber-600">
                             {tournament.prizePool.toLocaleString()}
                           </p>
                         </div>
