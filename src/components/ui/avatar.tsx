@@ -32,6 +32,7 @@ export function Avatar({ src, name, size = "md", className }: AvatarProps) {
       )}
     >
       {src ? (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img src={src} alt={name || "Avatar"} className="w-full h-full object-cover" />
       ) : initials ? (
         <span className="font-semibold text-emerald-700">{initials}</span>

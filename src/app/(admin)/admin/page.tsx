@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Trophy, Coins, TrendingUp, Activity, AlertTriangle, Shield, Settings, BarChart3, Flag } from "lucide-react";
+import { Users, Trophy, Coins, TrendingUp, AlertTriangle, Shield, Settings, Flag } from "lucide-react";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

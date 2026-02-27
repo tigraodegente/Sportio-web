@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Coins, ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";

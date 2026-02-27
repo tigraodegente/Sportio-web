@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trophy, Plus, Search, MapPin, Calendar, Users, Coins, Filter } from "lucide-react";
+import { Plus, Search, MapPin, Calendar, Users, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -157,7 +157,7 @@ export default function TournamentsPage() {
           { id: "enrolled", label: "Inscritos" },
         ]}
       >
-        {(activeTab) => (
+        {() => (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {mockTournaments.map((tournament) => (
               <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>

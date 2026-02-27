@@ -2,7 +2,7 @@ import { z } from "zod";
 import { eq, ilike, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { users, userRoles, userSports, followers, sports } from "@/server/db/schema";
+import { users, userRoles, userSports, followers } from "@/server/db/schema";
 import bcrypt from "bcryptjs";
 
 export const userRouter = createTRPCRouter({

@@ -1,12 +1,11 @@
 "use client";
 
-import { Trophy, MapPin, Calendar, Star, Users, Coins, Edit3, Instagram, Twitter, Youtube, Target, Swords } from "lucide-react";
+import { MapPin, Calendar, Star, Coins, Edit3, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { Tabs } from "@/components/ui/tabs";
-import { StatsCard } from "@/components/ui/stats-card";
 import Link from "next/link";
 
 const profile = {

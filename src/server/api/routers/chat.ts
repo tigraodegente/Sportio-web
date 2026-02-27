@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { chatRooms, chatMembers, chatMessages } from "@/server/db/schema";
 

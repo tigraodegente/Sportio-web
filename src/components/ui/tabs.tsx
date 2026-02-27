@@ -12,8 +12,8 @@ interface Tab {
 interface TabsProps {
   tabs: Tab[];
   defaultTab?: string;
-  onChange?: (tabId: string) => void;
-  children: (activeTab: string) => React.ReactNode;
+  onChange?: (_id: string) => void;
+  children: (_tab: string) => React.ReactNode;
   className?: string;
 }
 

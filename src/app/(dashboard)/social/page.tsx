@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Image, Send, Heart, MessageCircle, Share2, MoreHorizontal, Smile } from "lucide-react";
+import { ImageIcon, Send, Heart, MessageCircle, Share2, MoreHorizontal, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 
 const feedPosts = [
   {
@@ -92,7 +91,7 @@ export default function SocialPage() {
             <div className="flex items-center justify-between pt-3 border-t border-slate-100">
               <div className="flex gap-2">
                 <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
-                  <Image className="w-5 h-5" />
+                  <ImageIcon className="w-5 h-5" />
                 </button>
                 <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
                   <Smile className="w-5 h-5" />

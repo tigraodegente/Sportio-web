@@ -1,6 +1,6 @@
 "use client";
 
-import { Trophy, Coins, Target, TrendingUp, Calendar, Swords, Users, Star } from "lucide-react";
+import { Trophy, Coins, Target, TrendingUp, Users, Star } from "lucide-react";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

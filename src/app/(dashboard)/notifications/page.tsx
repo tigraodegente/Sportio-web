@@ -2,9 +2,7 @@
 
 import { Bell, Trophy, Coins, MessageSquare, Target, Users, CheckCheck, Swords, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const notifications = [

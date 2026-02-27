@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Send, Plus, Phone, Video, MoreVertical, Image, Smile, Users } from "lucide-react";
+import { Search, Send, Plus, Phone, Video, MoreVertical, ImageIcon, Smile, Users } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const conversations = [
@@ -168,7 +167,7 @@ export default function ChatPage() {
           <div className="p-4 border-t border-slate-200">
             <div className="flex items-center gap-2">
               <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
-                <Image className="w-5 h-5" />
+                <ImageIcon className="w-5 h-5" />
               </button>
               <button className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
                 <Smile className="w-5 h-5" />

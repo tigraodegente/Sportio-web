@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq, desc, and, gte, lte, ilike, sql } from "drizzle-orm";
+import { eq, desc, and, ilike } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { tournaments, enrollments, matches } from "@/server/db/schema";
 

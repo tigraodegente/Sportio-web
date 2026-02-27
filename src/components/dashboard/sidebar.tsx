@@ -12,7 +12,6 @@ import {
   Target,
   Settings,
   User,
-  Swords,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";

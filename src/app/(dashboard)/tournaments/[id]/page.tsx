@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Trophy, MapPin, Calendar, Users, Coins, Clock, Share2, Flag, Swords, ChevronRight } from "lucide-react";
+import { Trophy, MapPin, Calendar, Users, Coins, Share2, Flag, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
@@ -188,7 +187,7 @@ export default function TournamentDetailPage() {
             {tab === "participants" && (
               <Card>
                 <div className="divide-y divide-slate-100">
-                  {participants.map((p, i) => (
+                  {participants.map((p) => (
                     <div key={p.id} className="flex items-center justify-between py-3 px-2">
                       <div className="flex items-center gap-3">
                         <span className="text-sm text-slate-400 w-6">#{p.seed}</span>
