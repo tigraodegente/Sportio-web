@@ -211,7 +211,7 @@ function HeroSection() {
 
         {/* Stats bar */}
         <div className="mt-14 sm:mt-20 lg:mt-24">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             {[
               { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-emerald-400 to-emerald-600" },
               { value: "850+", label: "Torneios/mês", icon: Trophy, color: "from-amber-400 to-amber-600" },
@@ -220,13 +220,13 @@ function HeroSection() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 sm:p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
               >
-                <div className={cn("mx-auto mb-2 sm:mb-3 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
+                <div className={cn("mx-auto mb-3 flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
                   <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <div className="text-xl sm:text-3xl font-black text-white">{stat.value}</div>
-                <div className="mt-0.5 text-xs sm:text-sm text-slate-400">{stat.label}</div>
+                <div className="text-2xl sm:text-3xl font-black text-white">{stat.value}</div>
+                <div className="mt-1 text-xs sm:text-sm text-slate-400">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -258,7 +258,7 @@ function HowItWorksSection() {
             <Rocket className="h-4 w-4 text-emerald-600" />
             <span className="text-sm font-semibold text-emerald-700">Simples e rápido</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
             Como <span className="text-gradient-primary">Funciona</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
@@ -268,14 +268,14 @@ function HowItWorksSection() {
 
         <div className="space-y-4 sm:hidden">
           {steps.map((step) => (
-            <div key={step.number} className="flex items-start gap-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-              <div className={cn("shrink-0 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", step.color)}>
-                <step.icon className="h-6 w-6 text-white" />
+            <div key={step.number} className="flex items-start gap-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className={cn("shrink-0 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", step.color)}>
+                <step.icon className="h-7 w-7 text-white" />
               </div>
               <div className="min-w-0">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Passo {step.number}</span>
-                <h3 className="text-base font-bold text-gray-900 mt-0.5">{step.title}</h3>
-                <p className="text-sm text-gray-500 mt-1 leading-relaxed">{step.description}</p>
+                <h3 className="text-lg font-bold text-gray-900 mt-1">{step.title}</h3>
+                <p className="text-sm text-gray-500 mt-1.5 leading-relaxed">{step.description}</p>
               </div>
             </div>
           ))}
@@ -326,72 +326,72 @@ function GCoinsEconomySection() {
             <BadgeDollarSign className="h-4 w-4 text-amber-400" />
             <span className="text-sm font-semibold text-amber-300">Economia digital</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
             A Economia do <span className="text-gradient-hero">Sportio</span>
           </h2>
-          <p className="text-sm sm:text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
             Dois tipos de GCoins para maximizar seus ganhos e recompensas
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* GCoins Reais */}
-          <div className="group relative rounded-2xl sm:rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 backdrop-blur-sm p-6 sm:p-10 transition-all duration-500 hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/10">
-            <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-8">
-              <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30">
-                <CircleDollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+          <div className="group relative rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 backdrop-blur-sm p-7 sm:p-10 transition-all duration-500 hover:border-emerald-500/40 hover:shadow-2xl hover:shadow-emerald-500/10">
+            <div className="flex items-center gap-4 mb-6 sm:mb-8">
+              <div className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30">
+                <CircleDollarSign className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
               </div>
               <div>
-                <h3 className="text-lg sm:text-2xl font-bold text-white">GCoins Reais</h3>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-emerald-300 mt-1">
+                <h3 className="text-xl sm:text-2xl font-bold text-white">GCoins Reais</h3>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300 mt-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   Dinheiro de verdade
                 </span>
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-slate-300 mb-5 sm:mb-8 leading-relaxed">
+            <p className="text-base text-slate-300 mb-6 sm:mb-8 leading-relaxed">
               Ganhe dinheiro de verdade praticando esporte. Converta GCoins para sua conta via <span className="text-emerald-400 font-semibold">PIX instantâneo</span>.
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {["Vitórias em torneios", "Prêmios de competições", "Assinaturas de torcedores", "Saque via PIX instantâneo"].map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-emerald-500/20">
-                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20">
+                    <Check className="h-4 w-4 text-emerald-400" />
                   </div>
-                  <span className="text-sm sm:text-base text-slate-300">{item}</span>
+                  <span className="text-base text-slate-300">{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* GCoins Gamificação */}
-          <div className="group relative rounded-2xl sm:rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm p-6 sm:p-10 transition-all duration-500 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/10">
-            <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-8">
-              <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30">
-                <Gift className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+          <div className="group relative rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm p-7 sm:p-10 transition-all duration-500 hover:border-amber-500/40 hover:shadow-2xl hover:shadow-amber-500/10">
+            <div className="flex items-center gap-4 mb-6 sm:mb-8">
+              <div className="flex h-14 w-14 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30">
+                <Gift className="h-7 w-7 sm:h-8 sm:w-8 text-white" />
               </div>
               <div>
-                <h3 className="text-lg sm:text-2xl font-bold text-white">GCoins Gamificação</h3>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-amber-300 mt-1">
+                <h3 className="text-xl sm:text-2xl font-bold text-white">GCoins Gamificação</h3>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-300 mt-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                   Recompensas e vantagens
                 </span>
               </div>
             </div>
 
-            <p className="text-sm sm:text-base text-slate-300 mb-5 sm:mb-8 leading-relaxed">
+            <p className="text-base text-slate-300 mb-6 sm:mb-8 leading-relaxed">
               Ganhe recompensas por participar da comunidade. Troque por <span className="text-amber-400 font-semibold">produtos exclusivos</span> e vantagens especiais.
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {["Engajamento social", "Desafios técnicos", "Rankings especiais", "Troque por produtos exclusivos"].map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-amber-500/20">
-                    <Check className="h-3.5 w-3.5 text-amber-400" />
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/20">
+                    <Check className="h-4 w-4 text-amber-400" />
                   </div>
-                  <span className="text-sm sm:text-base text-slate-300">{item}</span>
+                  <span className="text-base text-slate-300">{item}</span>
                 </div>
               ))}
             </div>
@@ -431,28 +431,28 @@ function SportsGridSection() {
             <Sparkles className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-700">13 modalidades</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
             Encontre Seu <span className="text-gradient-primary">Esporte</span>
           </h2>
-          <p className="text-sm sm:text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto">
             Do futebol ao e-sports, encontre a modalidade perfeita para seu estilo
           </p>
         </div>
 
         {/* Mobile: compact 3-col icon grid */}
-        <div className="grid grid-cols-3 gap-3 sm:hidden">
+        <div className="grid grid-cols-3 gap-4 sm:hidden">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
             const colors = sportColors[sport.color] || sportColors["text-emerald-500"];
             return (
               <div
                 key={sport.id}
-                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white p-4 shadow-sm", colors.border)}
+                className={cn("flex flex-col items-center text-center rounded-2xl border bg-white py-5 px-3 shadow-sm", colors.border)}
               >
-                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-2", colors.bg)}>
+                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-3", colors.bg)}>
                   <IconComponent className={cn("h-6 w-6", colors.text)} />
                 </div>
-                <h3 className="text-xs font-bold text-gray-900 leading-tight">{sport.name}</h3>
+                <h3 className="text-sm font-bold text-gray-900 leading-tight">{sport.name}</h3>
               </div>
             );
           })}
@@ -520,16 +520,16 @@ function UserTypesSection() {
             <Users className="h-4 w-4 text-purple-400" />
             <span className="text-sm font-semibold text-purple-300">Para cada perfil</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
             Há um Lugar Para <span className="text-gradient-hero">Você</span>
           </h2>
-          <p className="text-sm sm:text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
             Seja atleta, organizador ou fã — o Sportio tem algo especial para você
           </p>
         </div>
 
         {/* Mobile: compact 2-col grid */}
-        <div className="grid grid-cols-2 gap-3 sm:hidden">
+        <div className="grid grid-cols-2 gap-4 sm:hidden">
           {USER_TYPES.map((userType) => {
             const IconComponent = USER_TYPE_ICON_MAP[userType.icon] || Users;
             const colors = typeColors[userType.color] || typeColors["text-emerald-500"];
@@ -537,10 +537,10 @@ function UserTypesSection() {
               <a
                 key={userType.id}
                 href={userType.href}
-                className="group flex flex-col items-center text-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 transition-all duration-300 hover:bg-white/10"
+                className="group flex flex-col items-center text-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 transition-all duration-300 hover:bg-white/10"
               >
-                <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", colors.gradient)}>
-                  <IconComponent className="h-6 w-6 text-white" />
+                <div className={cn("mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", colors.gradient)}>
+                  <IconComponent className="h-7 w-7 text-white" />
                 </div>
                 <h3 className="text-sm font-bold text-white leading-tight">{userType.name}</h3>
               </a>
@@ -618,39 +618,39 @@ function TestimonialsSection() {
             <Star className="h-4 w-4 text-amber-600" />
             <span className="text-sm font-semibold text-amber-700">Depoimentos reais</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
             Quem Já Está <span className="text-gradient-accent">Ganhando</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {testimonials.map((t) => (
             <div
               key={t.author}
-              className="group relative rounded-2xl sm:rounded-3xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2"
+              className="group relative rounded-3xl border border-gray-100 bg-white p-7 sm:p-8 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2"
             >
-              <div className="flex gap-1 mb-4 sm:mb-6">
+              <div className="flex gap-1 mb-5 sm:mb-6">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 fill-amber-400 text-amber-400" />
+                  <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
 
-              <blockquote className="text-sm sm:text-lg text-gray-700 leading-relaxed mb-5 sm:mb-8">
+              <blockquote className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
 
-              <div className={cn("inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-3 py-1.5 sm:px-4 sm:py-2 mb-4 sm:mb-6", t.color)}>
-                <Coins className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" />
-                <span className="text-xs sm:text-sm font-bold text-white">{t.earnings}</span>
+              <div className={cn("inline-flex items-center gap-2 rounded-full bg-gradient-to-r px-4 py-2 mb-5 sm:mb-6", t.color)}>
+                <Coins className="h-4 w-4 text-white" />
+                <span className="text-sm font-bold text-white">{t.earnings}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className={cn("flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-sm sm:text-lg font-bold text-white", t.color)}>
+                <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-lg font-bold text-white", t.color)}>
                   {t.author.split(" ").map((n) => n[0]).join("")}
                 </div>
                 <div>
-                  <div className="text-sm sm:text-base font-bold text-gray-900">{t.author}</div>
-                  <div className="text-xs sm:text-sm text-gray-500">{t.role}</div>
+                  <div className="text-base font-bold text-gray-900">{t.author}</div>
+                  <div className="text-sm text-gray-500">{t.role}</div>
                 </div>
               </div>
             </div>
@@ -678,7 +678,7 @@ function CTASection() {
           <Coins className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
         </div>
 
-        <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black text-white mb-4 sm:mb-6 leading-tight">
+        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white mb-5 sm:mb-6 leading-tight">
           Comece a Ganhar com Seu Esporte Hoje
         </h2>
 
@@ -749,23 +749,23 @@ function FAQSection() {
     <section className="relative py-20 sm:py-28 lg:py-32 bg-gray-50 overflow-hidden">
       <div className="relative mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
         <div className="text-center mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-3">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-4">
             Perguntas <span className="text-gradient-primary">Frequentes</span>
           </h2>
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-4">
           {faqs.map((faq) => (
-            <details key={faq.question} className="group rounded-xl sm:rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-md open:shadow-lg open:border-emerald-200">
-              <summary className="flex cursor-pointer items-center justify-between p-4 sm:p-6 [&::-webkit-details-marker]:hidden">
-                <span className="pr-4 text-sm sm:text-lg font-bold text-gray-900 group-open:text-emerald-600 transition-colors">
+            <details key={faq.question} className="group rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:shadow-md open:shadow-lg open:border-emerald-200">
+              <summary className="flex cursor-pointer items-center justify-between p-5 sm:p-6 [&::-webkit-details-marker]:hidden">
+                <span className="pr-4 text-base sm:text-lg font-bold text-gray-900 group-open:text-emerald-600 transition-colors">
                   {faq.question}
                 </span>
-                <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-100">
-                  <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 group-open:text-emerald-600" />
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 transition-all duration-300 group-open:rotate-180 group-open:bg-emerald-100">
+                  <ChevronDown className="h-4 w-4 text-gray-500 group-open:text-emerald-600" />
                 </span>
               </summary>
-              <div className="px-4 pb-4 sm:px-6 sm:pb-6 text-sm sm:text-base text-gray-600 leading-relaxed">
+              <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-base text-gray-600 leading-relaxed">
                 {faq.answer}
               </div>
             </details>
