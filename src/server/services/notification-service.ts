@@ -145,3 +145,104 @@ export async function notifyChatMessage(userId: string, senderName: string, room
     data: { roomId },
   });
 }
+
+// ==================== Brand/Sponsorship notifications ====================
+
+export async function notifyBrandReward(userId: string, brandName: string, amount: number, campaignId: string) {
+  return createNotification({
+    userId,
+    type: "gcoin",
+    title: "Recompensa de marca",
+    message: `Voce ganhou ${amount} GCoins da marca "${brandName}"`,
+    data: { campaignId, amount, brandName },
+  });
+}
+
+export async function notifyProductRedeemed(userId: string, brandName: string, productName: string, campaignId: string) {
+  return createNotification({
+    userId,
+    type: "system",
+    title: "Produto resgatado",
+    message: `Voce resgatou "${productName}" da marca "${brandName}". A marca entrara em contato para entrega.`,
+    data: { campaignId, productName, brandName },
+  });
+}
+
+export async function notifyNewSponsor(organizerId: string, brandName: string, tournamentName: string, tier: string, tournamentId: string) {
+  return createNotification({
+    userId: organizerId,
+    type: "tournament",
+    title: "Novo patrocinador!",
+    message: `A marca "${brandName}" quer patrocinar o torneio "${tournamentName}" como ${tier === "main" ? "Principal" : tier === "gold" ? "Ouro" : tier === "silver" ? "Prata" : "Bronze"}`,
+    data: { tournamentId, brandName, tier },
+  });
+}
+
+export async function notifySponsorshipApproved(brandUserId: string, tournamentName: string, tournamentId: string) {
+  return createNotification({
+    userId: brandUserId,
+    type: "tournament",
+    title: "Patrocinio aprovado!",
+    message: `Seu patrocinio do torneio "${tournamentName}" foi aprovado. Sua marca ja esta visivel!`,
+    data: { tournamentId },
+  });
+}
+
+// ==================== Invite notifications ====================
+
+export async function notifyTournamentInviteAthlete(userId: string, organizerName: string, tournamentName: string, tournamentId: string, inviteId: string) {
+  return createNotification({
+    userId,
+    type: "tournament",
+    title: "Convite para torneio!",
+    message: `${organizerName} convidou voce para participar do torneio "${tournamentName}"`,
+    data: { tournamentId, inviteId, inviteType: "athlete" },
+  });
+}
+
+export async function notifyTournamentInviteSponsor(userId: string, organizerName: string, tournamentName: string, tournamentId: string, inviteId: string, tier?: string) {
+  const tierLabel = tier === "main" ? "Principal" : tier === "gold" ? "Ouro" : tier === "silver" ? "Prata" : tier === "bronze" ? "Bronze" : "";
+  return createNotification({
+    userId,
+    type: "tournament",
+    title: "Convite para patrocinar!",
+    message: `${organizerName} convidou sua marca para patrocinar o torneio "${tournamentName}"${tierLabel ? ` como ${tierLabel}` : ""}`,
+    data: { tournamentId, inviteId, inviteType: "sponsor", tier },
+  });
+}
+
+export async function notifyInviteAccepted(organizerId: string, userName: string, tournamentName: string, tournamentId: string, inviteType: string) {
+  return createNotification({
+    userId: organizerId,
+    type: "tournament",
+    title: inviteType === "athlete" ? "Convite aceito!" : "Patrocinio aceito!",
+    message: inviteType === "athlete"
+      ? `${userName} aceitou o convite e se inscreveu no torneio "${tournamentName}"`
+      : `${userName} aceitou patrocinar o torneio "${tournamentName}"`,
+    data: { tournamentId, inviteType },
+  });
+}
+
+export async function notifyInviteDeclined(organizerId: string, userName: string, tournamentName: string, tournamentId: string, inviteType: string) {
+  return createNotification({
+    userId: organizerId,
+    type: "tournament",
+    title: "Convite recusado",
+    message: inviteType === "athlete"
+      ? `${userName} recusou o convite para o torneio "${tournamentName}"`
+      : `${userName} recusou patrocinar o torneio "${tournamentName}"`,
+    data: { tournamentId, inviteType },
+  });
+}
+
+export async function notifyPrizeAwarded(userId: string, tournamentName: string, placement: number, prizeDescription: string, tournamentId: string) {
+  const placementLabels: Record<number, string> = { 1: "Campeao", 2: "Vice-campeao", 3: "Terceiro lugar" };
+  const label = placementLabels[placement] ?? `${placement}o lugar`;
+  return createNotification({
+    userId,
+    type: "tournament",
+    title: `${label}!`,
+    message: `Parabens! Voce ficou em ${label} no torneio "${tournamentName}" e ganhou: ${prizeDescription}`,
+    data: { tournamentId, placement, prizeDescription },
+  });
+}

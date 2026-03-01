@@ -14,6 +14,7 @@ import {
   X,
   Zap,
   Megaphone,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
@@ -22,6 +23,7 @@ import { trpc } from "@/lib/trpc";
 const navItems = [
   { href: "/social", label: "Feed", icon: Users },
   { href: "/tournaments", label: "Torneios", icon: Trophy },
+  { href: "/tournaments/invites", label: "Convites", icon: Mail, badgeKey: "invites" as const },
   { href: "/gcoins", label: "GCoins", icon: Coins },
   { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
@@ -38,6 +40,7 @@ export function Sidebar() {
   // Live data for sidebar widgets
   const balance = trpc.gcoin.balance.useQuery(undefined, { refetchInterval: 30000 });
   const unreadCount = trpc.notification.unreadCount.useQuery(undefined, { refetchInterval: 15000 });
+  const pendingInvites = trpc.tournament.pendingInvitesCount.useQuery(undefined, { refetchInterval: 30000 });
   const totalBalance = balance.data?.total ?? 0;
 
   return (
@@ -75,7 +78,7 @@ export function Sidebar() {
         <nav className="flex-1 py-4 px-3 space-y-0.5 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive = pathname === item.href || (pathname.startsWith(item.href + "/") && !navItems.some(other => other.href !== item.href && other.href.startsWith(item.href + "/") && (pathname === other.href || pathname.startsWith(other.href + "/"))));
             return (
               <Link
                 key={item.href}
@@ -93,6 +96,11 @@ export function Sidebar() {
                 {item.href === "/notifications" && (unreadCount.data ?? 0) > 0 && (
                   <span className="ml-auto flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
                     {(unreadCount.data ?? 0) > 99 ? "99+" : unreadCount.data}
+                  </span>
+                )}
+                {"badgeKey" in item && item.badgeKey === "invites" && (pendingInvites.data ?? 0) > 0 && (
+                  <span className="ml-auto flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-blue-500 text-white text-[10px] font-bold px-1">
+                    {(pendingInvites.data ?? 0) > 99 ? "99+" : pendingInvites.data}
                   </span>
                 )}
               </Link>
