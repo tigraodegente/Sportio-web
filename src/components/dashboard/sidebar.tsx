@@ -13,6 +13,7 @@ import {
   User,
   X,
   Zap,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/notifications", label: "Notificacoes", icon: Bell },
+  { href: "/brand", label: "Marca", icon: Megaphone },
   { href: "/profile", label: "Perfil", icon: User },
   { href: "/settings", label: "Configuracoes", icon: Settings },
 ];

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Loader2, Rss } from "lucide-react";
 import { FeedPost, CreatePostForm, FeedFilters, FeedSidebar } from "@/components/feed";
+import { SponsorBanner } from "@/components/ads/sponsor-banner";
 import { trpc } from "@/lib/trpc";
 
 export default function SocialPage() {
@@ -123,13 +124,20 @@ export default function SocialPage() {
             </div>
           )}
 
-          {allPosts.map((post) => (
-            <FeedPost
-              key={post.id}
-              post={post}
-              currentUserId={currentUser?.id}
-              onPostDeleted={() => feedQuery.refetch()}
-            />
+          {allPosts.map((post, index) => (
+            <div key={post.id}>
+              <FeedPost
+                post={post}
+                currentUserId={currentUser?.id}
+                onPostDeleted={() => feedQuery.refetch()}
+              />
+              {/* Show sponsor banner after every 5th post */}
+              {(index + 1) % 5 === 0 && (
+                <div className="mt-6">
+                  <SponsorBanner placement="feed_banner" sportId={selectedSportId} />
+                </div>
+              )}
+            </div>
           ))}
 
           {/* Load More Trigger */}
