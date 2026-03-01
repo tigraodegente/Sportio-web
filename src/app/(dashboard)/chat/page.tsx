@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 
@@ -75,6 +77,8 @@ export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const me = trpc.user.me.useQuery();
@@ -93,6 +97,20 @@ export default function ChatPage() {
     onSuccess: () => {
       messages.refetch();
       rooms.refetch();
+    },
+  });
+
+  const userSearch = trpc.user.search.useQuery(
+    { query: userSearchQuery, limit: 10 },
+    { enabled: userSearchQuery.length >= 2 }
+  );
+
+  const createDM = trpc.chat.createDM.useMutation({
+    onSuccess: (room) => {
+      setShowNewChatModal(false);
+      setUserSearchQuery("");
+      rooms.refetch();
+      if (room) setSelectedChat(room.id);
     },
   });
 
@@ -237,7 +255,7 @@ export default function ChatPage() {
 
         {/* New Chat Button */}
         <div className="p-4 border-t border-slate-100 bg-gradient-to-t from-slate-50/80 to-white">
-          <Button className="w-full" variant="outline">
+          <Button className="w-full" variant="outline" onClick={() => setShowNewChatModal(true)}>
             <Plus className="w-4 h-4" />
             Nova Conversa
           </Button>
@@ -471,13 +489,58 @@ export default function ChatPage() {
               Selecione uma conversa ou inicie um novo chat com seus parceiros
               de treino.
             </p>
-            <Button variant="outline" className="gap-2 shadow-sm">
+            <Button variant="outline" className="gap-2 shadow-sm" onClick={() => setShowNewChatModal(true)}>
               <Sparkles className="w-4 h-4 text-blue-500" />
               Iniciar Nova Conversa
             </Button>
           </div>
         </div>
       )}
+
+      {/* New Chat Modal */}
+      <Modal isOpen={showNewChatModal} onClose={() => { setShowNewChatModal(false); setUserSearchQuery(""); }} title="Nova Conversa">
+        <div className="space-y-4">
+          <Input
+            label="Buscar usuario"
+            placeholder="Digite o nome do usuario..."
+            icon={<Search className="w-4 h-4" />}
+            value={userSearchQuery}
+            onChange={(e) => setUserSearchQuery(e.target.value)}
+          />
+          {userSearchQuery.length >= 2 && (
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {userSearch.isLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                </div>
+              ) : !userSearch.data?.items?.length ? (
+                <p className="text-sm text-slate-400 text-center py-4">Nenhum usuario encontrado</p>
+              ) : (
+                userSearch.data.items
+                  .filter((u) => u.id !== currentUserId)
+                  .map((user) => (
+                    <button
+                      key={user.id}
+                      onClick={() => createDM.mutate({ userId: user.id })}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors text-left"
+                      disabled={createDM.isPending}
+                    >
+                      <Avatar name={user.name} src={user.image} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
+                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                      </div>
+                      <MessageSquareText className="w-4 h-4 text-slate-300" />
+                    </button>
+                  ))
+              )}
+            </div>
+          )}
+          {userSearchQuery.length < 2 && (
+            <p className="text-xs text-slate-400 text-center py-4">Digite pelo menos 2 caracteres para buscar</p>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -2,6 +2,9 @@ import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { matches } from "@/server/db/schema";
+import { createAutoPost } from "@/server/services/auto-feed";
+import { settleBets, cancelMatchBets } from "@/server/services/bet-settlement";
+import { createNotification } from "@/server/services/notification-service";
 
 export const matchRouter = createTRPCRouter({
   // Get match by ID
@@ -49,6 +52,74 @@ export const matchRouter = createTRPCRouter({
         })
         .where(eq(matches.id, matchId))
         .returning();
+
+      // Auto-post for completed matches
+      if (input.status === "completed" && input.winnerId) {
+        const match = await ctx.db.query.matches.findFirst({
+          where: eq(matches.id, matchId),
+          with: { tournament: true },
+        });
+        if (match) {
+          const loserId =
+            match.player1Id === input.winnerId
+              ? match.player2Id
+              : match.player1Id;
+
+          // Winner post
+          createAutoPost({
+            type: "match_won",
+            userId: input.winnerId,
+            data: {
+              opponentName: "adversario",
+              score: `${input.score1} x ${input.score2}`,
+              tournamentName: match.tournament?.name ?? "torneio",
+            },
+            tournamentId: match.tournamentId,
+          }).catch(() => {});
+
+          // Loser post
+          if (loserId) {
+            createAutoPost({
+              type: "match_lost",
+              userId: loserId,
+              data: {
+                opponentName: "adversario",
+                score: `${input.score2} x ${input.score1}`,
+                tournamentName: match.tournament?.name ?? "torneio",
+              },
+              tournamentId: match.tournamentId,
+            }).catch(() => {});
+          }
+
+          // Settle all bets for this match
+          settleBets(matchId, input.winnerId).catch(() => {});
+
+          // Notify winner and loser
+          createNotification({
+            userId: input.winnerId,
+            type: "match",
+            title: "Vitoria!",
+            message: `Voce venceu por ${input.score1} x ${input.score2} no torneio "${match.tournament?.name}"`,
+            data: { matchId, tournamentId: match.tournamentId },
+          }).catch(() => {});
+
+          if (loserId) {
+            createNotification({
+              userId: loserId,
+              type: "match",
+              title: "Resultado da partida",
+              message: `Resultado: ${input.score2} x ${input.score1} no torneio "${match.tournament?.name}"`,
+              data: { matchId, tournamentId: match.tournamentId },
+            }).catch(() => {});
+          }
+        }
+      }
+
+      // Cancel bets if match is cancelled
+      if (input.status === "cancelled") {
+        cancelMatchBets(matchId).catch(() => {});
+      }
+
       return updated;
     }),
 

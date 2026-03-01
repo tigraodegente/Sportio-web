@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { chatRooms, chatMembers, chatMessages } from "@/server/db/schema";
+import { chatRooms, chatMembers, chatMessages, users } from "@/server/db/schema";
+import { notifyChatMessage } from "@/server/services/notification-service";
 
 export const chatRouter = createTRPCRouter({
   // My rooms
@@ -68,6 +69,21 @@ export const chatRouter = createTRPCRouter({
           images: input.images,
         })
         .returning();
+
+      // Notify other members in the room
+      const members = await ctx.db.query.chatMembers.findMany({
+        where: eq(chatMembers.roomId, input.roomId),
+      });
+      const sender = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: { name: true },
+      });
+      for (const member of members) {
+        if (member.userId !== ctx.session.user.id) {
+          notifyChatMessage(member.userId, sender?.name ?? "Alguem", input.roomId).catch(() => {});
+        }
+      }
+
       return message;
     }),
 

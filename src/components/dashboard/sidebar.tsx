@@ -13,9 +13,11 @@ import {
   User,
   X,
   Zap,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
+import { trpc } from "@/lib/trpc";
 
 const navItems = [
   { href: "/social", label: "Feed", icon: Users },
@@ -24,6 +26,7 @@ const navItems = [
   { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/notifications", label: "Notificacoes", icon: Bell },
+  { href: "/brand", label: "Marca", icon: Megaphone },
   { href: "/profile", label: "Perfil", icon: User },
   { href: "/settings", label: "Configuracoes", icon: Settings },
 ];
@@ -31,6 +34,11 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, setSidebarOpen } = useUIStore();
+
+  // Live data for sidebar widgets
+  const balance = trpc.gcoin.balance.useQuery(undefined, { refetchInterval: 30000 });
+  const unreadCount = trpc.notification.unreadCount.useQuery(undefined, { refetchInterval: 15000 });
+  const totalBalance = balance.data?.total ?? 0;
 
   return (
     <>
@@ -82,8 +90,10 @@ export function Sidebar() {
               >
                 <Icon className="w-[18px] h-[18px] flex-shrink-0" />
                 {item.label}
-                {item.href === "/notifications" && (
-                  <span className="ml-auto w-2 h-2 rounded-full bg-red-500" />
+                {item.href === "/notifications" && (unreadCount.data ?? 0) > 0 && (
+                  <span className="ml-auto flex items-center justify-center min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold px-1">
+                    {(unreadCount.data ?? 0) > 99 ? "99+" : unreadCount.data}
+                  </span>
                 )}
               </Link>
             );
@@ -99,7 +109,9 @@ export function Sidebar() {
                 <Zap className="w-4 h-4 text-blue-200" />
                 <p className="text-xs font-medium text-blue-200">Saldo GCoins</p>
               </div>
-              <p className="text-2xl font-bold tracking-tight">--,--</p>
+              <p className="text-2xl font-bold tracking-tight">
+                {balance.isLoading ? "--,--" : totalBalance.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
               <div className="flex gap-2 mt-3">
                 <Link
                   href="/gcoins"

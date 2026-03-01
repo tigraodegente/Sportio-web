@@ -2,6 +2,7 @@ import { z } from "zod";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { bets, users, gcoinTransactions } from "@/server/db/schema";
+import { calculateOdds } from "@/server/services/odds-calculator";
 
 export const betRouter = createTRPCRouter({
   // Place bet
@@ -26,8 +27,8 @@ export const betRouter = createTRPCRouter({
         throw new Error("Saldo insuficiente de GCoins");
       }
 
-      // Simple odds calculation
-      const odds = input.betType === "winner" ? 1.8 : input.betType === "score" ? 5.0 : 3.0;
+      // Dynamic odds calculation based on existing bets
+      const { odds } = await calculateOdds(ctx.db, input.matchId, input.betType, input.prediction);
       const potentialWin = input.amount * odds;
 
       // Debit user
@@ -88,6 +89,20 @@ export const betRouter = createTRPCRouter({
         orderBy: [desc(bets.createdAt)],
         limit: input.limit,
       });
+    }),
+
+  // Get current odds for a match
+  getOdds: publicProcedure
+    .input(
+      z.object({
+        matchId: z.string().uuid(),
+        betType: z.enum(["winner", "score", "mvp", "custom"]),
+        prediction: z.record(z.string(), z.unknown()),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const result = await calculateOdds(ctx.db, input.matchId, input.betType, input.prediction);
+      return result;
     }),
 
   // Leaderboard

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { gcoinTransactions, users } from "@/server/db/schema";
+import { notifyGcoinReceived } from "@/server/services/notification-service";
 
 export const gcoinRouter = createTRPCRouter({
   // Get balance
@@ -108,6 +109,9 @@ export const gcoinRouter = createTRPCRouter({
           referenceType: "user",
         },
       ]);
+
+      // Notify recipient
+      notifyGcoinReceived(input.toUserId, input.amount, sender.name).catch(() => {});
 
       return { success: true };
     }),

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Search, MapPin, Calendar, Users, Trophy, Ticket, Loader2 } from "lucide-react";
+import { Plus, Search, MapPin, Calendar, Users, Trophy, Ticket, Loader2, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +12,13 @@ import { Tabs } from "@/components/ui/tabs";
 import { Select } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 
-const sportEmojiMap: Record<string, string> = {
-  "Beach Tennis": "\u{1F3D6}\uFE0F",
-  "CrossFit": "\u{1F3CB}\uFE0F",
-  "Futebol": "\u26BD",
-  "E-Sports": "\u{1F3AE}",
-  "Corrida": "\u{1F3C3}",
-  "Volei": "\u{1F3D0}",
+const sportIconMap: Record<string, LucideIcon> = {
+  "Beach Tennis": Sun,
+  "CrossFit": Dumbbell,
+  "Futebol": Target,
+  "E-Sports": Gamepad2,
+  "Corrida": Footprints,
+  "Volei": Circle,
 };
 
 const sportGradientMap: Record<string, string> = {
@@ -75,7 +76,7 @@ function TournamentCard({ tournament }: { tournament: any }) { // eslint-disable
   const maxParticipants = tournament.maxParticipants ?? 32;
   const fillPercent = Math.round((enrollmentCount / maxParticipants) * 100);
   const sportName = tournament.sport?.name ?? "Esporte";
-  const sportEmoji = sportEmojiMap[sportName] || "\u{1F3C6}";
+  const SportIcon = sportIconMap[sportName] || Trophy;
   const sportColor = tournament.sport?.color || sportColorMap[sportName] || "bg-blue-500";
   const gradient = sportGradientMap[sportColor] || "from-blue-400 to-blue-600";
   const entryFee = Number(tournament.entryFee ?? 0);
@@ -105,7 +106,7 @@ function TournamentCard({ tournament }: { tournament: any }) { // eslint-disable
           {tournament.name}
         </h3>
         <p className="text-sm text-slate-500 mb-4 flex items-center gap-1.5">
-          <span className="text-base leading-none">{sportEmoji}</span>
+          <SportIcon className="w-4 h-4 text-slate-400" />
           <span className="font-medium">{sportName}</span>
         </p>
 

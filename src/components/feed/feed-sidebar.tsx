@@ -4,6 +4,7 @@ import { TrendingUp, UserPlus, Heart, MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { SponsorBanner } from "@/components/ads/sponsor-banner";
 import { trpc } from "@/lib/trpc";
 
 interface FeedSidebarProps {
@@ -26,6 +27,9 @@ export function FeedSidebar({ currentUserId }: FeedSidebarProps) {
 
   return (
     <div className="space-y-6">
+      {/* Sidebar Ad */}
+      <SponsorBanner placement="sidebar" />
+
       {/* Trending Posts */}
       <Card>
         <div className="flex items-center gap-2 mb-4">

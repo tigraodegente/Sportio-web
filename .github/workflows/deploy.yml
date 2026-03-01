@@ -12,6 +12,37 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
+  # Run database migration before deploy
+  db-migrate:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Push schema to database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm db:push
+
+      - name: Seed database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm db:seed
+        continue-on-error: true
+
   deploy-preview:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -41,7 +72,7 @@ jobs:
         run: |
           url=$(vercel deploy --prebuilt --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
-          echo "### 🚀 Preview Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "### Preview Deployed" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY
 
       - name: Comment PR with Preview URL
@@ -53,11 +84,12 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚀 Preview deployed to: ${{ steps.deploy.outputs.url }}`
+              body: `Preview deployed to: ${{ steps.deploy.outputs.url }}`
             })
 
   deploy-production:
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    needs: db-migrate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,5 +117,5 @@ jobs:
         run: |
           url=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
-          echo "### 🚀 Production Deployed" >> $GITHUB_STEP_SUMMARY
+          echo "### Production Deployed" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY

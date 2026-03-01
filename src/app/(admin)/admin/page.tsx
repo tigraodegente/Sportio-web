@@ -91,6 +91,35 @@ export default function AdminPage() {
   // --- tRPC Queries ---
   const currentUser = trpc.user.me.useQuery(undefined, { retry: false });
 
+  // RBAC: Check if user has admin or organizer role
+  const userRoles = currentUser.data?.roles?.map((r: { role: string }) => r.role) ?? [];
+  const isAdmin = userRoles.includes("admin");
+  const isOrganizer = userRoles.includes("organizer");
+  const hasAccess = isAdmin || isOrganizer;
+
+  if (currentUser.isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-6">
+        <div className="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center">
+          <Shield className="w-8 h-8 text-red-500" />
+        </div>
+        <h1 className="text-xl font-bold text-slate-900">Acesso Restrito</h1>
+        <p className="text-slate-500 text-center max-w-md">
+          Voce nao tem permissao para acessar o painel administrativo.
+          Entre em contato com um administrador se precisar de acesso.
+        </p>
+      </div>
+    );
+  }
+
   // user.search requires query with min(1), so only query when there is input
   const usersQuery = trpc.user.search.useQuery(
     { query: userSearch || "a", limit: 20 },

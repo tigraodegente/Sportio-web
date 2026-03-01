@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle } from "lucide-react";
+import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle, BarChart3 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
@@ -27,13 +28,13 @@ const formatMap: Record<string, string> = {
   league: "Liga",
 };
 
-const sportEmojiMap: Record<string, string> = {
-  "Beach Tennis": "\u{1F3D6}\uFE0F",
-  "CrossFit": "\u{1F3CB}\uFE0F",
-  "Futebol": "\u26BD",
-  "E-Sports": "\u{1F3AE}",
-  "Corrida": "\u{1F3C3}",
-  "Volei": "\u{1F3D0}",
+const sportIconMap: Record<string, LucideIcon> = {
+  "Beach Tennis": Sun,
+  "CrossFit": Dumbbell,
+  "Futebol": Target,
+  "E-Sports": Gamepad2,
+  "Corrida": Footprints,
+  "Volei": Circle,
 };
 
 function formatDate(date: Date | string | null | undefined): string {
@@ -75,6 +76,8 @@ export default function TournamentDetailPage() {
     { enabled: !!tournamentId }
   );
 
+  const currentUserQuery = trpc.user.me.useQuery(undefined, { retry: false });
+
   const enrollMutation = trpc.tournament.enroll.useMutation({
     onSuccess: () => {
       setEnrollSuccess(true);
@@ -89,10 +92,40 @@ export default function TournamentDetailPage() {
     },
   });
 
+  const generateBracketMutation = trpc.tournament.generateBracket.useMutation({
+    onSuccess: () => {
+      tournamentQuery.refetch();
+      matchesQuery.refetch();
+    },
+  });
+
+  const standingsQuery = trpc.tournament.standings.useQuery(
+    { tournamentId },
+    { enabled: !!tournamentId }
+  );
+
+  // Build a map of player IDs to names from enrollment data
+  const playerNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const enrollments = tournamentQuery.data?.enrollments;
+    if (enrollments) {
+      for (const enrollment of enrollments) {
+        if (enrollment.userId && enrollment.user?.name) {
+          map.set(enrollment.userId, enrollment.user.name);
+        }
+      }
+    }
+    return map;
+  }, [tournamentQuery.data?.enrollments]);
+
   const handleEnroll = () => {
     setEnrolling(true);
     setEnrollError(null);
     enrollMutation.mutate({ tournamentId });
+  };
+
+  const handleGenerateBracket = () => {
+    generateBracketMutation.mutate({ tournamentId });
   };
 
   if (tournamentQuery.isLoading) {
@@ -134,11 +167,24 @@ export default function TournamentDetailPage() {
   const entryFee = Number(tournament.entryFee ?? 0);
   const prizePool = Number(tournament.prizePool ?? 0);
   const sportName = tournament.sport?.name ?? "Esporte";
-  const sportEmoji = sportEmojiMap[sportName] || "\u{1F3C6}";
+  const SportIcon = sportIconMap[sportName] || Trophy;
   const cityDisplay = tournament.isOnline
     ? "Online"
     : [tournament.city, tournament.state].filter(Boolean).join(", ") || "--";
   const canEnroll = tournament.status === "registration_open" && !enrollSuccess;
+  const currentUserId = currentUserQuery.data?.id;
+  const isOrganizer = currentUserId === tournament.organizerId;
+  const canGenerateBracket =
+    isOrganizer && tournament.status === "registration_closed";
+  const showStandingsTab =
+    tournament.format === "round_robin" ||
+    tournament.format === "league" ||
+    tournament.format === "swiss";
+
+  const getPlayerName = (playerId: string | null): string => {
+    if (!playerId) return "TBD";
+    return playerNameMap.get(playerId) ?? "Jogador";
+  };
 
   const matchList = matchesQuery.data ?? [];
   const rounds = [...new Set(matchList.map((m) => m.round))].sort((a, b) => a - b);
@@ -158,7 +204,7 @@ export default function TournamentDetailPage() {
                 {statusMap[tournament.status as string]?.label ?? tournament.status}
               </Badge>
               <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm">
-                <span className="mr-0.5">{sportEmoji}</span> {sportName}
+                <SportIcon className="w-3.5 h-3.5 mr-0.5 inline-block" /> {sportName}
               </Badge>
             </div>
             <Button variant="ghost" size="icon" className="text-white/70 hover:text-white hover:bg-white/10">
@@ -229,6 +275,33 @@ export default function TournamentDetailPage() {
             </Button>
           </div>
 
+          {canGenerateBracket && (
+            <div className="mt-4">
+              <Button
+                variant="accent"
+                size="lg"
+                onClick={handleGenerateBracket}
+                loading={generateBracketMutation.isPending}
+                disabled={generateBracketMutation.isPending}
+              >
+                <Swords className="w-5 h-5" />
+                {generateBracketMutation.isPending
+                  ? "Gerando chaves..."
+                  : "Gerar Chaves"}
+              </Button>
+              {generateBracketMutation.isError && (
+                <p className="mt-2 text-sm text-red-200 bg-red-500/20 rounded-lg px-3 py-2">
+                  {generateBracketMutation.error.message}
+                </p>
+              )}
+              {generateBracketMutation.isSuccess && (
+                <p className="mt-2 text-sm text-green-200 bg-green-500/20 rounded-lg px-3 py-2">
+                  Chaves geradas com sucesso!
+                </p>
+              )}
+            </div>
+          )}
+
           {enrollError && (
             <p className="mt-3 text-sm text-red-200 bg-red-500/20 rounded-lg px-3 py-2">{enrollError}</p>
           )}
@@ -241,6 +314,9 @@ export default function TournamentDetailPage() {
           { id: "info", label: "Informacoes" },
           { id: "participants", label: `Participantes (${enrollmentCount})` },
           { id: "bracket", label: "Chaves" },
+          ...(showStandingsTab
+            ? [{ id: "standings", label: "Classificacao" }]
+            : []),
           { id: "rules", label: "Regras" },
         ]}
       >
@@ -300,21 +376,27 @@ export default function TournamentDetailPage() {
                     <CardContent className="mt-4 space-y-3">
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50/70">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F947}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">1</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">1o Lugar</span>
                         </div>
                         <span className="font-bold text-amber-600">{Math.round(prizePool * 0.5).toLocaleString()} GCoins</span>
                       </div>
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/70">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F948}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-slate-400 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">2</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">2o Lugar</span>
                         </div>
                         <span className="font-bold text-slate-500">{Math.round(prizePool * 0.3).toLocaleString()} GCoins</span>
                       </div>
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-orange-50/50">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F949}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-amber-700 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">3</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">3o Lugar</span>
                         </div>
                         <span className="font-bold text-amber-800">{Math.round(prizePool * 0.2).toLocaleString()} GCoins</span>
@@ -453,7 +535,7 @@ export default function TournamentDetailPage() {
                                             ? "text-slate-400"
                                             : "text-slate-700 font-medium"
                                       }`}>
-                                        {match.player1Id ? `Jogador` : "TBD"}
+                                        {getPlayerName(match.player1Id)}
                                       </span>
                                     </div>
                                     {match.score1 != null && (
@@ -487,7 +569,7 @@ export default function TournamentDetailPage() {
                                             ? "text-slate-400"
                                             : "text-slate-700 font-medium"
                                       }`}>
-                                        {match.player2Id ? `Jogador` : "TBD"}
+                                        {getPlayerName(match.player2Id)}
                                       </span>
                                     </div>
                                     {match.score2 != null && (
@@ -516,6 +598,88 @@ export default function TournamentDetailPage() {
                         </div>
                       );
                     })}
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {tab === "standings" && showStandingsTab && (
+              <Card>
+                <CardTitle className="mb-6">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                    Classificacao
+                  </div>
+                </CardTitle>
+                {standingsQuery.isLoading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+                  </div>
+                ) : standingsQuery.data && standingsQuery.data.length > 0 ? (
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-slate-200">
+                            <th className="text-left py-2 px-2 font-semibold text-slate-500 text-xs">#</th>
+                            <th className="text-left py-2 px-2 font-semibold text-slate-500 text-xs">Jogador</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">J</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">V</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">E</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">D</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">GP</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">GC</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">SG</th>
+                            <th className="text-center py-2 px-2 font-semibold text-slate-500 text-xs">Pts</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {standingsQuery.data.map((row, index) => (
+                            <tr
+                              key={row.participantId}
+                              className={`border-b border-slate-100 transition-colors hover:bg-blue-500/5 ${
+                                index < 3 ? "bg-slate-50/50" : ""
+                              }`}
+                            >
+                              <td className="py-2.5 px-2">
+                                <span className={`text-sm font-bold ${
+                                  index === 0
+                                    ? "text-amber-500"
+                                    : index === 1
+                                      ? "text-slate-400"
+                                      : index === 2
+                                        ? "text-amber-700"
+                                        : "text-slate-400"
+                                }`}>
+                                  {index + 1}
+                                </span>
+                              </td>
+                              <td className="py-2.5 px-2">
+                                <div className="flex items-center gap-2">
+                                  <Avatar name={row.participantName} size="sm" />
+                                  <span className="font-medium text-slate-900">{row.participantName}</span>
+                                </div>
+                              </td>
+                              <td className="text-center py-2.5 px-2 text-slate-600">{row.played}</td>
+                              <td className="text-center py-2.5 px-2 text-green-600 font-medium">{row.wins}</td>
+                              <td className="text-center py-2.5 px-2 text-slate-500">{row.draws}</td>
+                              <td className="text-center py-2.5 px-2 text-red-500">{row.losses}</td>
+                              <td className="text-center py-2.5 px-2 text-slate-600">{row.goalsFor}</td>
+                              <td className="text-center py-2.5 px-2 text-slate-600">{row.goalsAgainst}</td>
+                              <td className="text-center py-2.5 px-2 font-medium text-slate-700">{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
+                              <td className="text-center py-2.5 px-2">
+                                <span className="font-bold text-blue-600">{row.points}</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <BarChart3 className="w-10 h-10 text-slate-300 mb-3" />
+                    <p className="text-sm text-slate-500">Nenhuma classificacao disponivel ainda.</p>
                   </div>
                 )}
               </Card>

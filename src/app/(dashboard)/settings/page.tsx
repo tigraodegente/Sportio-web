@@ -1,17 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Shield, CreditCard, LogOut, Camera, Settings, AlertTriangle, Instagram, Twitter, Youtube, Check, Save, Users, Loader2, AlertCircle } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { User, Bell, Shield, CreditCard, LogOut, Camera, Settings, AlertTriangle, Instagram, Twitter, Youtube, Check, Save, Users, Loader2, AlertCircle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
+import { Modal } from "@/components/ui/modal";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 
 export default function SettingsPage() {
   const user = trpc.user.me.useQuery();
+  const settings = trpc.user.getSettings.useQuery();
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
       user.refetch();
@@ -20,7 +23,37 @@ export default function SettingsPage() {
     },
   });
 
+  const updateNotificationPrefs = trpc.user.updateNotificationPrefs.useMutation({
+    onSuccess: () => settings.refetch(),
+  });
+
+  const updatePrivacyPrefs = trpc.user.updatePrivacyPrefs.useMutation({
+    onSuccess: () => settings.refetch(),
+  });
+
+  const changePassword = trpc.user.changePassword.useMutation({
+    onSuccess: () => {
+      setShowPasswordModal(false);
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordError("");
+    },
+    onError: (err) => setPasswordError(err.message),
+  });
+
+  const savePixKey = trpc.user.savePixKey.useMutation({
+    onSuccess: () => {
+      user.refetch();
+      setPixSaved(true);
+      setTimeout(() => setPixSaved(false), 2000);
+    },
+  });
+
   const [saved, setSaved] = useState(false);
+  const [pixSaved, setPixSaved] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pixKey, setPixKey] = useState("");
 
   // Form state
   const [name, setName] = useState("");
@@ -43,6 +76,7 @@ export default function SettingsPage() {
       setInstagram(user.data.instagram ?? "");
       setTwitter(user.data.twitter ?? "");
       setYoutube(user.data.youtube ?? "");
+      setPixKey(user.data.pixKey ?? "");
     }
   }, [user.data]);
 
@@ -57,6 +91,50 @@ export default function SettingsPage() {
       twitter: twitter || undefined,
       youtube: youtube || undefined,
     });
+  };
+
+  const handleChangePassword = () => {
+    setPasswordError("");
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError("As senhas nao conferem");
+      return;
+    }
+    if (passwordForm.newPassword.length < 8) {
+      setPasswordError("A nova senha deve ter pelo menos 8 caracteres");
+      return;
+    }
+    changePassword.mutate({
+      currentPassword: passwordForm.currentPassword,
+      newPassword: passwordForm.newPassword,
+    });
+  };
+
+  const handleSavePixKey = () => {
+    if (pixKey.trim()) {
+      savePixKey.mutate({ pixKey: pixKey.trim() });
+    }
+  };
+
+  // Photo upload handler
+  const handlePhotoUpload = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png,image/webp";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Arquivo muito grande. Maximo 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        updateProfile.mutate({ image: base64 });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   };
 
   if (user.isLoading) {
@@ -80,6 +158,7 @@ export default function SettingsPage() {
   }
 
   const profile = user.data;
+  const prefs = settings.data;
 
   const initials = profile.name
     ?.split(" ")
@@ -113,7 +192,6 @@ export default function SettingsPage() {
           <>
             {tab === "profile" && (
               <div className="space-y-6">
-                {/* Profile Card with blue accent */}
                 <Card className="border-l-4 border-l-blue-500 overflow-visible">
                   <CardTitle className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -122,9 +200,8 @@ export default function SettingsPage() {
                     Informacoes Pessoais
                   </CardTitle>
                   <CardContent className="mt-4 space-y-4">
-                    {/* Avatar with camera overlay */}
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="relative group cursor-pointer">
+                      <div className="relative group cursor-pointer" onClick={handlePhotoUpload}>
                         {profile.image ? (
                           <div className="w-20 h-20 rounded-full ring-4 ring-blue-100 ring-offset-2 ring-offset-white overflow-hidden transition-all duration-300 group-hover:ring-blue-200">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -143,7 +220,7 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       <div>
-                        <Button variant="outline" size="sm" className="shadow-sm">
+                        <Button variant="outline" size="sm" className="shadow-sm" onClick={handlePhotoUpload}>
                           <Camera className="w-3.5 h-3.5" />
                           Alterar foto
                         </Button>
@@ -151,46 +228,20 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input
-                        label="Nome"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
+                      <Input label="Nome" value={name} onChange={(e) => setName(e.target.value)} />
                       <Input label="Email" type="email" value={profile.email} disabled />
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input
-                        label="Telefone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="(11) 99999-9999"
-                      />
+                      <Input label="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-9999" />
                       <div className="grid sm:grid-cols-2 gap-4">
-                        <Input
-                          label="Cidade"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          placeholder="Sao Paulo"
-                        />
-                        <Input
-                          label="Estado"
-                          value={state}
-                          onChange={(e) => setState(e.target.value)}
-                          placeholder="SP"
-                        />
+                        <Input label="Cidade" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Sao Paulo" />
+                        <Input label="Estado" value={state} onChange={(e) => setState(e.target.value)} placeholder="SP" />
                       </div>
                     </div>
-                    <Textarea
-                      label="Bio"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      rows={3}
-                      placeholder="Conte um pouco sobre voce..."
-                    />
+                    <Textarea label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Conte um pouco sobre voce..." />
                   </CardContent>
                 </Card>
 
-                {/* Social Media Card with blue accent */}
                 <Card className="border-l-4 border-l-blue-500">
                   <CardTitle className="flex items-center gap-2">
                     <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -199,52 +250,33 @@ export default function SettingsPage() {
                     Redes Sociais
                   </CardTitle>
                   <CardContent className="mt-4 space-y-4">
-                    {/* Instagram */}
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 flex items-center justify-center flex-shrink-0 shadow-sm">
                         <Instagram className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input
-                          label="Instagram"
-                          placeholder="@seuusuario"
-                          value={instagram}
-                          onChange={(e) => setInstagram(e.target.value)}
-                        />
+                        <Input label="Instagram" placeholder="@seuusuario" value={instagram} onChange={(e) => setInstagram(e.target.value)} />
                       </div>
                     </div>
-                    {/* Twitter */}
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm">
                         <Twitter className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input
-                          label="Twitter"
-                          placeholder="@seuusuario"
-                          value={twitter}
-                          onChange={(e) => setTwitter(e.target.value)}
-                        />
+                        <Input label="Twitter" placeholder="@seuusuario" value={twitter} onChange={(e) => setTwitter(e.target.value)} />
                       </div>
                     </div>
-                    {/* YouTube */}
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                         <Youtube className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input
-                          label="YouTube"
-                          placeholder="URL do canal"
-                          value={youtube}
-                          onChange={(e) => setYoutube(e.target.value)}
-                        />
+                        <Input label="YouTube" placeholder="URL do canal" value={youtube} onChange={(e) => setYoutube(e.target.value)} />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Error message */}
                 {updateProfile.error && (
                   <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -252,7 +284,6 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* Save Button with success animation */}
                 <div className="flex justify-end">
                   <Button
                     loading={updateProfile.isPending}
@@ -262,17 +293,7 @@ export default function SettingsPage() {
                       saved && "bg-gradient-to-r from-blue-500 to-green-500 shadow-lg shadow-blue-500/30"
                     )}
                   >
-                    {saved ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        Salvo com Sucesso!
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Salvar Alteracoes
-                      </>
-                    )}
+                    {saved ? (<><Check className="w-4 h-4" />Salvo com Sucesso!</>) : (<><Save className="w-4 h-4" />Salvar Alteracoes</>)}
                   </Button>
                 </div>
               </div>
@@ -288,21 +309,26 @@ export default function SettingsPage() {
                 </CardTitle>
                 <CardContent className="mt-4 space-y-1">
                   {[
-                    { label: "Torneios", desc: "Novos torneios, inscricoes e resultados", defaultOn: true },
-                    { label: "Partidas", desc: "Agenda, placar ao vivo e resultados", defaultOn: true },
-                    { label: "GCoins", desc: "Transacoes e saldo", defaultOn: true },
-                    { label: "Social", desc: "Novos seguidores, curtidas e comentarios", defaultOn: true },
-                    { label: "Chat", desc: "Novas mensagens", defaultOn: true },
-                    { label: "Palpites", desc: "Resultados dos palpites", defaultOn: true },
-                    { label: "Marketing", desc: "Novidades e ofertas da plataforma", defaultOn: false },
+                    { key: "notifyTournaments", label: "Torneios", desc: "Novos torneios, inscricoes e resultados" },
+                    { key: "notifyMatches", label: "Partidas", desc: "Agenda, placar ao vivo e resultados" },
+                    { key: "notifyGcoins", label: "GCoins", desc: "Transacoes e saldo" },
+                    { key: "notifySocial", label: "Social", desc: "Novos seguidores, curtidas e comentarios" },
+                    { key: "notifyChat", label: "Chat", desc: "Novas mensagens" },
+                    { key: "notifyBets", label: "Palpites", desc: "Resultados dos palpites" },
+                    { key: "notifyMarketing", label: "Marketing", desc: "Novidades e ofertas da plataforma" },
                   ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 group">
+                    <div key={item.key} className="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 group">
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{item.label}</p>
                         <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                        <input type="checkbox" className="sr-only peer" defaultChecked={item.defaultOn} />
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={prefs ? (prefs[item.key as keyof typeof prefs] as boolean) : true}
+                          onChange={(e) => updateNotificationPrefs.mutate({ [item.key]: e.target.checked })}
+                        />
                         <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 transition-all duration-300"></div>
                       </label>
                     </div>
@@ -321,25 +347,30 @@ export default function SettingsPage() {
                 </CardTitle>
                 <CardContent className="mt-4 space-y-1">
                   {[
-                    { label: "Perfil publico", desc: "Permitir que outros vejam seu perfil", defaultOn: true },
-                    { label: "Mostrar resultados", desc: "Exibir historico de torneios", defaultOn: true },
-                    { label: "Mostrar GCoins", desc: "Exibir saldo de GCoins no perfil", defaultOn: true },
-                    { label: "Permitir mensagens", desc: "Receber mensagens de qualquer usuario", defaultOn: true },
+                    { key: "publicProfile", label: "Perfil publico", desc: "Permitir que outros vejam seu perfil" },
+                    { key: "showResults", label: "Mostrar resultados", desc: "Exibir historico de torneios" },
+                    { key: "showGcoins", label: "Mostrar GCoins", desc: "Exibir saldo de GCoins no perfil" },
+                    { key: "allowMessages", label: "Permitir mensagens", desc: "Receber mensagens de qualquer usuario" },
                   ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 group">
+                    <div key={item.key} className="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 group">
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{item.label}</p>
                         <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
-                        <input type="checkbox" className="sr-only peer" defaultChecked={item.defaultOn} />
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={prefs ? (prefs[item.key as keyof typeof prefs] as boolean) : true}
+                          onChange={(e) => updatePrivacyPrefs.mutate({ [item.key]: e.target.checked })}
+                        />
                         <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 transition-all duration-300"></div>
                       </label>
                     </div>
                   ))}
                   <div className="pt-4 mt-3 border-t border-slate-200">
-                    <Button variant="outline" size="sm" className="shadow-sm">
-                      <Shield className="w-3.5 h-3.5" />
+                    <Button variant="outline" size="sm" className="shadow-sm" onClick={() => setShowPasswordModal(true)}>
+                      <Lock className="w-3.5 h-3.5" />
                       Alterar Senha
                     </Button>
                   </div>
@@ -357,10 +388,15 @@ export default function SettingsPage() {
                     Chave PIX
                   </CardTitle>
                   <CardContent className="mt-4 space-y-4">
-                    <Input label="Chave PIX para saques" placeholder="CPF, email, telefone ou chave aleatoria" />
-                    <Button variant="outline" size="sm" className="shadow-sm">
-                      <Save className="w-3.5 h-3.5" />
-                      Salvar Chave PIX
+                    <Input label="Chave PIX para saques" placeholder="CPF, email, telefone ou chave aleatoria" value={pixKey} onChange={(e) => setPixKey(e.target.value)} />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={cn("shadow-sm", pixSaved && "bg-green-50 text-green-700 border-green-300")}
+                      onClick={handleSavePixKey}
+                      disabled={savePixKey.isPending}
+                    >
+                      {pixSaved ? (<><Check className="w-3.5 h-3.5" />Salvo!</>) : (<><Save className="w-3.5 h-3.5" />Salvar Chave PIX</>)}
                     </Button>
                   </CardContent>
                 </Card>
@@ -388,7 +424,7 @@ export default function SettingsPage() {
         )}
       </Tabs>
 
-      {/* Danger Zone - Red gradient border + warning icon */}
+      {/* Danger Zone */}
       <Card className="border-red-200 bg-gradient-to-r from-red-50/50 via-white to-white border-l-4 border-l-red-500">
         <CardTitle className="text-red-600 flex items-center gap-2">
           <div className="w-6 h-6 rounded-lg bg-red-100 flex items-center justify-center">
@@ -401,12 +437,31 @@ export default function SettingsPage() {
             <p className="text-sm font-semibold text-slate-900">Sair da conta</p>
             <p className="text-xs text-slate-500 mt-0.5">Voce sera desconectado de todos os dispositivos</p>
           </div>
-          <Button variant="danger" size="sm" className="shadow-sm shadow-red-500/20">
+          <Button variant="danger" size="sm" className="shadow-sm shadow-red-500/20" onClick={() => signOut({ callbackUrl: "/login" })}>
             <LogOut className="w-4 h-4" />
             Sair
           </Button>
         </CardContent>
       </Card>
+
+      {/* Change Password Modal */}
+      <Modal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} title="Alterar Senha">
+        <div className="space-y-4">
+          <Input label="Senha atual" type="password" value={passwordForm.currentPassword} onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })} placeholder="Digite sua senha atual" />
+          <Input label="Nova senha" type="password" value={passwordForm.newPassword} onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })} placeholder="Minimo 8 caracteres" />
+          <Input label="Confirmar nova senha" type="password" value={passwordForm.confirmPassword} onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })} placeholder="Repita a nova senha" />
+          {passwordError && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {passwordError}
+            </div>
+          )}
+          <Button className="w-full" onClick={handleChangePassword} loading={changePassword.isPending} disabled={!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}>
+            <Lock className="w-4 h-4" />
+            Alterar Senha
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
