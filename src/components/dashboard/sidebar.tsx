@@ -13,11 +13,11 @@ import {
   Settings,
   User,
   X,
-  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 import { SportioLogo } from "@/components/shared/sportio-logo";
+import { trpc } from "@/lib/trpc";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -34,6 +34,10 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, setSidebarOpen } = useUIStore();
+  const { data: balance } = trpc.gcoin.balance.useQuery();
+  const { data: unreadCount } = trpc.notification.unreadCount.useQuery();
+
+  const gcoinsDisplay = balance?.real?.toLocaleString("pt-BR", { minimumFractionDigits: 2 }) ?? "0,00";
 
   return (
     <>
@@ -82,9 +86,9 @@ export function Sidebar() {
               >
                 <Icon className="w-[18px] h-[18px] flex-shrink-0" />
                 {item.label}
-                {item.href === "/notifications" && (
+                {item.href === "/notifications" && (unreadCount ?? 0) > 0 && (
                   <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    3
+                    {unreadCount}
                   </span>
                 )}
               </Link>
@@ -101,7 +105,7 @@ export function Sidebar() {
                 <Coins className="w-4 h-4 text-yellow-400" />
                 <p className="text-xs font-medium text-yellow-300/80">Saldo GCoins</p>
               </div>
-              <p className="text-2xl font-bold tracking-tight text-yellow-400">1.250,00</p>
+              <p className="text-2xl font-bold tracking-tight text-yellow-400">{gcoinsDisplay}</p>
               <div className="flex gap-2 mt-3">
                 <Link
                   href="/gcoins"

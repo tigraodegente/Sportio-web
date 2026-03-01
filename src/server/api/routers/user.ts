@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { eq, ilike, desc, sql } from "drizzle-orm";
+import { eq, ilike, desc, sql, and, or } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { users, userRoles, userSports, followers } from "@/server/db/schema";
+import { users, userRoles, userSports, followers, enrollments, tournaments, bets, gcoinTransactions, notifications } from "@/server/db/schema";
 import bcrypt from "bcryptjs";
 
 export const userRouter = createTRPCRouter({
@@ -228,4 +228,135 @@ export const userRouter = createTRPCRouter({
       });
       return query;
     }),
+
+  // Dashboard stats (aggregated data for dashboard page)
+  dashboardStats: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    // Get user data
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, userId),
+      with: {
+        roles: true,
+        sports: { with: { sport: true } },
+      },
+    });
+
+    if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado" });
+
+    // GCoins balance
+    const gcoinsReal = Number(user.gcoinsReal ?? 0);
+
+    // Total tournaments enrolled
+    const userEnrollments = await ctx.db.query.enrollments.findMany({
+      where: eq(enrollments.userId, userId),
+      with: {
+        tournament: { with: { sport: true } },
+      },
+    });
+
+    const totalTournaments = userEnrollments.length;
+    const activeTournaments = userEnrollments.filter(
+      (e) => e.tournament.status === "in_progress" || e.tournament.status === "registration_open"
+    ).length;
+
+    // Victories (enrollments where status = winner)
+    const victories = userEnrollments.filter((e) => e.status === "winner").length;
+
+    // Total wins from userSports
+    const totalWins = user.sports.reduce((sum, s) => sum + (s.wins ?? 0), 0);
+    const totalLosses = user.sports.reduce((sum, s) => sum + (s.losses ?? 0), 0);
+    const winRate = totalWins + totalLosses > 0 ? Math.round((totalWins / (totalWins + totalLosses)) * 100) : 0;
+
+    // Recent tournaments (last 3 the user is enrolled in)
+    const recentTournaments = userEnrollments
+      .sort((a, b) => new Date(b.tournament.createdAt).getTime() - new Date(a.tournament.createdAt).getTime())
+      .slice(0, 3)
+      .map((e) => ({
+        id: e.tournament.id,
+        name: e.tournament.name,
+        sport: e.tournament.sport?.name ?? "Esporte",
+        status: e.tournament.status,
+        date: e.tournament.startDate
+          ? new Date(e.tournament.startDate).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })
+          : "A definir",
+        prize: Number(e.tournament.prizePool ?? 0).toLocaleString("pt-BR"),
+      }));
+
+    // Recent bets (last 3)
+    const recentBets = await ctx.db.query.bets.findMany({
+      where: eq(bets.userId, userId),
+      with: {
+        match: true,
+        tournament: true,
+      },
+      orderBy: [desc(bets.createdAt)],
+      limit: 3,
+    });
+
+    const formattedBets = recentBets.map((b) => ({
+      id: b.id,
+      match: b.tournament?.name ?? "Partida",
+      amount: Number(b.amount),
+      odds: Number(b.odds ?? 0),
+      status: b.result ?? "pending",
+    }));
+
+    // Follow counts
+    const [followersCount] = await ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(followers)
+      .where(eq(followers.followingId, userId));
+
+    const [followingCount] = await ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(followers)
+      .where(eq(followers.followerId, userId));
+
+    // Unread notifications
+    const [unreadNotifs] = await ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(notifications)
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
+
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+        bio: user.bio,
+        city: user.city,
+        state: user.state,
+        level: user.level ?? 1,
+        xp: user.xp ?? 0,
+        isPro: user.isPro ?? false,
+        isVerified: user.isVerified ?? false,
+        instagram: user.instagram,
+        twitter: user.twitter,
+        youtube: user.youtube,
+        createdAt: user.createdAt,
+        roles: user.roles.map((r) => r.role),
+        sports: user.sports.map((s) => ({
+          name: s.sport?.name ?? "Esporte",
+          level: s.level ?? "C",
+          rating: Number(s.rating ?? 1000),
+          wins: s.wins ?? 0,
+          losses: s.losses ?? 0,
+        })),
+      },
+      stats: {
+        gcoinsReal,
+        totalTournaments,
+        activeTournaments,
+        victories: totalWins,
+        winRate,
+        followers: Number(followersCount?.count ?? 0),
+        following: Number(followingCount?.count ?? 0),
+        unreadNotifications: Number(unreadNotifs?.count ?? 0),
+      },
+      recentTournaments,
+      recentBets: formattedBets,
+    };
+  }),
 });

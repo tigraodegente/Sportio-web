@@ -4,9 +4,18 @@ import { Menu, Search, Bell, Coins } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { useUIStore } from "@/stores/ui-store";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc";
 
 export function DashboardHeader() {
   const { toggleSidebar } = useUIStore();
+  const { data } = trpc.user.me.useQuery();
+  const { data: balance } = trpc.gcoin.balance.useQuery();
+  const { data: unreadCount } = trpc.notification.unreadCount.useQuery();
+
+  const userName = data?.name?.split(" ")[0] ?? "";
+  const fullName = data?.name ?? "";
+  const level = data?.level ?? 1;
+  const gcoinsDisplay = balance?.real?.toLocaleString("pt-BR") ?? "0";
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-lg border-b border-slate-100 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
@@ -36,7 +45,7 @@ export function DashboardHeader() {
           className="flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 px-3.5 py-2 rounded-xl text-sm font-bold hover:shadow-md hover:shadow-amber-500/10 transition-all border border-amber-200/50"
         >
           <Coins className="w-4 h-4" />
-          <span className="hidden sm:inline">1.250</span>
+          <span className="hidden sm:inline">{gcoinsDisplay}</span>
         </Link>
 
         <Link
@@ -44,14 +53,16 @@ export function DashboardHeader() {
           className="relative p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
+          {(unreadCount ?? 0) > 0 && (
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
+          )}
         </Link>
 
         <Link href="/profile" className="flex items-center gap-2 pl-2 border-l border-slate-100 ml-1">
-          <Avatar name="Lucas Mendes" size="sm" />
+          <Avatar name={fullName || "U"} size="sm" />
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-slate-900 leading-tight">Lucas</p>
-            <p className="text-[10px] text-slate-400 leading-tight">Nivel 15</p>
+            <p className="text-sm font-semibold text-slate-900 leading-tight">{userName || "..."}</p>
+            <p className="text-[10px] text-slate-400 leading-tight">Nivel {level}</p>
           </div>
         </Link>
       </div>
