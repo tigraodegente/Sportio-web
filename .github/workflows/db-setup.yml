@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - claude/**
     paths:
       - '.github/workflows/db-setup.yml'
@@ -32,22 +33,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile || pnpm install
 
-      - name: Load environment variables
-        run: |
-          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
-          elif [ -f .env ]; then
-            grep -E '^DATABASE_URL=' .env >> $GITHUB_ENV
-            echo "Loaded DATABASE_URL from .env file"
-          else
-            echo "ERROR: DATABASE_URL not found" && exit 1
-          fi
-
       - name: Push schema to database
-        run: pnpm db:push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "ERROR: DATABASE_URL not found in secrets" && exit 1
+          fi
+          pnpm db:push
 
       - name: Seed database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm db:seed
 
       - name: Success
-        run: echo "Database setup completed successfully!"
+        run: |
+          echo "### Database setup completed" >> $GITHUB_STEP_SUMMARY
+          echo "- Schema pushed" >> $GITHUB_STEP_SUMMARY
+          echo "- Seed data loaded (43 sports)" >> $GITHUB_STEP_SUMMARY

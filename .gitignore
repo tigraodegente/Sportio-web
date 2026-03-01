@@ -24,8 +24,8 @@ yarn-error.log*
 .env
 .env*.local
 
-# claude code memory (contains secrets)
-CLAUDE.md
+# claude code memory
+# CLAUDE.md is tracked in git (no secrets - secrets are in GitHub Secrets)
 
 # vercel
 .vercel
