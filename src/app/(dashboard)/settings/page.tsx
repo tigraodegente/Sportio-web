@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
 import { User, Bell, Shield, CreditCard, LogOut, Camera, Settings, AlertTriangle, Instagram, Twitter, Youtube, Check, Save, Users, Loader2, AlertCircle, Lock } from "lucide-react";
+import { logoutAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -437,10 +437,12 @@ export default function SettingsPage() {
             <p className="text-sm font-semibold text-slate-900">Sair da conta</p>
             <p className="text-xs text-slate-500 mt-0.5">Você será desconectado de todos os dispositivos</p>
           </div>
-          <Button variant="danger" size="sm" className="shadow-sm shadow-red-500/20" onClick={() => signOut({ callbackUrl: "/login" })}>
-            <LogOut className="w-4 h-4" />
-            Sair
-          </Button>
+          <form action={logoutAction}>
+            <Button type="submit" variant="danger" size="sm" className="shadow-sm shadow-red-500/20">
+              <LogOut className="w-4 h-4" />
+              Sair
+            </Button>
+          </form>
         </CardContent>
       </Card>
 
