@@ -63,7 +63,7 @@ function markdownToHtml(md: string): string {
     // Unordered list items (- item)
     .replace(
       /^- (.+)$/gm,
-      '<li class="ml-1 flex items-start gap-2"><span class="mt-2 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-500"></span><span>$1</span></li>'
+      '<li class="ml-1 flex items-start gap-2"><span class="mt-2 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-600"></span><span>$1</span></li>'
     );
 
   // Wrap consecutive <li> in <ul>
@@ -104,7 +104,7 @@ function formatDate(iso: string): string {
 
 // ── Accent colors ──
 const accentColors: Record<string, string> = {
-  futebol: "bg-emerald-500",
+  futebol: "bg-blue-600",
   "beach-tennis": "bg-amber-500",
   corrida: "bg-blue-500",
   crossfit: "bg-red-500",
@@ -151,7 +151,7 @@ export default async function BlogPostPage({
           "h-1.5 w-full",
           post.sport && accentColors[post.sport]
             ? accentColors[post.sport]
-            : "bg-gradient-to-r from-emerald-500 to-teal-400"
+            : "bg-gradient-to-r from-blue-500 to-cyan-400"
         )}
       />
 
@@ -160,7 +160,7 @@ export default async function BlogPostPage({
         {/* Back link */}
         <Link
           href="/blog"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-emerald-600"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600"
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar ao Blog
@@ -180,7 +180,7 @@ export default async function BlogPostPage({
         <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-gray-500">
           {/* Author */}
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
               <User className="h-4 w-4" />
             </div>
             <div className="flex flex-col">
@@ -280,17 +280,17 @@ export default async function BlogPostPage({
         </div>
 
         {/* CTA */}
-        <div className="mt-10 flex flex-col items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-8 text-center text-white sm:p-10">
+        <div className="mt-10 flex flex-col items-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 p-8 text-center text-white sm:p-10">
           <h3 className="text-2xl font-extrabold sm:text-3xl">
             Cadastre-se grátis e comece a ganhar
           </h3>
-          <p className="mt-3 max-w-lg text-emerald-100">
+          <p className="mt-3 max-w-lg text-blue-100">
             Junte-se a milhares de atletas que já transformam esporte em renda
             real. Crie sua conta em menos de 2 minutos.
           </p>
           <Link
             href="#cadastro"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-emerald-600 transition-all hover:bg-emerald-50 hover:shadow-lg"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 hover:shadow-lg"
           >
             Criar Conta Grátis
             <ArrowRight className="h-4 w-4" />
@@ -321,7 +321,7 @@ export default async function BlogPostPage({
                     "h-1.5 w-full",
                     relPost.sport && accentColors[relPost.sport]
                       ? accentColors[relPost.sport]
-                      : "bg-gradient-to-r from-emerald-500 to-teal-400"
+                      : "bg-gradient-to-r from-blue-500 to-cyan-400"
                   )}
                 />
 
@@ -330,7 +330,7 @@ export default async function BlogPostPage({
                     {relPost.coverImage}
                   </div>
 
-                  <h3 className="text-lg font-bold leading-snug text-gray-900 group-hover:text-emerald-600 transition-colors">
+                  <h3 className="text-lg font-bold leading-snug text-gray-900 group-hover:text-blue-600 transition-colors">
                     {relPost.title}
                   </h3>
 

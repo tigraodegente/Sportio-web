@@ -102,9 +102,9 @@ const bettingTypes = [
       "Limites configuráveis",
       "Verificação de identidade",
     ],
-    color: "bg-emerald-50 border-emerald-300",
-    accent: "text-emerald-700",
-    badgeColor: "bg-emerald-500",
+    color: "bg-blue-50 border-blue-300",
+    accent: "text-blue-700",
+    badgeColor: "bg-blue-500",
   },
   {
     type: "GCoins Gamificação",
@@ -117,9 +117,9 @@ const bettingTypes = [
       "Ideal para iniciantes",
       "Recompensas diárias",
     ],
-    color: "bg-teal-50 border-teal-300",
-    accent: "text-teal-700",
-    badgeColor: "bg-teal-500",
+    color: "bg-blue-50 border-blue-300",
+    accent: "text-blue-700",
+    badgeColor: "bg-blue-500",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function BettorsPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 py-24 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 pt-32 pb-20 sm:pt-40 sm:pb-28 text-white">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
@@ -138,21 +138,21 @@ export default function BettorsPage() {
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Aposte com Inteligência no Esporte
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-emerald-50 sm:text-xl">
+            <p className="mt-6 text-lg leading-relaxed text-blue-100 sm:text-xl">
               Use seus GCoins para apostar em partidas reais. Dados
               transparentes, odds justas e pagamento automático.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
                 href="#"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-emerald-600 shadow-lg transition-all hover:bg-emerald-50 hover:shadow-xl"
+                className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Começar a Apostar
                 <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="#como-funciona"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-base font-semibold text-white transition-all hover:border-white/60 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-white/20 px-8 py-4 text-base font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
               >
                 Como Funciona
               </a>
@@ -175,10 +175,10 @@ export default function BettorsPage() {
           <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => (
               <div key={step.number} className="relative text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
                   <step.icon className="h-7 w-7" />
                 </div>
-                <span className="text-sm font-bold text-emerald-500">
+                <span className="text-sm font-bold text-blue-500">
                   Passo {step.number}
                 </span>
                 <h3 className="mt-2 text-lg font-semibold text-gray-900">
@@ -212,7 +212,7 @@ export default function BettorsPage() {
                   "rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md"
                 )}
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                   <benefit.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -275,7 +275,7 @@ export default function BettorsPage() {
                       key={feature}
                       className="flex items-center gap-2 text-sm text-gray-700"
                     >
-                      <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                      <ShieldCheck className="h-4 w-4 text-blue-500" />
                       {feature}
                     </li>
                   ))}
@@ -308,17 +308,17 @@ export default function BettorsPage() {
       {/* Final CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 px-8 py-16 text-center shadow-xl sm:px-16">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900 to-blue-700 px-8 py-16 text-center shadow-xl sm:px-16">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Pronto Para Apostar com Inteligência?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-emerald-50">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
               Crie sua conta, analise os dados e faça sua primeira aposta com
               GCoins. Cadastro gratuito.
             </p>
             <a
               href="#"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-emerald-600 shadow-lg transition-all hover:bg-emerald-50 hover:shadow-xl"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Criar Minha Conta Grátis
               <ChevronRight className="h-5 w-5" />
