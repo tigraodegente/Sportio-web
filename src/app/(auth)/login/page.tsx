@@ -5,7 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Coins, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -31,7 +32,7 @@ export default function LoginPage() {
         toast.error("Email ou senha incorretos");
       } else {
         toast.success("Login realizado com sucesso!");
-        router.push("/dashboard");
+        router.push("/social");
         router.refresh();
       }
     } catch {
@@ -48,12 +49,8 @@ export default function LoginPage() {
   return (
     <div>
       {/* Mobile logo */}
-      <div className="lg:hidden flex items-center gap-3 mb-8">
-        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/20">
-          <Coins className="w-6 h-6 text-white drop-shadow-sm" />
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
-        </div>
-        <span className="text-2xl font-bold text-slate-900 tracking-tight">Sportio</span>
+      <div className="lg:hidden mb-8">
+        <SportioLogo className="h-10" />
       </div>
 
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Bem-vindo de volta</h2>
@@ -124,9 +121,9 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-6 text-center text-sm text-slate-500">
-        Nao tem conta?{" "}
+        Não tem conta?{" "}
         <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-          Cadastre-se gratis
+          Cadastre-se grátis
         </Link>
       </p>
 

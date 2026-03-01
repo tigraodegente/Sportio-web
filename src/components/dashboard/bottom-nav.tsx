@@ -15,8 +15,8 @@ import { cn } from "@/lib/utils";
 const bottomNavItems = [
   { href: "/social", label: "Feed", icon: Home },
   { href: "/tournaments", label: "Torneios", icon: Trophy },
-  { href: "/challenges", label: "Desafios", icon: Target },
-  { href: "/bets", label: "Apostas", icon: Coins },
+  { href: "/gcoins", label: "GCoins", icon: Coins },
+  { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/profile", label: "Perfil", icon: User },
 ];

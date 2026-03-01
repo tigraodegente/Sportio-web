@@ -96,7 +96,7 @@ export default function SettingsPage() {
   const handleChangePassword = () => {
     setPasswordError("");
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError("As senhas nao conferem");
+      setPasswordError("As senhas não conferem");
       return;
     }
     if (passwordForm.newPassword.length < 8) {
@@ -234,11 +234,11 @@ export default function SettingsPage() {
                     <div className="grid sm:grid-cols-2 gap-4">
                       <Input label="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(11) 99999-9999" />
                       <div className="grid sm:grid-cols-2 gap-4">
-                        <Input label="Cidade" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Sao Paulo" />
+                        <Input label="Cidade" value={city} onChange={(e) => setCity(e.target.value)} placeholder="São Paulo" />
                         <Input label="Estado" value={state} onChange={(e) => setState(e.target.value)} placeholder="SP" />
                       </div>
                     </div>
-                    <Textarea label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Conte um pouco sobre voce..." />
+                    <Textarea label="Bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="Conte um pouco sobre você..." />
                   </CardContent>
                 </Card>
 
@@ -435,7 +435,7 @@ export default function SettingsPage() {
         <CardContent className="mt-4 flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-900">Sair da conta</p>
-            <p className="text-xs text-slate-500 mt-0.5">Voce sera desconectado de todos os dispositivos</p>
+            <p className="text-xs text-slate-500 mt-0.5">Você será desconectado de todos os dispositivos</p>
           </div>
           <Button variant="danger" size="sm" className="shadow-sm shadow-red-500/20" onClick={() => signOut({ callbackUrl: "/login" })}>
             <LogOut className="w-4 h-4" />

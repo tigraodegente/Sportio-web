@@ -435,7 +435,7 @@ export default function BetsPage() {
                     <Target className="w-8 h-8 mb-2 opacity-50" />
                     <p className="text-sm font-medium">
                       {tab === "all"
-                        ? "Voce ainda nao fez nenhum palpite"
+                        ? "Você ainda não fez nenhum palpite"
                         : tab === "pending"
                           ? "Nenhum palpite pendente"
                           : tab === "won"

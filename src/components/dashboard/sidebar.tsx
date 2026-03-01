@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 import { trpc } from "@/lib/trpc";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 
 const navItems = [
   { href: "/social", label: "Feed", icon: Users },
@@ -27,10 +28,10 @@ const navItems = [
   { href: "/gcoins", label: "GCoins", icon: Coins },
   { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
-  { href: "/notifications", label: "Notificacoes", icon: Bell },
+  { href: "/notifications", label: "Notificações", icon: Bell },
   { href: "/brand", label: "Marca", icon: Megaphone },
   { href: "/profile", label: "Perfil", icon: User },
-  { href: "/settings", label: "Configuracoes", icon: Settings },
+  { href: "/settings", label: "Configurações", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -60,11 +61,8 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-white/10">
-          <Link href="/social" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/25">
-              <Coins className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">Sportio</span>
+          <Link href="/social" className="flex items-center">
+            <SportioLogo white className="h-8" />
           </Link>
           <button
             className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"

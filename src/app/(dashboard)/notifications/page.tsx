@@ -144,7 +144,7 @@ export default function NotificationsPage() {
           </div>
           <div>
             <p className="text-sm font-semibold text-blue-900">Tudo em dia!</p>
-            <p className="text-xs text-blue-600 mt-0.5">Voce leu todas as suas notificacoes. Continue assim!</p>
+            <p className="text-xs text-blue-600 mt-0.5">Você leu todas as suas notificações. Continue assim!</p>
           </div>
         </div>
       )}

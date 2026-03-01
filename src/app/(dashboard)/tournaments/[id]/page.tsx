@@ -196,8 +196,8 @@ export default function TournamentDetailPage() {
         <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
           <Trophy className="w-8 h-8 text-slate-300" />
         </div>
-        <h3 className="text-lg font-semibold text-slate-900 mb-1">Torneio nao encontrado</h3>
-        <p className="text-sm text-slate-500">O torneio que voce procura nao existe ou foi removido.</p>
+        <h3 className="text-lg font-semibold text-slate-900 mb-1">Torneio não encontrado</h3>
+        <p className="text-sm text-slate-500">O torneio que você procura não existe ou foi removido.</p>
       </div>
     );
   }
