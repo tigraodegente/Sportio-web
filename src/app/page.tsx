@@ -85,7 +85,7 @@ function SectionContainer({
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-24 sm:pt-40 pb-16 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-32 sm:pt-40 pb-20 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
       {/* Gradient orbs */}
       <div className="absolute inset-0">
         <div className="absolute top-[-20%] left-[-10%] h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] rounded-full bg-blue-500/20 blur-[120px] animate-float" />
@@ -259,11 +259,11 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section id="como-funciona" className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+    <section id="como-funciona" className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-yellow-400 to-blue-600" />
 
       <SectionContainer>
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Rocket className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-700">Simples e rapido</span>
@@ -323,14 +323,14 @@ function HowItWorksSection() {
 
 function GCoinsEconomySection() {
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-yellow-400/10 blur-[120px]" />
       </div>
 
       <SectionContainer className="relative">
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-5 py-2.5 mb-6 sm:mb-8">
             <BadgeDollarSign className="h-4 w-4 text-yellow-400" />
             <span className="text-sm font-semibold text-yellow-300">Economia digital</span>
@@ -429,9 +429,9 @@ function SportsGridSection() {
   };
 
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
       <SectionContainer>
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Sparkles className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-700">13 modalidades</span>
@@ -499,14 +499,14 @@ function UserTypesSection() {
   };
 
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-1/3 left-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[100px]" />
         <div className="absolute bottom-1/3 right-0 h-72 w-72 rounded-full bg-yellow-400/10 blur-[100px]" />
       </div>
 
       <SectionContainer className="relative">
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-400/10 px-5 py-2.5 mb-6 sm:mb-8">
             <Users className="h-4 w-4 text-blue-400" />
             <span className="text-sm font-semibold text-blue-300">Para cada perfil</span>
@@ -572,9 +572,9 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <SectionContainer>
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-yellow-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Star className="h-4 w-4 text-yellow-600" />
             <span className="text-sm font-semibold text-yellow-700">Depoimentos reais</span>
@@ -622,7 +622,7 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-yellow-400/10 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-blue-400/10 blur-3xl" />
@@ -683,9 +683,9 @@ function FAQSection() {
   ];
 
   return (
-    <section className="relative py-16 sm:py-32 lg:py-40 bg-gray-50 overflow-hidden">
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gray-50 overflow-hidden">
       <SectionContainer narrow>
-        <div className="text-center mb-10 sm:mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Perguntas <span className="text-blue-600">Frequentes</span>
           </h2>

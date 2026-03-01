@@ -31,7 +31,7 @@ const sportFilters = [
 ];
 
 const accentColors: Record<string, string> = {
-  futebol: "bg-emerald-500",
+  futebol: "bg-blue-600",
   "beach-tennis": "bg-amber-500",
   corrida: "bg-blue-500",
   crossfit: "bg-red-500",
@@ -52,9 +52,9 @@ export default function BlogPage() {
     <div className="min-h-screen bg-gray-50">
       {/* ── Hero ── */}
       <section className="relative overflow-hidden bg-gray-900 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-transparent to-transparent" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
-          <div className="flex items-center gap-2 text-emerald-400">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-7xl px-4 pt-32 pb-16 sm:px-6 sm:pt-40 sm:pb-24 lg:px-8 lg:py-28">
+          <div className="flex items-center gap-2 text-blue-400">
             <Newspaper className="h-5 w-5" />
             <span className="text-sm font-semibold uppercase tracking-wider">
               Blog
@@ -62,7 +62,7 @@ export default function BlogPage() {
           </div>
           <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
             Blog{" "}
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
               Sportio
             </span>
           </h1>
@@ -82,7 +82,7 @@ export default function BlogPage() {
             <input
               type="text"
               placeholder="Buscar artigos..."
-              className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 shadow-lg shadow-gray-900/5 outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-sm text-gray-900 shadow-lg shadow-gray-900/5 outline-none placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               readOnly
             />
           </div>
@@ -95,7 +95,7 @@ export default function BlogPage() {
                 className={cn(
                   "cursor-default rounded-full px-4 py-2 text-sm font-medium transition-colors",
                   idx === 0
-                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/25"
+                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/25"
                     : "bg-white text-gray-600 shadow-sm hover:bg-gray-50"
                 )}
               >
@@ -121,7 +121,7 @@ export default function BlogPage() {
                   "h-1.5 w-full",
                   post.sport && accentColors[post.sport]
                     ? accentColors[post.sport]
-                    : "bg-gradient-to-r from-emerald-500 to-teal-400"
+                    : "bg-gradient-to-r from-blue-500 to-cyan-400"
                 )}
               />
 
@@ -133,7 +133,7 @@ export default function BlogPage() {
                 </div>
 
                 {/* Title */}
-                <h2 className="text-lg font-bold leading-snug text-gray-900 group-hover:text-emerald-600 transition-colors">
+                <h2 className="text-lg font-bold leading-snug text-gray-900 group-hover:text-blue-600 transition-colors">
                   {post.title}
                 </h2>
 
@@ -160,7 +160,7 @@ export default function BlogPage() {
                 {/* Meta */}
                 <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-4">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                       <User className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex flex-col">
@@ -195,7 +195,7 @@ export default function BlogPage() {
         <div className="mx-auto flex max-w-4xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
           <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
             Pronto para transformar esporte em{" "}
-            <span className="text-emerald-400">renda real</span>?
+            <span className="text-blue-400">renda real</span>?
           </h2>
           <p className="mt-4 max-w-xl text-gray-400">
             Cadastre-se gratuitamente no Sportio e comece a acumular GCoins com
@@ -204,7 +204,7 @@ export default function BlogPage() {
           </p>
           <Link
             href="#cadastro"
-            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/25"
+            className="mt-8 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25"
           >
             Criar Conta Grátis
             <ArrowRight className="h-4 w-4" />

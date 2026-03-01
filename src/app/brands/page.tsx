@@ -95,24 +95,24 @@ const roiExamples = [
     result: "1.200 atletas impactados",
     detail:
       "Distribuição de GCoins como recompensa. Alta taxa de engajamento e recall de marca.",
-    color: "bg-emerald-50 border-emerald-200",
-    accent: "text-emerald-600",
+    color: "bg-blue-50 border-blue-200",
+    accent: "text-blue-600",
   },
   {
     investment: "Patrocínio R$ 2.000",
     result: "700 jogadores + 2.000 views",
     detail:
       "Naming rights de torneio, logo em chaveamento e presença nos resultados.",
-    color: "bg-emerald-100 border-emerald-300",
-    accent: "text-emerald-700",
+    color: "bg-blue-100 border-blue-300",
+    accent: "text-blue-700",
   },
   {
     investment: "Liga R$ 10.000",
     result: "5.000 atletas + 25.000 impressões",
     detail:
       "Patrocínio de circuito mensal com presença recorrente em todas as etapas.",
-    color: "bg-emerald-200 border-emerald-400",
-    accent: "text-emerald-800",
+    color: "bg-blue-200 border-blue-400",
+    accent: "text-blue-800",
   },
 ];
 
@@ -120,7 +120,7 @@ export default function BrandsPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-500 py-24 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 pt-32 pb-20 sm:pt-40 sm:pb-28 text-white">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
@@ -131,21 +131,21 @@ export default function BrandsPage() {
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Conecte Sua Marca a 500k+ Atletas
             </h1>
-            <p className="mt-6 text-lg leading-relaxed text-emerald-50 sm:text-xl">
+            <p className="mt-6 text-lg leading-relaxed text-blue-100 sm:text-xl">
               Alcance consumidores apaixonados pelo esporte com ROI de 3-5x.
               Segmentação precisa e dados reais.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
                 href="#"
-                className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-emerald-600 shadow-lg transition-all hover:bg-emerald-50 hover:shadow-xl"
+                className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Falar com Comercial
                 <ArrowRight className="h-5 w-5" />
               </a>
               <a
                 href="#como-funciona"
-                className="inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-base font-semibold text-white transition-all hover:border-white/60 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border-2 border-white/20 px-8 py-4 text-base font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
               >
                 Ver Resultados
               </a>
@@ -168,10 +168,10 @@ export default function BrandsPage() {
           <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => (
               <div key={step.number} className="relative text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
                   <step.icon className="h-7 w-7" />
                 </div>
-                <span className="text-sm font-bold text-emerald-500">
+                <span className="text-sm font-bold text-blue-500">
                   Passo {step.number}
                 </span>
                 <h3 className="mt-2 text-lg font-semibold text-gray-900">
@@ -205,7 +205,7 @@ export default function BrandsPage() {
                   "rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md"
                 )}
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                   <benefit.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
@@ -289,17 +289,17 @@ export default function BrandsPage() {
       {/* Final CTA */}
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-500 px-8 py-16 text-center shadow-xl sm:px-16">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-900 to-blue-700 px-8 py-16 text-center shadow-xl sm:px-16">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Pronto Para Alcançar Atletas Apaixonados?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-emerald-50">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
               Fale com nosso time comercial e descubra como sua marca pode
               crescer com o esporte.
             </p>
             <a
               href="#"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-emerald-600 shadow-lg transition-all hover:bg-emerald-50 hover:shadow-xl"
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Agendar Demonstração
               <ChevronRight className="h-5 w-5" />
