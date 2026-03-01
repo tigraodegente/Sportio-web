@@ -36,7 +36,7 @@ export function DashboardHeader() {
           className="flex items-center gap-1.5 bg-gradient-to-r from-amber-50 to-amber-100 text-amber-700 px-3.5 py-2 rounded-xl text-sm font-bold hover:shadow-md hover:shadow-amber-500/10 transition-all border border-amber-200/50"
         >
           <Coins className="w-4 h-4" />
-          <span className="hidden sm:inline">1.250</span>
+          <span className="hidden sm:inline">GCoins</span>
         </Link>
 
         <Link
@@ -48,10 +48,10 @@ export function DashboardHeader() {
         </Link>
 
         <Link href="/profile" className="flex items-center gap-2 pl-2 border-l border-slate-100 ml-1">
-          <Avatar name="Lucas Mendes" size="sm" />
+          <Avatar name="Meu Perfil" size="sm" />
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-slate-900 leading-tight">Lucas</p>
-            <p className="text-[10px] text-slate-400 leading-tight">Nivel 15</p>
+            <p className="text-sm font-semibold text-slate-900 leading-tight">Perfil</p>
+            <p className="text-[10px] text-slate-400 leading-tight">Minha conta</p>
           </div>
         </Link>
       </div>

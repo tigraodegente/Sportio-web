@@ -136,7 +136,7 @@ function HeroSection() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400" />
               </span>
-              <span className="text-[11px] sm:text-sm font-medium text-yellow-200">Plataforma #1 de esportes no Brasil</span>
+              <span className="text-[11px] sm:text-sm font-medium text-yellow-200">A plataforma que transforma esporte em renda</span>
             </div>
 
             <h1 className="text-[2rem] sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-5 sm:mb-8">
@@ -146,7 +146,7 @@ function HeroSection() {
             </h1>
 
             <p className="text-[15px] sm:text-lg lg:text-xl text-blue-200 mb-8 sm:mb-12 max-w-xl leading-relaxed">
-              Junte-se a <span className="text-white font-semibold">12.500+ atletas</span> que ja transformam paixao em lucro real. Ganhe <span className="text-yellow-400 font-semibold">GCoins</span> competindo no que voce ama.
+              Seja <span className="text-white font-semibold">atleta, treinador, organizador ou arbitro</span> — transforme sua paixao pelo esporte em <span className="text-yellow-400 font-semibold">renda real</span> com GCoins.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
@@ -182,12 +182,12 @@ function HeroSection() {
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1 rounded-2xl bg-yellow-400/10 border border-yellow-400/20 p-4 text-center">
-                    <p className="text-2xl font-bold text-yellow-400">R$ 5.000</p>
+                    <p className="text-2xl font-bold text-yellow-400">GCoins</p>
                     <p className="text-xs text-blue-300 mt-1">Premiacao</p>
                   </div>
                   <div className="flex-1 rounded-2xl bg-blue-400/10 border border-blue-400/20 p-4 text-center">
-                    <p className="text-2xl font-bold text-blue-300">128</p>
-                    <p className="text-xs text-blue-300 mt-1">Atletas</p>
+                    <p className="text-2xl font-bold text-blue-300">PIX</p>
+                    <p className="text-xs text-blue-300 mt-1">Saque rapido</p>
                   </div>
                 </div>
               </div>
@@ -198,8 +198,8 @@ function HeroSection() {
                     <Coins className="h-5 w-5 text-blue-900" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">+250 GCoins</p>
-                    <p className="text-xs text-yellow-400">Vitoria no torneio!</p>
+                    <p className="text-sm font-semibold text-white">GCoins ganhos!</p>
+                    <p className="text-xs text-yellow-400">Vitoria no torneio</p>
                   </div>
                 </div>
               </div>
@@ -210,7 +210,7 @@ function HeroSection() {
                     <Crown className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">#3 Ranking</p>
+                    <p className="text-sm font-semibold text-white">Top Ranking</p>
                     <p className="text-xs text-blue-300">Beach Tennis SP</p>
                   </div>
                 </div>
@@ -223,10 +223,10 @@ function HeroSection() {
         <div className="mt-10 sm:mt-24 lg:mt-28">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
             {[
-              { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-yellow-400 to-amber-500" },
-              { value: "850+", label: "Torneios/mes", icon: Trophy, color: "from-blue-400 to-blue-600" },
-              { value: "R$ 2M+", label: "Em Premiacoes", icon: CircleDollarSign, color: "from-blue-300 to-blue-500" },
-              { value: "13", label: "Modalidades", icon: Medal, color: "from-yellow-300 to-yellow-500" },
+              { value: "Milhares", label: "de Profissionais", icon: Users, color: "from-yellow-400 to-amber-500" },
+              { value: "Centenas", label: "de Torneios", icon: Trophy, color: "from-blue-400 to-blue-600" },
+              { value: "PIX", label: "Saque Instantaneo", icon: CircleDollarSign, color: "from-blue-300 to-blue-500" },
+              { value: "13+", label: "Modalidades", icon: Medal, color: "from-yellow-300 to-yellow-500" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -252,10 +252,10 @@ function HeroSection() {
 
 function HowItWorksSection() {
   const steps = [
-    { number: "01", title: "Crie sua conta", description: "Cadastro rapido em segundos, 100% gratuito", icon: UserPlus, color: "from-blue-500 to-blue-700" },
-    { number: "02", title: "Escolha o esporte", description: "13 modalidades disponiveis para voce", icon: Medal, color: "from-blue-400 to-blue-600" },
-    { number: "03", title: "Participe e Compita", description: "Torneios, desafios e competicoes diarias", icon: Trophy, color: "from-yellow-400 to-amber-500" },
-    { number: "04", title: "Ganhe GCoins", description: "Converta seus GCoins em dinheiro via PIX", icon: Coins, color: "from-yellow-400 to-amber-500" },
+    { number: "01", title: "Crie sua conta", description: "Cadastro gratuito. Escolha seu perfil: atleta, treinador, organizador ou arbitro", icon: UserPlus, color: "from-blue-500 to-blue-700" },
+    { number: "02", title: "Escolha seu esporte", description: "Mais de 13 modalidades para voce competir e ganhar", icon: Medal, color: "from-blue-400 to-blue-600" },
+    { number: "03", title: "Compita e organize", description: "Participe de torneios, treine atletas ou organize eventos esportivos", icon: Trophy, color: "from-yellow-400 to-amber-500" },
+    { number: "04", title: "Ganhe com esporte", description: "Transforme GCoins em dinheiro real via PIX instantaneo", icon: Coins, color: "from-yellow-400 to-amber-500" },
   ];
 
   return (
@@ -434,13 +434,13 @@ function SportsGridSection() {
         <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Sparkles className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-700">13 modalidades</span>
+            <span className="text-sm font-semibold text-blue-700">Diversas modalidades</span>
           </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Encontre Seu <span className="text-blue-600">Esporte</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Do futebol ao e-sports, encontre a modalidade perfeita para seu estilo
+            Do futebol ao e-sports, encontre a modalidade perfeita para ganhar com esporte
           </p>
         </div>
 
@@ -512,10 +512,10 @@ function UserTypesSection() {
             <span className="text-sm font-semibold text-blue-300">Para cada perfil</span>
           </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
-            Ha um Lugar Para <span className="text-yellow-400">Voce</span>
+            Transforme Esporte em <span className="text-yellow-400">Renda</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Seja atleta, organizador ou fa — o Sportio tem algo especial para voce
+            Atleta, treinador, organizador ou arbitro — o Sportio e a sua plataforma para ganhar com esporte
           </p>
         </div>
 
@@ -566,9 +566,9 @@ function UserTypesSection() {
 
 function TestimonialsSection() {
   const testimonials = [
-    { quote: "Comecei jogando futebol e hoje tiro $2.000 por mes competindo e apostando. O Sportio transformou minha paixao em renda real.", author: "Joao Silva", role: "Atleta de Futebol", earnings: "R$ 2.000/mes", color: "from-blue-500 to-blue-700" },
-    { quote: "Organizei 12 torneios e lucrei R$ 15 mil em tres meses. Tudo automatizado pela plataforma.", author: "Maria Santos", role: "Organizadora", earnings: "R$ 15.000", color: "from-yellow-400 to-amber-500" },
-    { quote: "Comecei apostando 50 GCoins e hoje ja saquei R$ 1.800 via PIX.", author: "Pedro Costa", role: "Apostador", earnings: "R$ 1.800", color: "from-blue-400 to-blue-600" },
+    { quote: "O Sportio me deu visibilidade como atleta e hoje consigo renda competindo no que amo. Torneios toda semana e GCoins que viram dinheiro real.", author: "Joao Silva", role: "Atleta de Futebol", earnings: "Renda recorrente", color: "from-blue-500 to-blue-700" },
+    { quote: "Como organizadora, automatizei tudo: inscricoes, brackets, premiacoes. Lucro real organizando torneios pela plataforma.", author: "Maria Santos", role: "Organizadora de Torneios", earnings: "Lucro com torneios", color: "from-yellow-400 to-amber-500" },
+    { quote: "Sou treinador e uso o Sportio pra encontrar alunos, organizar campeonatos e ganhar com o que faco de melhor.", author: "Carlos Lima", role: "Treinador de Beach Tennis", earnings: "Mais alunos", color: "from-blue-400 to-blue-600" },
   ];
 
   return (
@@ -660,7 +660,7 @@ function CTASection() {
           </div>
           <div className="flex items-center gap-2.5">
             <Users className="h-4 w-4" />
-            <span className="text-sm">12.500+ atletas</span>
+            <span className="text-sm">Milhares de profissionais</span>
           </div>
         </div>
       </SectionContainer>
@@ -674,12 +674,12 @@ function CTASection() {
 
 function FAQSection() {
   const faqs = [
-    { question: "O que e o Sportio?", answer: "O Sportio e a plataforma esportiva mais completa do Brasil. Conectamos atletas, organizadores, marcas, fas e arbitros em um ecossistema digital onde voce pode competir em torneios, ganhar GCoins e transformar sua paixao pelo esporte em renda real." },
+    { question: "O que e o Sportio?", answer: "O Sportio e a plataforma que transforma esporte em renda. Conectamos atletas, treinadores, organizadores, arbitros e marcas em um ecossistema onde cada um pode ganhar fazendo o que ama." },
     { question: "O que sao GCoins?", answer: "GCoins sao a moeda digital do Sportio. Existem dois tipos: GCoins Reais (convertidos em dinheiro via PIX) e GCoins de Gamificacao (recompensas por engajamento, trocaveis por produtos exclusivos)." },
-    { question: "Como ganho dinheiro no Sportio?", answer: "Participe e venca torneios, organize eventos, construa uma base de torcedores, de palpites certeiros e como marca, patrocine atletas. Os GCoins Reais podem ser sacados via PIX a qualquer momento." },
-    { question: "E seguro usar o Sportio?", answer: "100%. Sistema antifraude com IA, validacao por arbitros certificados e total transparencia nas transacoes." },
-    { question: "Quais esportes sao suportados?", answer: "13 modalidades: Futebol, Beach Tennis, Corrida, CrossFit, Volei, Futevolei, E-Sports, Basquete, Natacao, Tenis, Skate, Lutas e Ciclismo." },
-    { question: "Preciso pagar para usar?", answer: "Nao! Criar uma conta e 100% gratuito. Participe de torneios gratuitos, interaja na comunidade e ganhe GCoins sem custo." },
+    { question: "Como ganho dinheiro no Sportio?", answer: "Depende do seu perfil: atletas ganham competindo em torneios, organizadores lucram com eventos, treinadores conectam-se com alunos e arbitros sao remunerados por partidas. GCoins Reais podem ser sacados via PIX a qualquer momento." },
+    { question: "E seguro usar o Sportio?", answer: "Sim. Sistema antifraude com validacao por arbitros certificados e total transparencia nas transacoes." },
+    { question: "Quais esportes sao suportados?", answer: "Mais de 13 modalidades: Futebol, Beach Tennis, Corrida, CrossFit, Volei, Futevolei, E-Sports, Basquete, Natacao, Tenis, Skate, Lutas, Ciclismo e mais." },
+    { question: "Preciso pagar para usar?", answer: "Nao! Criar uma conta e 100% gratuito. Comece a participar de torneios, conecte-se com a comunidade e ganhe GCoins sem custo." },
   ];
 
   return (

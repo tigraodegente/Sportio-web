@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
   Trophy,
   Coins,
   Users,
@@ -19,10 +18,9 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/social", label: "Feed", icon: Users },
   { href: "/tournaments", label: "Torneios", icon: Trophy },
   { href: "/gcoins", label: "GCoins", icon: Coins },
-  { href: "/social", label: "Feed", icon: Users },
   { href: "/bets", label: "Palpites", icon: Target },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/notifications", label: "Notificacoes", icon: Bell },
@@ -51,7 +49,7 @@ export function Sidebar() {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-white/10">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Link href="/social" className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/25">
               <Coins className="w-5 h-5 text-white" />
             </div>
@@ -85,9 +83,7 @@ export function Sidebar() {
                 <Icon className="w-[18px] h-[18px] flex-shrink-0" />
                 {item.label}
                 {item.href === "/notifications" && (
-                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                    3
-                  </span>
+                  <span className="ml-auto w-2 h-2 rounded-full bg-red-500" />
                 )}
               </Link>
             );
@@ -103,7 +99,7 @@ export function Sidebar() {
                 <Zap className="w-4 h-4 text-emerald-200" />
                 <p className="text-xs font-medium text-emerald-200">Saldo GCoins</p>
               </div>
-              <p className="text-2xl font-bold tracking-tight">1.250,00</p>
+              <p className="text-2xl font-bold tracking-tight">--,--</p>
               <div className="flex gap-2 mt-3">
                 <Link
                   href="/gcoins"
