@@ -83,17 +83,7 @@ jobs:
       - name: Deploy to Production
         id: deploy-prod
         run: |
-          for i in 1 2 3; do
-            echo "Deploy attempt $i..."
-            url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1) && break
-            echo "Attempt $i failed: $url"
-            sleep $((i * 5))
-          done
-          if [ -z "$url" ] || echo "$url" | grep -qi "error"; then
-            echo "All deploy attempts failed"
-            echo "$url"
-            exit 1
-          fi
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> $GITHUB_OUTPUT
           echo "### 🚀 Production Deployed" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY
