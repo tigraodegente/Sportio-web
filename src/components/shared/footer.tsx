@@ -42,10 +42,10 @@ function FooterLinkGroup({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-4">
+      <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-5">
         {title}
       </h3>
-      <ul className="space-y-3">
+      <ul className="space-y-3.5">
         {links.map((link) => (
           <li key={link.href}>
             <Link
@@ -64,21 +64,21 @@ function FooterLinkGroup({
 export function Footer() {
   return (
     <footer className="bg-slate-950 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-8 lg:px-10 lg:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-8 py-16 sm:px-10 lg:px-12 lg:py-20">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand column */}
           <div>
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600">
                 <Coins className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">Sportio</span>
+              <span className="text-xl font-extrabold tracking-tight text-white">Sportio</span>
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-slate-400">
+            <p className="mt-5 text-sm leading-relaxed text-slate-400">
               A plataforma completa que conecta atletas, organizadores, marcas,
               fas e apostadores no mundo do esporte.
             </p>
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-7 flex items-center gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -87,7 +87,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={social.label}
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-xl",
+                    "flex h-11 w-11 items-center justify-center rounded-xl",
                     "bg-white/5 text-slate-400 transition-all",
                     "hover:bg-emerald-500/20 hover:text-emerald-400 hover:scale-110"
                   )}
@@ -103,7 +103,7 @@ export function Footer() {
           <FooterLinkGroup title="Empresa" links={companyLinks} />
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-5 border-t border-white/10 pt-10 sm:flex-row">
           <p className="text-sm text-slate-500">
             &copy; 2025 Sportio. Todos os direitos reservados.
           </p>
