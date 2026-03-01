@@ -12,7 +12,20 @@ import {
   Linkedin,
   Share2,
   Tag,
+  Target,
+  Sun,
+  Footprints,
+  Dumbbell,
+  Trophy,
+  TrendingUp,
+  Dice5,
+  Flag,
+  Apple,
+  Camera,
+  GraduationCap,
+  Coins,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBlogPost, getBlogPosts, blogPosts } from "@/lib/blog-data";
 
@@ -102,6 +115,27 @@ function formatDate(iso: string): string {
   });
 }
 
+// ── Cover icon map ──
+const coverIconMap: Record<string, LucideIcon> = {
+  target: Target,
+  sun: Sun,
+  footprints: Footprints,
+  dumbbell: Dumbbell,
+  trophy: Trophy,
+  "trending-up": TrendingUp,
+  dice: Dice5,
+  flag: Flag,
+  apple: Apple,
+  camera: Camera,
+  "graduation-cap": GraduationCap,
+  coins: Coins,
+};
+
+function CoverIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = coverIconMap[name] || Trophy;
+  return <Icon className={className} />;
+}
+
 // ── Accent colors ──
 const accentColors: Record<string, string> = {
   futebol: "bg-blue-600",
@@ -166,9 +200,9 @@ export default async function BlogPostPage({
           Voltar ao Blog
         </Link>
 
-        {/* Emoji cover */}
-        <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-100 text-4xl">
-          {post.coverImage}
+        {/* Cover icon */}
+        <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-gray-100">
+          <CoverIcon name={post.coverImage} className="h-10 w-10 text-blue-600" />
         </div>
 
         {/* Title */}
@@ -326,8 +360,8 @@ export default async function BlogPostPage({
                 />
 
                 <div className="flex flex-1 flex-col p-6">
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-xl">
-                    {relPost.coverImage}
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100">
+                    <CoverIcon name={relPost.coverImage} className="h-6 w-6 text-blue-600" />
                   </div>
 
                   <h3 className="text-lg font-bold leading-snug text-gray-900 group-hover:text-blue-600 transition-colors">

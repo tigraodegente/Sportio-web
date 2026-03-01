@@ -35,6 +35,13 @@ import {
   Rocket,
   Lock,
   Shield,
+  Spade,
+  LayoutGrid,
+  Dices,
+  Palette,
+  Mountain,
+  Flag,
+  Hand,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -52,6 +59,15 @@ const SPORT_ICON_MAP: Record<string, LucideIcon> = {
   Zap: Zap,
   Swords: Swords,
   Bike: Bike,
+  Crown: Crown,
+  Flag: Flag,
+  Spade: Spade,
+  Grid: LayoutGrid,
+  Dice: Dices,
+  Palette: Palette,
+  Mountain: Mountain,
+  Hand: Hand,
+  Racquet: Target,
 };
 
 const USER_TYPE_ICON_MAP: Record<string, LucideIcon> = {
@@ -105,14 +121,14 @@ function HeroSection() {
       {/* Floating sport icons - desktop only */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
         {[
-          { icon: "⚽", top: "15%", left: "8%", delay: "0s", size: "text-4xl" },
-          { icon: "🎾", top: "25%", right: "12%", delay: "1s", size: "text-3xl" },
-          { icon: "🏀", bottom: "30%", left: "15%", delay: "2s", size: "text-3xl" },
-          { icon: "🏆", top: "10%", right: "30%", delay: "2.5s", size: "text-3xl" },
+          { Icon: Target, top: "15%", left: "8%", delay: "0s", size: "h-10 w-10" },
+          { Icon: Sun, top: "25%", right: "12%", delay: "1s", size: "h-8 w-8" },
+          { Icon: Circle, bottom: "30%", left: "15%", delay: "2s", size: "h-8 w-8" },
+          { Icon: Trophy, top: "10%", right: "30%", delay: "2.5s", size: "h-8 w-8" },
         ].map((item, i) => (
           <div
             key={i}
-            className={cn("absolute opacity-15 animate-float", item.size)}
+            className="absolute opacity-15 animate-float"
             style={{
               top: item.top,
               left: item.left,
@@ -122,7 +138,7 @@ function HeroSection() {
               animationDuration: "6s",
             }}
           >
-            {item.icon}
+            <item.Icon className={cn("text-white/80", item.size)} />
           </div>
         ))}
       </div>
@@ -226,7 +242,7 @@ function HeroSection() {
               { value: "Milhares", label: "de Profissionais", icon: Users, color: "from-yellow-400 to-amber-500" },
               { value: "Centenas", label: "de Torneios", icon: Trophy, color: "from-blue-400 to-blue-600" },
               { value: "PIX", label: "Saque Instantaneo", icon: CircleDollarSign, color: "from-blue-300 to-blue-500" },
-              { value: "13+", label: "Modalidades", icon: Medal, color: "from-yellow-300 to-yellow-500" },
+              { value: "40+", label: "Modalidades", icon: Medal, color: "from-yellow-300 to-yellow-500" },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -253,7 +269,7 @@ function HeroSection() {
 function HowItWorksSection() {
   const steps = [
     { number: "01", title: "Crie sua conta", description: "Cadastro gratuito. Escolha seu perfil: atleta, treinador, organizador ou arbitro", icon: UserPlus, color: "from-blue-500 to-blue-700" },
-    { number: "02", title: "Escolha seu esporte", description: "Mais de 13 modalidades para voce competir e ganhar", icon: Medal, color: "from-blue-400 to-blue-600" },
+    { number: "02", title: "Escolha seu esporte", description: "Mais de 40 modalidades para voce competir e ganhar", icon: Medal, color: "from-blue-400 to-blue-600" },
     { number: "03", title: "Compita e organize", description: "Participe de torneios, treine atletas ou organize eventos esportivos", icon: Trophy, color: "from-yellow-400 to-amber-500" },
     { number: "04", title: "Ganhe com esporte", description: "Transforme GCoins em dinheiro real via PIX instantaneo", icon: Coins, color: "from-yellow-400 to-amber-500" },
   ];
@@ -678,7 +694,7 @@ function FAQSection() {
     { question: "O que sao GCoins?", answer: "GCoins sao a moeda digital do Sportio. Existem dois tipos: GCoins Reais (convertidos em dinheiro via PIX) e GCoins de Gamificacao (recompensas por engajamento, trocaveis por produtos exclusivos)." },
     { question: "Como ganho dinheiro no Sportio?", answer: "Depende do seu perfil: atletas ganham competindo em torneios, organizadores lucram com eventos, treinadores conectam-se com alunos e arbitros sao remunerados por partidas. GCoins Reais podem ser sacados via PIX a qualquer momento." },
     { question: "E seguro usar o Sportio?", answer: "Sim. Sistema antifraude com validacao por arbitros certificados e total transparencia nas transacoes." },
-    { question: "Quais esportes sao suportados?", answer: "Mais de 13 modalidades: Futebol, Beach Tennis, Corrida, CrossFit, Volei, Futevolei, E-Sports, Basquete, Natacao, Tenis, Skate, Lutas, Ciclismo e mais." },
+    { question: "Quais esportes sao suportados?", answer: "Mais de 40 modalidades em tres categorias: Esportes Tradicionais (Futebol, Beach Tennis, Volei, Basquete, Tenis, Padel, Natacao, Corrida, Ciclismo, Jiu-Jitsu, Surf, Boxe, Golfe e mais), E-Sports (League of Legends, Counter-Strike, Valorant, Fortnite, FIFA/EA FC, Free Fire, Dota 2, Rocket League) e Jogos de Mesa (Truco, Poker, Xadrez, Damas, Sinuca, Domino, Buraco, Uno)." },
     { question: "Preciso pagar para usar?", answer: "Nao! Criar uma conta e 100% gratuito. Comece a participar de torneios, conecte-se com a comunidade e ganhe GCoins sem custo." },
   ];
 

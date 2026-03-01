@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle } from "lucide-react";
+import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
@@ -27,13 +28,13 @@ const formatMap: Record<string, string> = {
   league: "Liga",
 };
 
-const sportEmojiMap: Record<string, string> = {
-  "Beach Tennis": "\u{1F3D6}\uFE0F",
-  "CrossFit": "\u{1F3CB}\uFE0F",
-  "Futebol": "\u26BD",
-  "E-Sports": "\u{1F3AE}",
-  "Corrida": "\u{1F3C3}",
-  "Volei": "\u{1F3D0}",
+const sportIconMap: Record<string, LucideIcon> = {
+  "Beach Tennis": Sun,
+  "CrossFit": Dumbbell,
+  "Futebol": Target,
+  "E-Sports": Gamepad2,
+  "Corrida": Footprints,
+  "Volei": Circle,
 };
 
 function formatDate(date: Date | string | null | undefined): string {
@@ -134,7 +135,7 @@ export default function TournamentDetailPage() {
   const entryFee = Number(tournament.entryFee ?? 0);
   const prizePool = Number(tournament.prizePool ?? 0);
   const sportName = tournament.sport?.name ?? "Esporte";
-  const sportEmoji = sportEmojiMap[sportName] || "\u{1F3C6}";
+  const SportIcon = sportIconMap[sportName] || Trophy;
   const cityDisplay = tournament.isOnline
     ? "Online"
     : [tournament.city, tournament.state].filter(Boolean).join(", ") || "--";
@@ -158,7 +159,7 @@ export default function TournamentDetailPage() {
                 {statusMap[tournament.status as string]?.label ?? tournament.status}
               </Badge>
               <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm">
-                <span className="mr-0.5">{sportEmoji}</span> {sportName}
+                <SportIcon className="w-3.5 h-3.5 mr-0.5 inline-block" /> {sportName}
               </Badge>
             </div>
             <Button variant="ghost" size="icon" className="text-white/70 hover:text-white hover:bg-white/10">
@@ -300,21 +301,27 @@ export default function TournamentDetailPage() {
                     <CardContent className="mt-4 space-y-3">
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50/70">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F947}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-amber-400 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">1</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">1o Lugar</span>
                         </div>
                         <span className="font-bold text-amber-600">{Math.round(prizePool * 0.5).toLocaleString()} GCoins</span>
                       </div>
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/70">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F948}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-slate-400 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">2</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">2o Lugar</span>
                         </div>
                         <span className="font-bold text-slate-500">{Math.round(prizePool * 0.3).toLocaleString()} GCoins</span>
                       </div>
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-orange-50/50">
                         <div className="flex items-center gap-2.5">
-                          <span className="text-lg">{"\u{1F949}"}</span>
+                          <div className="w-7 h-7 rounded-full bg-amber-700 flex items-center justify-center">
+                            <span className="text-xs font-bold text-white">3</span>
+                          </div>
                           <span className="text-sm font-medium text-slate-700">3o Lugar</span>
                         </div>
                         <span className="font-bold text-amber-800">{Math.round(prizePool * 0.2).toLocaleString()} GCoins</span>

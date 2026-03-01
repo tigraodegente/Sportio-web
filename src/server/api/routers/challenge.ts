@@ -2,6 +2,7 @@ import { z } from "zod";
 import { eq, desc, and } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { challenges, challengeParticipants } from "@/server/db/schema";
+import { createAutoPost } from "@/server/services/auto-feed";
 
 export const challengeRouter = createTRPCRouter({
   // List active challenges
@@ -36,6 +37,21 @@ export const challengeRouter = createTRPCRouter({
         })
         .onConflictDoNothing()
         .returning();
+
+      // Auto-post for challenge join
+      const challenge = await ctx.db.query.challenges.findFirst({
+        where: eq(challenges.id, input.challengeId),
+        columns: { title: true, sportId: true },
+      });
+      if (challenge) {
+        createAutoPost({
+          type: "challenge_joined",
+          userId: ctx.session.user.id,
+          data: { challengeTitle: challenge.title },
+          sportId: challenge.sportId ?? undefined,
+        }).catch(() => {});
+      }
+
       return participant;
     }),
 

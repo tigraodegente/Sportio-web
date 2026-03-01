@@ -21,7 +21,7 @@ export const blogPosts: BlogPost[] = [
     title: "Como Jogadores Amadores de Futebol Ganham Dinheiro Real",
     description:
       "Descubra como milhares de jogadores de pelada estão transformando cada gol em GCoins e convertendo em dinheiro real na plataforma Sportio.",
-    coverImage: "\u26BD",
+    coverImage: "target",
     author: { name: "Rafael Mendes", role: "Editor de Futebol" },
     publishedAt: "2026-02-20T10:00:00Z",
     readTime: 6,
@@ -56,7 +56,7 @@ Cadastrar-se \u00E9 gratuito e leva menos de 2 minutos. Baixe o app, crie seu pe
     title: "Beach Tennis: Transforme Lazer em Renda",
     description:
       "O esporte que mais cresce no Brasil tamb\u00E9m \u00E9 o que mais paga. Veja como monetizar suas partidas de beach tennis no Sportio.",
-    coverImage: "\u{1F3D6}\uFE0F",
+    coverImage: "sun",
     author: { name: "Camila Rodrigues", role: "Especialista em Beach Sports" },
     publishedAt: "2026-02-18T14:00:00Z",
     readTime: 5,
@@ -89,7 +89,7 @@ Com a integra\u00E7\u00E3o do Sportio com clubes e arenas parceiras em todo o Br
     title: "Corredor Amador: Ganhe Dinheiro Correndo",
     description:
       "Cada quil\u00F4metro conta. Saiba como corredores amadores est\u00E3o acumulando GCoins com treinos e provas de rua atrav\u00E9s do Sportio.",
-    coverImage: "\u{1F3C3}",
+    coverImage: "footprints",
     author: { name: "Thiago Almeida", role: "Colunista de Corrida" },
     publishedAt: "2026-02-15T08:00:00Z",
     readTime: 7,
@@ -126,7 +126,7 @@ A integra\u00E7\u00E3o \u00E9 autom\u00E1tica. Basta conectar seu app de corrida
     title: "CrossFit: Monetize Seus WODs",
     description:
       "Transforme seus treinos de CrossFit em GCoins. Competi\u00E7\u00F5es, desafios e rankings que pagam de verdade.",
-    coverImage: "\u{1F4AA}",
+    coverImage: "dumbbell",
     author: { name: "Fernanda Lima", role: "Editora Fitness" },
     publishedAt: "2026-02-12T09:00:00Z",
     readTime: 5,
@@ -159,7 +159,7 @@ Se voc\u00EA j\u00E1 treina CrossFit regularmente, est\u00E1 literalmente deixan
     title: "Organizador de Liga: Monetize Cada Torneio",
     description:
       "Ferramentas completas para organizar torneios, gerenciar inscri\u00E7\u00F5es e gerar receita recorrente como organizador esportivo.",
-    coverImage: "\u{1F3C6}",
+    coverImage: "trophy",
     author: { name: "Marcos Oliveira", role: "Ger. de Parcerias" },
     publishedAt: "2026-02-10T11:00:00Z",
     readTime: 8,
@@ -201,7 +201,7 @@ Crie sua conta de organizador gratuitamente e publique seu primeiro torneio em m
     title: "Como Marcas Geram 10x ROI no Sportio",
     description:
       "Descubra como marcas est\u00E3o alcan\u00E7ando ROI de 10x ao investir em patroc\u00EDnios esportivos segmentados na plataforma Sportio.",
-    coverImage: "\u{1F4C8}",
+    coverImage: "trending-up",
     author: { name: "Ana Beatriz Santos", role: "Head de Marketing" },
     publishedAt: "2026-02-08T13:00:00Z",
     readTime: 7,
@@ -238,7 +238,7 @@ O Sportio aceita investimentos a partir de R$ 500, tornando o marketing esportiv
     title: "Apostas Esportivas para Iniciantes",
     description:
       "Guia completo para come\u00E7ar a dar palpites esportivos com GCoins no Sportio. Sem risco financeiro real, com divers\u00E3o garantida.",
-    coverImage: "\u{1F3B2}",
+    coverImage: "dice",
     author: { name: "Lucas Ferreira", role: "Analista de Palpites" },
     publishedAt: "2026-02-05T16:00:00Z",
     readTime: 6,
@@ -281,7 +281,7 @@ O Sportio promove o entretenimento respons\u00E1vel. Como os palpites s\u00E3o f
     title: "\u00C1rbitro de Futebol: Ganhe por Partida",
     description:
       "Torne-se \u00E1rbitro cadastrado no Sportio e receba por cada partida apitada. Veja como funciona e quanto d\u00E1 para ganhar.",
-    coverImage: "\u{1F6A9}",
+    coverImage: "flag",
     author: { name: "Roberto Dias", role: "Coord. de Arbitragem" },
     publishedAt: "2026-02-03T10:00:00Z",
     readTime: 5,
@@ -319,7 +319,7 @@ O Sportio tem um sistema de avalia\u00E7\u00E3o bidirecional. Jogadores avaliam 
     title: "Nutricionista Esportivo: Renda Recorrente",
     description:
       "Profissionais de nutri\u00E7\u00E3o esportiva podem construir uma base de clientes recorrente atendendo atletas diretamente pelo Sportio.",
-    coverImage: "\u{1F34E}",
+    coverImage: "apple",
     author: { name: "Dra. Patr\u00EDcia Nunes", role: "Nutri\u00E7\u00E3o Esportiva" },
     publishedAt: "2026-01-28T09:00:00Z",
     readTime: 6,
@@ -359,7 +359,7 @@ O grande diferencial \u00E9 o acesso aos dados esportivos dos atletas. Voc\u00EA
     title: "Fot\u00F3grafo Esportivo: Monetize Eventos",
     description:
       "Fot\u00F3grafos esportivos t\u00EAm uma nova fonte de renda no Sportio. Cubra torneios, venda fotos e construa seu portf\u00F3lio.",
-    coverImage: "\u{1F4F7}",
+    coverImage: "camera",
     author: { name: "Diego Martins", role: "Dir. de Conte\u00FAdo Visual" },
     publishedAt: "2026-01-25T11:00:00Z",
     readTime: 5,
@@ -397,7 +397,7 @@ Al\u00E9m da renda imediata, o Sportio funciona como uma **vitrine profissional 
     title: "Atleta Universit\u00E1rio: Bolsas e Renda",
     description:
       "Estudantes atletas podem conquistar bolsas de estudo e renda extra atrav\u00E9s do desempenho esportivo registrado no Sportio.",
-    coverImage: "\u{1F393}",
+    coverImage: "graduation-cap",
     author: { name: "Profa. Renata Vieira", role: "Coord. Esporte Universit\u00E1rio" },
     publishedAt: "2026-01-20T14:00:00Z",
     readTime: 6,
@@ -437,7 +437,7 @@ Atletas universit\u00E1rios que se destacam no Sportio compartilham algumas cara
     title: "A Nova Economia do GCoin",
     description:
       "Entenda como o GCoin funciona, seu valor, como ganhar, gastar e por que ele est\u00E1 revolucionando a economia do esporte amador.",
-    coverImage: "\u{1FA99}",
+    coverImage: "coins",
     author: { name: "Guilherme Teixeira", role: "Economista-Chefe" },
     publishedAt: "2026-01-15T10:00:00Z",
     readTime: 8,

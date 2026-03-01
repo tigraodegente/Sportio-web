@@ -2,6 +2,8 @@ import { z } from "zod";
 import { eq, desc, and, ilike } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { tournaments, enrollments, matches } from "@/server/db/schema";
+import { createAutoPost } from "@/server/services/auto-feed";
+import { getRuleTemplate, formatRulesAsText, getAllRuleTemplates } from "@/server/services/rules-engine";
 
 export const tournamentRouter = createTRPCRouter({
   // List tournaments
@@ -108,6 +110,17 @@ export const tournamentRouter = createTRPCRouter({
           registrationDeadline: input.registrationDeadline ? new Date(input.registrationDeadline) : null,
         })
         .returning();
+
+      if (tournament) {
+        createAutoPost({
+          type: "tournament_created",
+          userId: ctx.session.user.id,
+          data: { tournamentName: input.name },
+          sportId: input.sportId,
+          tournamentId: tournament.id,
+        }).catch(() => {});
+      }
+
       return tournament;
     }),
 
@@ -154,6 +167,22 @@ export const tournamentRouter = createTRPCRouter({
         })
         .onConflictDoNothing()
         .returning();
+
+      // Auto-post for enrollment
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+        columns: { name: true, sportId: true },
+      });
+      if (tournament) {
+        createAutoPost({
+          type: "tournament_enrolled",
+          userId: ctx.session.user.id,
+          data: { tournamentName: tournament.name },
+          sportId: tournament.sportId,
+          tournamentId: input.tournamentId,
+        }).catch(() => {});
+      }
+
       return enrollment;
     }),
 
@@ -176,4 +205,22 @@ export const tournamentRouter = createTRPCRouter({
       orderBy: [desc(enrollments.createdAt)],
     });
   }),
+
+  // Get rule template for a sport
+  getRulesTemplate: publicProcedure
+    .input(z.object({ sportSlug: z.string() }))
+    .query(async ({ input }) => {
+      const template = getRuleTemplate(input.sportSlug);
+      if (!template) return null;
+      return {
+        template,
+        formatted: formatRulesAsText(template),
+      };
+    }),
+
+  // List all available rule templates
+  listRuleTemplates: publicProcedure
+    .query(async () => {
+      return getAllRuleTemplates();
+    }),
 });
