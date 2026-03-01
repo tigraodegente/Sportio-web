@@ -274,7 +274,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="w-full resize-none border border-slate-200 rounded-xl p-3 text-sm text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            className="w-full resize-none border border-slate-200 rounded-xl p-3 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all"
             rows={3}
           />
           <div className="flex gap-2 mt-2">
@@ -332,7 +332,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
         {/* Comment button */}
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-emerald-600 px-3 py-1.5 rounded-xl hover:bg-emerald-50/50 transition-all duration-200"
+          className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-600 px-3 py-1.5 rounded-xl hover:bg-blue-50/50 transition-all duration-200"
         >
           <MessageCircle className="w-4 h-4" />
           <span className="font-medium bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded-full text-[11px] min-w-[20px] text-center">
@@ -361,7 +361,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
                 onClick={handleCopyLink}
                 className="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-blue-500" /> : <Copy className="w-4 h-4" />}
                 {copied ? "Link copiado!" : "Copiar link"}
               </button>
               <button className="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors">
@@ -379,14 +379,14 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
           {/* Existing comments */}
           {commentsQuery.isLoading && (
             <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
           )}
 
           {commentsQuery.data?.map((comment) => (
             <div key={comment.id} className="flex gap-2.5 ml-2">
               <Avatar src={comment.user.image} name={comment.user.name} size="sm" />
-              <div className="flex-1 border-l-2 border-emerald-200 pl-3">
+              <div className="flex-1 border-l-2 border-blue-200 pl-3">
                 <div className="bg-slate-50/80 rounded-xl p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-bold text-slate-900">{comment.user.name}</span>
@@ -422,7 +422,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
                     }
                   }}
                   placeholder="Escrever comentário..."
-                  className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-slate-400"
+                  className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 placeholder:text-slate-400"
                 />
                 <Button
                   size="sm"
@@ -430,7 +430,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
                   onClick={handleComment}
                   disabled={!commentText.trim() || addComment.isPending}
                   loading={addComment.isPending}
-                  className="hover:bg-emerald-50 hover:text-emerald-600 rounded-xl"
+                  className="hover:bg-blue-50 hover:text-blue-600 rounded-xl"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

@@ -74,9 +74,9 @@ export default function CreateTournamentPage() {
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isActive
-                      ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
+                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/25"
                       : isCompleted
-                        ? "bg-emerald-50 text-emerald-600 ring-2 ring-emerald-200"
+                        ? "bg-blue-50 text-blue-600 ring-2 ring-blue-200"
                         : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
                   }`}>
                     {isCompleted ? (
@@ -87,9 +87,9 @@ export default function CreateTournamentPage() {
                   </div>
                   <span className={`text-xs font-semibold transition-colors hidden sm:block ${
                     isActive
-                      ? "text-emerald-600"
+                      ? "text-blue-600"
                       : isCompleted
-                        ? "text-emerald-500"
+                        ? "text-blue-500"
                         : "text-slate-400"
                   }`}>
                     {step.label}
@@ -99,7 +99,7 @@ export default function CreateTournamentPage() {
                   <div className="flex-1 mx-2 sm:mx-3">
                     <div className="h-0.5 rounded-full bg-slate-100 relative overflow-hidden">
                       <div
-                        className={`absolute inset-y-0 left-0 bg-emerald-400 rounded-full transition-all duration-500 ${
+                        className={`absolute inset-y-0 left-0 bg-blue-400 rounded-full transition-all duration-500 ${
                           isCompleted ? "w-full" : "w-0"
                         }`}
                       />
@@ -115,15 +115,15 @@ export default function CreateTournamentPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
         <Card className={`relative overflow-hidden transition-all duration-300 ${
-          activeStep === 1 ? "ring-1 ring-emerald-200 shadow-md" : ""
+          activeStep === 1 ? "ring-1 ring-blue-200 shadow-md" : ""
         }`}>
           <div className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 ${
-            activeStep >= 1 ? "bg-emerald-500" : "bg-slate-200"
+            activeStep >= 1 ? "bg-blue-500" : "bg-slate-200"
           }`} />
           <div className="pl-3">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <Info className="w-4.5 h-4.5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                <Info className="w-4.5 h-4.5 text-blue-600" />
               </div>
               <CardTitle>Informacoes Basicas</CardTitle>
             </div>
@@ -160,15 +160,15 @@ export default function CreateTournamentPage() {
 
         {/* Participants & Prize */}
         <Card className={`relative overflow-hidden transition-all duration-300 ${
-          activeStep === 2 ? "ring-1 ring-emerald-200 shadow-md" : ""
+          activeStep === 2 ? "ring-1 ring-blue-200 shadow-md" : ""
         }`}>
           <div className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 ${
-            activeStep >= 2 ? "bg-emerald-500" : "bg-slate-200"
+            activeStep >= 2 ? "bg-blue-500" : "bg-slate-200"
           }`} />
           <div className="pl-3">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <Users className="w-4.5 h-4.5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                <Users className="w-4.5 h-4.5 text-blue-600" />
               </div>
               <CardTitle>Participantes e Premiacao</CardTitle>
             </div>
@@ -187,22 +187,22 @@ export default function CreateTournamentPage() {
 
         {/* Location & Dates */}
         <Card className={`relative overflow-hidden transition-all duration-300 ${
-          activeStep === 3 ? "ring-1 ring-emerald-200 shadow-md" : ""
+          activeStep === 3 ? "ring-1 ring-blue-200 shadow-md" : ""
         }`}>
           <div className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 ${
-            activeStep >= 3 ? "bg-emerald-500" : "bg-slate-200"
+            activeStep >= 3 ? "bg-blue-500" : "bg-slate-200"
           }`} />
           <div className="pl-3">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <MapPin className="w-4.5 h-4.5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-4.5 h-4.5 text-blue-600" />
               </div>
               <CardTitle>Local e Datas</CardTitle>
             </div>
             <CardContent className="mt-4 space-y-4">
               <div className="flex items-center gap-4 mb-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" className="rounded border-slate-300 text-emerald-600" />
+                  <input type="checkbox" className="rounded border-slate-300 text-blue-600" />
                   <span className="text-sm text-slate-700">Torneio Online</span>
                 </label>
               </div>
@@ -222,15 +222,15 @@ export default function CreateTournamentPage() {
 
         {/* Rules */}
         <Card className={`relative overflow-hidden transition-all duration-300 ${
-          activeStep === 4 ? "ring-1 ring-emerald-200 shadow-md" : ""
+          activeStep === 4 ? "ring-1 ring-blue-200 shadow-md" : ""
         }`}>
           <div className={`absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300 ${
-            activeStep >= 4 ? "bg-emerald-500" : "bg-slate-200"
+            activeStep >= 4 ? "bg-blue-500" : "bg-slate-200"
           }`} />
           <div className="pl-3">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                <ScrollText className="w-4.5 h-4.5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                <ScrollText className="w-4.5 h-4.5 text-blue-600" />
               </div>
               <CardTitle>Regras</CardTitle>
             </div>
@@ -245,14 +245,14 @@ export default function CreateTournamentPage() {
         </Card>
 
         {/* Preview Summary */}
-        <div className="bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-2xl border border-emerald-200/60 p-5 sm:p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-2xl border border-blue-200/60 p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-full bg-emerald-500/15 flex items-center justify-center">
-              <Eye className="w-4.5 h-4.5 text-emerald-600" />
+            <div className="w-9 h-9 rounded-full bg-blue-500/15 flex items-center justify-center">
+              <Eye className="w-4.5 h-4.5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-emerald-900">Resumo do Torneio</h3>
-              <p className="text-xs text-emerald-600">Revise as informacoes antes de criar</p>
+              <h3 className="text-sm font-bold text-blue-900">Resumo do Torneio</h3>
+              <p className="text-xs text-blue-600">Revise as informacoes antes de criar</p>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -270,7 +270,7 @@ export default function CreateTournamentPage() {
             </div>
             <div className="bg-white/80 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-500 mb-0.5">Premiacao</p>
-              <p className="text-sm font-semibold text-emerald-600">0 GCoins</p>
+              <p className="text-sm font-semibold text-blue-600">0 GCoins</p>
             </div>
           </div>
         </div>

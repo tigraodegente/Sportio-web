@@ -50,7 +50,7 @@ export function Sidebar() {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-5 border-b border-white/10">
           <Link href="/social" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/25">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/25">
               <Coins className="w-5 h-5 text-white" />
             </div>
             <span className="text-lg font-bold text-white">Sportio</span>
@@ -76,7 +76,7 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-emerald-500/15 text-emerald-400"
+                    ? "bg-blue-500/15 text-blue-400"
                     : "text-slate-400 hover:bg-white/5 hover:text-white"
                 )}
               >
@@ -92,12 +92,12 @@ export function Sidebar() {
 
         {/* GCoins Balance */}
         <div className="p-3">
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 text-white">
+          <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-4 text-white">
             <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/10 rounded-full blur-xl" />
             <div className="relative">
               <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-4 h-4 text-emerald-200" />
-                <p className="text-xs font-medium text-emerald-200">Saldo GCoins</p>
+                <Zap className="w-4 h-4 text-blue-200" />
+                <p className="text-xs font-medium text-blue-200">Saldo GCoins</p>
               </div>
               <p className="text-2xl font-bold tracking-tight">--,--</p>
               <div className="flex gap-2 mt-3">

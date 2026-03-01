@@ -60,7 +60,7 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
     <Card
       className={`transition-all duration-300 ${
         focusedCompose
-          ? "ring-2 ring-emerald-500/30 border-emerald-200 shadow-lg shadow-emerald-500/5"
+          ? "ring-2 ring-blue-500/30 border-blue-200 shadow-lg shadow-blue-500/5"
           : ""
       }`}
     >
@@ -82,11 +82,11 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
           {/* Selected sport tag */}
           {selectedSport && (
             <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 text-xs font-semibold">
                 {selectedSport.icon} {selectedSport.name}
                 <button
                   onClick={() => setSelectedSportId(undefined)}
-                  className="ml-1 hover:text-emerald-900"
+                  className="ml-1 hover:text-blue-900"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -96,7 +96,7 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
 
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <div className="flex gap-1">
-              <button className="p-2 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
+              <button className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                 <ImageIcon className="w-5 h-5" />
               </button>
               <button className="p-2 rounded-xl text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all duration-200">
@@ -133,7 +133,7 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
                         }}
                         className={`flex items-center gap-2 w-full px-3.5 py-2 text-sm transition-colors ${
                           selectedSportId === sport.id
-                            ? "bg-emerald-50 text-emerald-700"
+                            ? "bg-blue-50 text-blue-700"
                             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                         }`}
                       >
