@@ -5,16 +5,18 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   Trophy,
-  PlusCircle,
+  Target,
   MessageSquare,
   User,
+  Coins,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const bottomNavItems = [
   { href: "/social", label: "Feed", icon: Home },
   { href: "/tournaments", label: "Torneios", icon: Trophy },
-  { href: "/tournaments/create", label: "Criar", icon: PlusCircle, isAction: true },
+  { href: "/challenges", label: "Desafios", icon: Target },
+  { href: "/bets", label: "Apostas", icon: Coins },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/profile", label: "Perfil", icon: User },
 ];
@@ -24,37 +26,23 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-slate-200 lg:hidden safe-area-bottom">
-      <div className="flex items-center justify-around px-2 h-16">
+      <div className="grid grid-cols-6 px-1 h-16">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
-
-          if (item.isAction) {
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex flex-col items-center justify-center -mt-4"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/30 transition-transform active:scale-95">
-                  <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
-                </div>
-              </Link>
-            );
-          }
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 transition-colors",
+                "flex flex-col items-center justify-center gap-0.5 py-1 transition-colors relative",
                 isActive ? "text-blue-600" : "text-slate-400"
               )}
             >
               <Icon
-                className={cn("w-[22px] h-[22px]", isActive && "stroke-[2.5]")}
+                className={cn("w-[20px] h-[20px]", isActive && "stroke-[2.5]")}
               />
               <span
                 className={cn(

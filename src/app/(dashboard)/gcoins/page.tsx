@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, User, Star } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, User, Star, Loader2, AlertCircle, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,17 +9,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { StatsCard } from "@/components/ui/stats-card";
-
-const transactions = [
-  { id: "1", category: "tournament_prize", description: "Premio - Copa Beach Tennis SP", amount: 2500, type: "real", date: "15 Mar 2025", time: "14:32" },
-  { id: "2", category: "bet_place", description: "Palpite - Team Alpha vs Beta", amount: -50, type: "gamification", date: "14 Mar 2025", time: "09:15" },
-  { id: "3", category: "bet_win", description: "Palpite ganho - Player A vs B", amount: 180, type: "gamification", date: "13 Mar 2025", time: "21:47" },
-  { id: "4", category: "tournament_entry", description: "Inscricao - Liga CrossFit", amount: -100, type: "real", date: "12 Mar 2025", time: "16:03" },
-  { id: "5", category: "daily_bonus", description: "Bonus diario", amount: 10, type: "gamification", date: "12 Mar 2025", time: "08:00" },
-  { id: "6", category: "referral_bonus", description: "Indicacao - Rafael Costa", amount: 50, type: "gamification", date: "11 Mar 2025", time: "11:22" },
-  { id: "7", category: "purchase", description: "Compra de GCoins", amount: 500, type: "real", date: "10 Mar 2025", time: "13:45" },
-  { id: "8", category: "transfer", description: "Transferencia para Andre", amount: -100, type: "real", date: "9 Mar 2025", time: "17:30" },
-];
+import { trpc } from "@/lib/trpc";
 
 const categoryLabels: Record<string, string> = {
   tournament_prize: "Premio",
@@ -36,20 +26,76 @@ const categoryLabels: Record<string, string> = {
   withdrawal: "Saque",
 };
 
-const mockSearchUsers = [
-  { id: "1", name: "Rafael Costa", email: "rafael@email.com", avatar: "RC" },
-  { id: "2", name: "Andre Santos", email: "andre@email.com", avatar: "AS" },
-  { id: "3", name: "Lucas Mendes", email: "lucas@email.com", avatar: "LM" },
-];
+function formatNumber(n: number): string {
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatDate(dateStr: string | Date): { date: string; time: string } {
+  const d = new Date(dateStr);
+  const date = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+  const time = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  return { date, time };
+}
 
 export default function GCoinsPage() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [transferSearch, setTransferSearch] = useState("");
-  const [selectedUser, setSelectedUser] = useState<(typeof mockSearchUsers)[0] | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email: string; avatar: string } | null>(null);
+  const [transferAmount, setTransferAmount] = useState("");
+  const [transferType, setTransferType] = useState<"real" | "gamification">("real");
+  const [transferError, setTransferError] = useState("");
+
+  // tRPC queries
+  const balance = trpc.gcoin.balance.useQuery();
+  const summary = trpc.gcoin.summary.useQuery();
+  const history = trpc.gcoin.history.useQuery({ limit: 20 });
+
+  // tRPC mutations
+  const transfer = trpc.gcoin.transfer.useMutation({
+    onSuccess: () => {
+      balance.refetch();
+      history.refetch();
+      summary.refetch();
+      setShowTransferModal(false);
+      resetTransferForm();
+    },
+    onError: (error) => {
+      setTransferError(error.message);
+    },
+  });
 
   const buyAmounts = [100, 250, 500, 1000, 2500, 5000];
+
+  function resetTransferForm() {
+    setTransferSearch("");
+    setSelectedUser(null);
+    setTransferAmount("");
+    setTransferType("real");
+    setTransferError("");
+  }
+
+  function handleTransfer() {
+    if (!selectedUser) {
+      setTransferError("Selecione um destinatario");
+      return;
+    }
+    const amount = Number(transferAmount);
+    if (!amount || amount <= 0) {
+      setTransferError("Informe um valor valido");
+      return;
+    }
+    setTransferError("");
+    transfer.mutate({
+      toUserId: selectedUser.id,
+      amount,
+      type: transferType,
+    });
+  }
+
+  const isLoading = balance.isLoading || summary.isLoading || history.isLoading;
+  const hasError = balance.isError || summary.isError || history.isError;
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -58,6 +104,31 @@ export default function GCoinsPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">GCoins</h1>
         <p className="text-sm sm:text-base text-slate-500 mt-1">Gerencie sua carteira de GCoins</p>
       </div>
+
+      {/* Error Banner */}
+      {hasError && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold">Erro ao carregar dados</p>
+            <p className="text-xs mt-0.5">
+              {balance.error?.message || summary.error?.message || history.error?.message || "Tente novamente mais tarde."}
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="ml-auto shrink-0"
+            onClick={() => {
+              balance.refetch();
+              summary.refetch();
+              history.refetch();
+            }}
+          >
+            Tentar novamente
+          </Button>
+        </div>
+      )}
 
       {/* Balance Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -71,7 +142,15 @@ export default function GCoinsPage() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div className="relative">
             <p className="text-blue-200 text-xs sm:text-sm font-medium">GCoins Reais</p>
-            <p className="text-3xl sm:text-4xl font-bold mt-1 tracking-tight">1.250,00</p>
+            {balance.isLoading ? (
+              <div className="flex items-center gap-2 mt-2">
+                <Loader2 className="w-5 h-5 animate-spin text-blue-200" />
+              </div>
+            ) : (
+              <p className="text-3xl sm:text-4xl font-bold mt-1 tracking-tight">
+                {formatNumber(balance.data?.real ?? 0)}
+              </p>
+            )}
             <p className="text-blue-300/80 text-xs mt-2">Saque disponivel via PIX</p>
           </div>
         </Card>
@@ -86,7 +165,15 @@ export default function GCoinsPage() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div className="relative">
             <p className="text-amber-200 text-xs sm:text-sm font-medium">GCoins Gamificacao</p>
-            <p className="text-3xl sm:text-4xl font-bold mt-1 tracking-tight">3.480,00</p>
+            {balance.isLoading ? (
+              <div className="flex items-center gap-2 mt-2">
+                <Loader2 className="w-5 h-5 animate-spin text-amber-200" />
+              </div>
+            ) : (
+              <p className="text-3xl sm:text-4xl font-bold mt-1 tracking-tight">
+                {formatNumber(balance.data?.gamification ?? 0)}
+              </p>
+            )}
             <p className="text-amber-300/80 text-xs mt-2">Uso em palpites e desafios</p>
           </div>
         </Card>
@@ -95,13 +182,21 @@ export default function GCoinsPage() {
         <div className="relative rounded-2xl p-[2px] bg-gradient-to-br from-blue-400 via-blue-500 to-amber-400">
           <div className="rounded-[14px] bg-white p-5 sm:p-6 h-full">
             <p className="text-slate-500 text-xs sm:text-sm font-medium">Saldo Total</p>
-            <p className="text-3xl sm:text-4xl font-bold text-slate-900 mt-1 tracking-tight">4.730,00</p>
+            {balance.isLoading ? (
+              <div className="flex items-center gap-2 mt-2">
+                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+              </div>
+            ) : (
+              <p className="text-3xl sm:text-4xl font-bold text-slate-900 mt-1 tracking-tight">
+                {formatNumber(balance.data?.total ?? 0)}
+              </p>
+            )}
             <div className="flex gap-2 mt-3">
               <Button size="sm" onClick={() => setShowBuyModal(true)}>
                 <Plus className="w-4 h-4" />
                 Comprar
               </Button>
-              <Button size="sm" variant="outline" onClick={() => setShowTransferModal(true)}>
+              <Button size="sm" variant="outline" onClick={() => { resetTransferForm(); setShowTransferModal(true); }}>
                 <Send className="w-4 h-4" />
                 Transferir
               </Button>
@@ -112,10 +207,46 @@ export default function GCoinsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatsCard title="Ganho este mes" value="2.840" changeType="positive" change="+32% vs mes anterior" icon={<TrendingUp className="w-5 h-5" />} />
-        <StatsCard title="Gasto este mes" value="250" changeType="negative" change="Em inscricoes e palpites" icon={<ArrowDownRight className="w-5 h-5" />} />
-        <StatsCard title="Transferencias" value="3" changeType="neutral" change="Enviadas este mes" icon={<Send className="w-5 h-5" />} />
-        <StatsCard title="Transacoes" value="24" changeType="neutral" change="Nos ultimos 30 dias" icon={<History className="w-5 h-5" />} />
+        {summary.isLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="relative bg-white rounded-xl border border-slate-100 p-4 sm:p-5 flex items-center justify-center min-h-[100px]">
+                <Loader2 className="w-5 h-5 animate-spin text-slate-300" />
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            <StatsCard
+              title="Total Ganho"
+              value={formatNumber(summary.data?.totalEarned ?? 0)}
+              changeType="positive"
+              change="GCoins recebidos"
+              icon={<TrendingUp className="w-5 h-5" />}
+            />
+            <StatsCard
+              title="Total Gasto"
+              value={formatNumber(summary.data?.totalSpent ?? 0)}
+              changeType="negative"
+              change="Em inscricoes e palpites"
+              icon={<ArrowDownRight className="w-5 h-5" />}
+            />
+            <StatsCard
+              title="Saldo Liquido"
+              value={formatNumber((summary.data?.totalEarned ?? 0) - (summary.data?.totalSpent ?? 0))}
+              changeType={(summary.data?.totalEarned ?? 0) - (summary.data?.totalSpent ?? 0) >= 0 ? "positive" : "negative"}
+              change="Ganho - Gasto"
+              icon={<Send className="w-5 h-5" />}
+            />
+            <StatsCard
+              title="Transacoes"
+              value={summary.data?.transactionCount ?? 0}
+              changeType="neutral"
+              change="Total de transacoes"
+              icon={<History className="w-5 h-5" />}
+            />
+          </>
+        )}
       </div>
 
       {/* Transaction History */}
@@ -124,67 +255,106 @@ export default function GCoinsPage() {
           <CardTitle>Historico de Transacoes</CardTitle>
         </div>
 
-        <Tabs
-          tabs={[
-            { id: "all", label: "Todas" },
-            { id: "real", label: "Reais" },
-            { id: "gamification", label: "Gamificacao" },
-          ]}
-        >
-          {(tab) => (
-            <div className="space-y-2">
-              {transactions
-                .filter((t) => tab === "all" || t.type === tab)
-                .map((tx) => (
-                  <div
-                    key={tx.id}
-                    className={`flex items-center justify-between py-3 px-3 sm:px-4 rounded-xl transition-all duration-200 hover:bg-slate-50/80 group border-l-[3px] ${
-                      tx.amount > 0
-                        ? "border-l-blue-500"
-                        : "border-l-red-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
+        {history.isLoading ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-3" />
+            <p className="text-sm text-slate-400">Carregando transacoes...</p>
+          </div>
+        ) : history.isError ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <AlertCircle className="w-8 h-8 text-red-400 mb-3" />
+            <p className="text-sm text-red-500 font-medium">Erro ao carregar transacoes</p>
+            <p className="text-xs text-slate-400 mt-1">{history.error?.message}</p>
+            <Button size="sm" variant="outline" className="mt-3" onClick={() => history.refetch()}>
+              Tentar novamente
+            </Button>
+          </div>
+        ) : (
+          <Tabs
+            tabs={[
+              { id: "all", label: "Todas" },
+              { id: "real", label: "Reais" },
+              { id: "gamification", label: "Gamificacao" },
+            ]}
+          >
+            {(tab) => {
+              const filtered = (history.data?.items ?? []).filter(
+                (t) => tab === "all" || t.type === tab
+              );
+
+              if (filtered.length === 0) {
+                return (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Coins className="w-10 h-10 text-slate-200 mb-3" />
+                    <p className="text-sm font-medium text-slate-400">Nenhuma transacao encontrada</p>
+                    <p className="text-xs text-slate-300 mt-1">
+                      {tab === "all"
+                        ? "Suas transacoes aparecerão aqui"
+                        : tab === "real"
+                          ? "Nenhuma transacao com GCoins reais"
+                          : "Nenhuma transacao de gamificacao"}
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="space-y-2">
+                  {filtered.map((tx) => {
+                    const { date, time } = formatDate(tx.createdAt);
+                    return (
                       <div
-                        className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${
-                          tx.amount > 0 ? "bg-green-100" : "bg-red-100"
+                        key={tx.id}
+                        className={`flex items-center justify-between py-3 px-3 sm:px-4 rounded-xl transition-all duration-200 hover:bg-slate-50/80 group border-l-[3px] ${
+                          Number(tx.amount) > 0
+                            ? "border-l-blue-500"
+                            : "border-l-red-400"
                         }`}
                       >
-                        {tx.amount > 0 ? (
-                          <ArrowUpRight className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <ArrowDownRight className="w-5 h-5 text-red-600" />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 truncate">{tx.description}</p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <Badge variant={tx.amount > 0 ? "primary" : "danger"} className="text-[10px] px-1.5 py-0">
-                            {categoryLabels[tx.category] || tx.category}
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div
+                            className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${
+                              Number(tx.amount) > 0 ? "bg-green-100" : "bg-red-100"
+                            }`}
+                          >
+                            {Number(tx.amount) > 0 ? (
+                              <ArrowUpRight className="w-5 h-5 text-green-600" />
+                            ) : (
+                              <ArrowDownRight className="w-5 h-5 text-red-600" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 truncate">{tx.description}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <Badge variant={Number(tx.amount) > 0 ? "primary" : "danger"} className="text-[10px] px-1.5 py-0">
+                                {categoryLabels[tx.category] || tx.category}
+                              </Badge>
+                              <span className="text-[11px] text-slate-400 font-medium">{date}</span>
+                              <span className="text-[10px] text-slate-300">|</span>
+                              <span className="text-[11px] text-slate-400">{time}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0 ml-3">
+                          <p
+                            className={`text-sm font-bold tracking-tight ${
+                              Number(tx.amount) > 0 ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {Number(tx.amount) > 0 ? "+" : ""}{tx.amount.toLocaleString()} GC
+                          </p>
+                          <Badge variant={tx.type === "real" ? "primary" : "accent"} className="text-[10px] mt-0.5">
+                            {tx.type === "real" ? "Real" : "Game"}
                           </Badge>
-                          <span className="text-[11px] text-slate-400 font-medium">{tx.date}</span>
-                          <span className="text-[10px] text-slate-300">|</span>
-                          <span className="text-[11px] text-slate-400">{tx.time}</span>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-right shrink-0 ml-3">
-                      <p
-                        className={`text-sm font-bold tracking-tight ${
-                          tx.amount > 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()} GC
-                      </p>
-                      <Badge variant={tx.type === "real" ? "primary" : "accent"} className="text-[10px] mt-0.5">
-                        {tx.type === "real" ? "Real" : "Game"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-        </Tabs>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          </Tabs>
+        )}
       </Card>
 
       {/* Buy Modal */}
@@ -253,7 +423,14 @@ export default function GCoinsPage() {
       </Modal>
 
       {/* Transfer Modal */}
-      <Modal isOpen={showTransferModal} onClose={() => setShowTransferModal(false)} title="Transferir GCoins">
+      <Modal
+        isOpen={showTransferModal}
+        onClose={() => {
+          setShowTransferModal(false);
+          resetTransferForm();
+        }}
+        title="Transferir GCoins"
+      >
         <div className="space-y-5">
           <Input
             label="Email ou nome do destinatario"
@@ -263,53 +440,9 @@ export default function GCoinsPage() {
             onChange={(e) => {
               setTransferSearch(e.target.value);
               setSelectedUser(null);
+              setTransferError("");
             }}
           />
-
-          {/* User search preview area */}
-          {transferSearch.length > 0 && !selectedUser && (
-            <div className="rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-3 py-2 bg-slate-50 border-b border-slate-100">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Resultados</p>
-              </div>
-              <div className="divide-y divide-slate-100">
-                {mockSearchUsers
-                  .filter(
-                    (u) =>
-                      u.name.toLowerCase().includes(transferSearch.toLowerCase()) ||
-                      u.email.toLowerCase().includes(transferSearch.toLowerCase())
-                  )
-                  .map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setTransferSearch(user.name);
-                      }}
-                      className="flex items-center gap-3 w-full px-3 py-3 hover:bg-blue-50/50 transition-colors text-left"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                        {user.avatar}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">{user.name}</p>
-                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
-                      </div>
-                    </button>
-                  ))}
-                {mockSearchUsers.filter(
-                  (u) =>
-                    u.name.toLowerCase().includes(transferSearch.toLowerCase()) ||
-                    u.email.toLowerCase().includes(transferSearch.toLowerCase())
-                ).length === 0 && (
-                  <div className="px-3 py-4 text-center">
-                    <User className="w-8 h-8 text-slate-300 mx-auto mb-1" />
-                    <p className="text-sm text-slate-400">Nenhum usuario encontrado</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Selected user preview */}
           {selectedUser && (
@@ -333,14 +466,68 @@ export default function GCoinsPage() {
             </div>
           )}
 
-          <Input label="Quantidade" type="number" placeholder="0" />
+          {/* Transfer type selector */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de GCoin</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setTransferType("real")}
+                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  transferType === "real"
+                    ? "bg-blue-100 text-blue-700 ring-2 ring-blue-500/30"
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`}
+              >
+                Real
+              </button>
+              <button
+                onClick={() => setTransferType("gamification")}
+                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  transferType === "gamification"
+                    ? "bg-amber-100 text-amber-700 ring-2 ring-amber-500/30"
+                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                }`}
+              >
+                Gamificacao
+              </button>
+            </div>
+          </div>
+
+          <Input
+            label="Quantidade"
+            type="number"
+            placeholder="0"
+            value={transferAmount}
+            onChange={(e) => {
+              setTransferAmount(e.target.value);
+              setTransferError("");
+            }}
+          />
           <p className="text-xs text-slate-400 flex items-center gap-1.5">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400" />
             Taxa de transferencia: 0 GCoins
           </p>
-          <Button size="lg" className="w-full">
-            <Send className="w-5 h-5" />
-            Transferir
+
+          {/* Transfer error message */}
+          {transferError && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <p className="text-sm">{transferError}</p>
+            </div>
+          )}
+
+          <Button
+            size="lg"
+            className="w-full"
+            onClick={handleTransfer}
+            disabled={transfer.isPending || !selectedUser || !transferAmount}
+          >
+            {transfer.isPending ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
+            {transfer.isPending ? "Transferindo..." : "Transferir"}
           </Button>
         </div>
       </Modal>

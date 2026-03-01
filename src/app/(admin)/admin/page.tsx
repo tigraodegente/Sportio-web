@@ -1,38 +1,26 @@
 "use client";
 
-import { Users, Trophy, Coins, TrendingUp, AlertTriangle, Shield, Settings, Flag } from "lucide-react";
+import { useState } from "react";
+import {
+  Users,
+  Trophy,
+  Coins,
+  TrendingUp,
+  Shield,
+  Settings,
+  Search,
+  Loader2,
+  Medal,
+  ListOrdered,
+} from "lucide-react";
 import { StatsCard } from "@/components/ui/stats-card";
-import { Card, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { Avatar } from "@/components/ui/avatar";
-
-const platformStats = {
-  totalUsers: 12583,
-  activeUsers: 8420,
-  totalTournaments: 856,
-  activeTournaments: 34,
-  totalGcoins: 2450000,
-  revenue: 124500,
-  pendingReports: 12,
-  pendingVerifications: 28,
-};
-
-const recentUsers = [
-  { id: "1", name: "Lucas Mendes", email: "lucas@email.com", role: "athlete", joined: "Hoje", status: "active" },
-  { id: "2", name: "Arena Sportio", email: "arena@email.com", role: "arena_owner", joined: "Hoje", status: "pending" },
-  { id: "3", name: "Nike Brasil", email: "nike@brand.com", role: "brand", joined: "Ontem", status: "active" },
-  { id: "4", name: "Rafael Costa", email: "rafael@email.com", role: "athlete", joined: "Ontem", status: "active" },
-  { id: "5", name: "Maria Silva", email: "maria@email.com", role: "referee", joined: "2 dias", status: "pending" },
-];
-
-const reports = [
-  { id: "1", type: "Spam", reporter: "Lucas M.", target: "Post #432", status: "pending", date: "Hoje" },
-  { id: "2", type: "Fraude", reporter: "Rafael C.", target: "User: FakeUser123", status: "pending", date: "Hoje" },
-  { id: "3", type: "Comportamento", reporter: "Andre S.", target: "Comment #891", status: "reviewing", date: "Ontem" },
-  { id: "4", type: "Bug", reporter: "Pedro L.", target: "Torneio #56", status: "resolved", date: "2 dias" },
-];
+import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc";
 
 const roleLabels: Record<string, string> = {
   athlete: "Atleta",
@@ -41,205 +29,580 @@ const roleLabels: Record<string, string> = {
   fan: "Fa",
   bettor: "Palpiteiro",
   referee: "Arbitro",
+  trainer: "Treinador",
+  nutritionist: "Nutricionista",
+  photographer: "Fotografo",
   arena_owner: "Arena",
   admin: "Admin",
 };
 
+const tournamentStatusLabels: Record<string, string> = {
+  draft: "Rascunho",
+  registration_open: "Inscricoes Abertas",
+  registration_closed: "Inscricoes Fechadas",
+  in_progress: "Em Andamento",
+  completed: "Finalizado",
+  cancelled: "Cancelado",
+};
+
+function LoadingSpinner({ className }: { className?: string }) {
+  return (
+    <Loader2
+      className={`animate-spin text-blue-500 ${className ?? "w-6 h-6"}`}
+    />
+  );
+}
+
+function LoadingRow() {
+  return (
+    <tr>
+      <td colSpan={5} className="py-8">
+        <div className="flex justify-center">
+          <LoadingSpinner />
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+        {icon}
+      </div>
+      <h3 className="text-base font-semibold text-slate-900 mb-1">{title}</h3>
+      <p className="text-sm text-slate-500 max-w-sm">{description}</p>
+    </div>
+  );
+}
+
 export default function AdminPage() {
+  const [userSearch, setUserSearch] = useState("");
+
+  // --- tRPC Queries ---
+  const currentUser = trpc.user.me.useQuery(undefined, { retry: false });
+
+  // user.search requires query with min(1), so only query when there is input
+  const usersQuery = trpc.user.search.useQuery(
+    { query: userSearch || "a", limit: 20 },
+    { enabled: userSearch.length > 0 }
+  );
+
+  const tournamentsQuery = trpc.tournament.list.useInfiniteQuery(
+    { limit: 20 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
+
+  const leaderboardQuery = trpc.bet.leaderboard.useQuery({ limit: 10 });
+
+  const rankingQuery = trpc.user.ranking.useQuery({ limit: 10 });
+
+  const unreadCount = trpc.notification.unreadCount.useQuery(undefined, {
+    retry: false,
+  });
+
+  // --- Derived data ---
+  const users = usersQuery.data?.items ?? [];
+
+  const allTournaments =
+    tournamentsQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  const totalTournaments = allTournaments.length;
+  const activeTournaments = allTournaments.filter(
+    (t) =>
+      t.status === "in_progress" ||
+      t.status === "registration_open" ||
+      t.status === "registration_closed"
+  ).length;
+
+  const leaderboard = leaderboardQuery.data ?? [];
+  const rankings = rankingQuery.data ?? [];
+
+  const notifications =
+    typeof unreadCount.data === "number" ? unreadCount.data : 0;
+
+  const isStatsLoading =
+    tournamentsQuery.isLoading || leaderboardQuery.isLoading;
+
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
               <Shield className="w-6 h-6 text-blue-600" />
               Painel Admin
             </h1>
-            <p className="text-slate-500">Visao geral da plataforma Sportio</p>
+            <p className="text-slate-500">
+              Visao geral da plataforma Sportio
+              {currentUser.data ? ` — ${currentUser.data.name}` : ""}
+            </p>
           </div>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-            Configuracoes
-          </Button>
+          <div className="flex items-center gap-3">
+            {notifications > 0 && (
+              <Badge variant="danger">{notifications} notificacoes</Badge>
+            )}
+            <Button variant="outline" size="sm">
+              <Settings className="w-4 h-4" />
+              Configuracoes
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard title="Total Usuarios" value={platformStats.totalUsers.toLocaleString()} change={`${platformStats.activeUsers.toLocaleString()} ativos`} changeType="positive" icon={<Users className="w-5 h-5" />} />
-          <StatsCard title="Torneios" value={platformStats.totalTournaments.toLocaleString()} change={`${platformStats.activeTournaments} ativos agora`} changeType="neutral" icon={<Trophy className="w-5 h-5" />} />
-          <StatsCard title="GCoins em Circulacao" value={`${(platformStats.totalGcoins / 1000000).toFixed(1)}M`} change="Volume total" changeType="neutral" icon={<Coins className="w-5 h-5" />} />
-          <StatsCard title="Receita (R$)" value={`${(platformStats.revenue / 1000).toFixed(0)}K`} change="+18% vs mes anterior" changeType="positive" icon={<TrendingUp className="w-5 h-5" />} />
+          {isStatsLoading ? (
+            <>
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="relative bg-white rounded-xl border border-slate-100 p-5 animate-pulse"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="h-4 bg-slate-200 rounded w-24" />
+                    <div className="w-10 h-10 bg-slate-100 rounded-xl" />
+                  </div>
+                  <div className="h-7 bg-slate-200 rounded w-16 mb-1" />
+                  <div className="h-3 bg-slate-100 rounded w-20" />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <StatsCard
+                title="Torneios"
+                value={totalTournaments.toLocaleString()}
+                change={`${activeTournaments} ativos agora`}
+                changeType="positive"
+                icon={<Trophy className="w-5 h-5" />}
+              />
+              <StatsCard
+                title="Torneios em Andamento"
+                value={
+                  allTournaments
+                    .filter((t) => t.status === "in_progress")
+                    .length.toLocaleString()
+                }
+                change="Em andamento agora"
+                changeType="neutral"
+                icon={<TrendingUp className="w-5 h-5" />}
+              />
+              <StatsCard
+                title="Top Palpiteiros"
+                value={leaderboard.length.toLocaleString()}
+                change="No leaderboard"
+                changeType="neutral"
+                icon={<Coins className="w-5 h-5" />}
+              />
+              <StatsCard
+                title="Ranking Usuarios"
+                value={rankings.length.toLocaleString()}
+                change="Usuarios ranqueados"
+                changeType="positive"
+                icon={<Users className="w-5 h-5" />}
+              />
+            </>
+          )}
         </div>
 
         {/* Alerts */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <Card className="border-orange-200 bg-orange-50">
+          <Card className="border-blue-200 bg-blue-50">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 text-orange-600" />
+              <Shield className="w-6 h-6 text-blue-600" />
               <div>
-                <p className="font-semibold text-orange-900">{platformStats.pendingReports} Reports Pendentes</p>
-                <p className="text-sm text-orange-700">Denuncias aguardando revisao</p>
+                <p className="font-semibold text-blue-900">
+                  {unreadCount.isLoading
+                    ? "Carregando..."
+                    : notifications > 0
+                    ? `${notifications} Notificacoes Nao Lidas`
+                    : "Nenhuma notificacao pendente"}
+                </p>
+                <p className="text-sm text-blue-700">
+                  Notificacoes da plataforma
+                </p>
               </div>
             </div>
           </Card>
           <Card className="border-blue-200 bg-blue-50">
             <div className="flex items-center gap-3">
-              <Shield className="w-6 h-6 text-blue-600" />
+              <Trophy className="w-6 h-6 text-blue-600" />
               <div>
-                <p className="font-semibold text-blue-900">{platformStats.pendingVerifications} Verificacoes Pendentes</p>
-                <p className="text-sm text-blue-700">Usuarios aguardando verificacao</p>
+                <p className="font-semibold text-blue-900">
+                  {tournamentsQuery.isLoading
+                    ? "Carregando..."
+                    : `${totalTournaments} Torneios Cadastrados`}
+                </p>
+                <p className="text-sm text-blue-700">
+                  {activeTournaments} ativos no momento
+                </p>
               </div>
             </div>
           </Card>
         </div>
 
+        {/* Tabs */}
         <Tabs
           tabs={[
             { id: "users", label: "Usuarios" },
-            { id: "reports", label: "Denuncias" },
-            { id: "analytics", label: "Analytics" },
+            { id: "tournaments", label: "Torneios" },
+            { id: "leaderboard", label: "Leaderboard" },
+            { id: "ranking", label: "Ranking" },
           ]}
         >
           {(tab) => (
             <>
+              {/* ===== USERS TAB ===== */}
               {tab === "users" && (
                 <Card>
-                  <div className="flex items-center justify-between mb-4">
-                    <CardTitle>Usuarios Recentes</CardTitle>
-                    <Button variant="outline" size="sm">Ver todos</Button>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                    <CardTitle>Buscar Usuarios</CardTitle>
+                    <div className="w-full sm:w-72">
+                      <Input
+                        placeholder="Buscar por nome..."
+                        icon={<Search className="w-4 h-4" />}
+                        value={userSearch}
+                        onChange={(e) => setUserSearch(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-slate-200">
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">Usuario</th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">Tipo</th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">Cadastro</th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">Status</th>
-                          <th className="text-right text-xs font-medium text-slate-500 py-3 px-2">Acoes</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {recentUsers.map((user) => (
-                          <tr key={user.id} className="border-b border-slate-50 hover:bg-slate-50">
-                            <td className="py-3 px-2">
-                              <div className="flex items-center gap-2">
-                                <Avatar name={user.name} size="sm" />
-                                <div>
-                                  <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                                  <p className="text-xs text-slate-500">{user.email}</p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-2">
-                              <Badge>{roleLabels[user.role] || user.role}</Badge>
-                            </td>
-                            <td className="py-3 px-2 text-sm text-slate-500">{user.joined}</td>
-                            <td className="py-3 px-2">
-                              <Badge variant={user.status === "active" ? "success" : "info"}>
-                                {user.status === "active" ? "Ativo" : "Pendente"}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-2 text-right">
-                              <Button variant="ghost" size="sm">Ver</Button>
-                            </td>
+
+                  {!userSearch && (
+                    <EmptyState
+                      icon={<Search className="w-7 h-7 text-slate-300" />}
+                      title="Buscar usuarios"
+                      description="Digite um nome no campo de busca para encontrar usuarios."
+                    />
+                  )}
+
+                  {userSearch && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-slate-200">
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Usuario
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Cidade
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Nivel
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Status
+                            </th>
+                            <th className="text-right text-xs font-medium text-slate-500 py-3 px-2">
+                              Acoes
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {usersQuery.isLoading && <LoadingRow />}
+
+                          {!usersQuery.isLoading && users.length === 0 && (
+                            <tr>
+                              <td colSpan={5}>
+                                <EmptyState
+                                  icon={
+                                    <Users className="w-7 h-7 text-slate-300" />
+                                  }
+                                  title="Nenhum usuario encontrado"
+                                  description={`Nenhum resultado para "${userSearch}". Tente outro termo.`}
+                                />
+                              </td>
+                            </tr>
+                          )}
+
+                          {users.map((user) => (
+                            <tr
+                              key={user.id}
+                              className="border-b border-slate-50 hover:bg-slate-50"
+                            >
+                              <td className="py-3 px-2">
+                                <div className="flex items-center gap-2">
+                                  <Avatar
+                                    src={user.image}
+                                    name={user.name}
+                                    size="sm"
+                                  />
+                                  <div>
+                                    <p className="text-sm font-medium text-slate-900">
+                                      {user.name}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                      {user.email}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3 px-2 text-sm text-slate-500">
+                                {user.city || "—"}
+                              </td>
+                              <td className="py-3 px-2">
+                                <Badge variant="primary">
+                                  Nivel {user.level ?? 1}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-2">
+                                <Badge
+                                  variant={
+                                    user.isVerified ? "success" : "info"
+                                  }
+                                >
+                                  {user.isVerified ? "Verificado" : "Pendente"}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-2 text-right">
+                                <Button variant="ghost" size="sm">
+                                  Ver
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+                      {usersQuery.isFetching && !usersQuery.isLoading && (
+                        <div className="flex justify-center py-3">
+                          <LoadingSpinner className="w-4 h-4" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </Card>
               )}
 
-              {tab === "reports" && (
+              {/* ===== TOURNAMENTS TAB ===== */}
+              {tab === "tournaments" && (
                 <Card>
-                  <CardTitle className="mb-4">Denuncias</CardTitle>
-                  <div className="space-y-3">
-                    {reports.map((report) => (
-                      <div key={report.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-50">
-                        <div className="flex items-center gap-3">
-                          <Flag className="w-5 h-5 text-slate-400" />
-                          <div>
-                            <p className="text-sm font-medium text-slate-900">
-                              {report.type} - {report.target}
+                  <CardTitle className="mb-4">Torneios</CardTitle>
+
+                  {tournamentsQuery.isLoading && (
+                    <div className="flex justify-center py-12">
+                      <LoadingSpinner />
+                    </div>
+                  )}
+
+                  {!tournamentsQuery.isLoading &&
+                    allTournaments.length === 0 && (
+                      <EmptyState
+                        icon={<Trophy className="w-7 h-7 text-slate-300" />}
+                        title="Nenhum torneio encontrado"
+                        description="Nenhum torneio cadastrado na plataforma ainda."
+                      />
+                    )}
+
+                  {allTournaments.length > 0 && (
+                    <div className="space-y-3">
+                      {allTournaments.map((tournament) => (
+                        <div
+                          key={tournament.id}
+                          className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                              <Trophy className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-900 truncate">
+                                {tournament.name}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {tournament.sport?.name ?? "Esporte"}{" "}
+                                &middot;{" "}
+                                {tournament.city || "Local nao definido"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <Badge
+                              variant={
+                                tournament.status === "in_progress" ||
+                                tournament.status === "registration_open"
+                                  ? "success"
+                                  : tournament.status === "completed"
+                                  ? "default"
+                                  : tournament.status === "cancelled"
+                                  ? "danger"
+                                  : "info"
+                              }
+                            >
+                              {tournament.status
+                                ? tournamentStatusLabels[tournament.status] ??
+                                  tournament.status
+                                : "Rascunho"}
+                            </Badge>
+                            <Button variant="ghost" size="sm">
+                              Ver
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {tournamentsQuery.hasNextPage && (
+                    <div className="flex justify-center mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => tournamentsQuery.fetchNextPage()}
+                        loading={tournamentsQuery.isFetchingNextPage}
+                      >
+                        Carregar mais torneios
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              )}
+
+              {/* ===== LEADERBOARD TAB ===== */}
+              {tab === "leaderboard" && (
+                <Card>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Coins className="w-5 h-5 text-blue-500" />
+                    <CardTitle>Leaderboard de Palpites</CardTitle>
+                  </div>
+
+                  {leaderboardQuery.isLoading && (
+                    <div className="flex justify-center py-12">
+                      <LoadingSpinner />
+                    </div>
+                  )}
+
+                  {!leaderboardQuery.isLoading && leaderboard.length === 0 && (
+                    <EmptyState
+                      icon={
+                        <ListOrdered className="w-7 h-7 text-slate-300" />
+                      }
+                      title="Nenhum palpiteiro no leaderboard"
+                      description="O leaderboard de palpites aparecera aqui quando houver dados."
+                    />
+                  )}
+
+                  {leaderboard.length > 0 && (
+                    <div className="space-y-2">
+                      {leaderboard.map((entry, index) => (
+                        <div
+                          key={entry.userId}
+                          className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                              index === 0
+                                ? "bg-amber-100 text-amber-700"
+                                : index === 1
+                                ? "bg-slate-200 text-slate-700"
+                                : index === 2
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            {index + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 truncate">
+                              {entry.userId.slice(0, 8)}...
                             </p>
                             <p className="text-xs text-slate-500">
-                              Reportado por {report.reporter} &middot; {report.date}
+                              {entry.totalBets} palpites
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-bold text-blue-600">
+                              {entry.totalWins} acertos
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Lucro: {Number(entry.totalProfit).toFixed(0)} GC
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            variant={
-                              report.status === "pending" ? "danger" : report.status === "reviewing" ? "info" : "success"
-                            }
-                          >
-                            {report.status === "pending" ? "Pendente" : report.status === "reviewing" ? "Em revisao" : "Resolvido"}
-                          </Badge>
-                          <Button variant="ghost" size="sm">Revisar</Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </Card>
               )}
 
-              {tab === "analytics" && (
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Card>
-                    <CardTitle>Usuarios por Tipo</CardTitle>
-                    <CardContent className="mt-4 space-y-3">
-                      {[
-                        { role: "Atletas", count: 8500, percent: 68 },
-                        { role: "Fas", count: 2100, percent: 17 },
-                        { role: "Palpiteiros", count: 980, percent: 8 },
-                        { role: "Organizadores", count: 520, percent: 4 },
-                        { role: "Marcas", count: 280, percent: 2 },
-                        { role: "Arbitros", count: 203, percent: 1 },
-                      ].map((item) => (
-                        <div key={item.role}>
-                          <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-slate-700">{item.role}</span>
-                            <span className="text-slate-500">{item.count.toLocaleString()} ({item.percent}%)</span>
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2">
-                            <div
-                              className="bg-blue-600 rounded-full h-2 transition-all"
-                              style={{ width: `${item.percent}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
+              {/* ===== RANKING TAB ===== */}
+              {tab === "ranking" && (
+                <Card>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Medal className="w-5 h-5 text-blue-500" />
+                    <CardTitle>Ranking de Usuarios</CardTitle>
+                  </div>
 
-                  <Card>
-                    <CardTitle>Esportes Mais Populares</CardTitle>
-                    <CardContent className="mt-4 space-y-3">
-                      {[
-                        { sport: "Futebol", tournaments: 320, percent: 37 },
-                        { sport: "Beach Tennis", tournaments: 180, percent: 21 },
-                        { sport: "CrossFit", tournaments: 120, percent: 14 },
-                        { sport: "Corrida", tournaments: 95, percent: 11 },
-                        { sport: "E-Sports", tournaments: 70, percent: 8 },
-                        { sport: "Volei", tournaments: 71, percent: 9 },
-                      ].map((item) => (
-                        <div key={item.sport}>
-                          <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-slate-700">{item.sport}</span>
-                            <span className="text-slate-500">{item.tournaments} torneios ({item.percent}%)</span>
+                  {rankingQuery.isLoading && (
+                    <div className="flex justify-center py-12">
+                      <LoadingSpinner />
+                    </div>
+                  )}
+
+                  {!rankingQuery.isLoading && rankings.length === 0 && (
+                    <EmptyState
+                      icon={<Medal className="w-7 h-7 text-slate-300" />}
+                      title="Nenhum usuario no ranking"
+                      description="O ranking aparecera aqui quando houver dados suficientes."
+                    />
+                  )}
+
+                  {rankings.length > 0 && (
+                    <div className="space-y-2">
+                      {rankings.map((entry, index) => (
+                        <div
+                          key={entry.id}
+                          className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
+                        >
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
+                              index === 0
+                                ? "bg-amber-100 text-amber-700"
+                                : index === 1
+                                ? "bg-slate-200 text-slate-700"
+                                : index === 2
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            {index + 1}
                           </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2">
-                            <div
-                              className="bg-amber-500 rounded-full h-2 transition-all"
-                              style={{ width: `${item.percent}%` }}
-                            />
+                          <Avatar
+                            src={entry.user.image}
+                            name={entry.user.name}
+                            size="sm"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 truncate">
+                              {entry.user.name}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {entry.user.city ?? ""}{" "}
+                              {entry.level ? `· Nivel ${entry.level}` : ""}
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <p className="text-sm font-bold text-blue-600">
+                              {Number(entry.rating).toFixed(0)} rating
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {entry.sport.name} · {entry.wins ?? 0}V{" "}
+                              {entry.losses ?? 0}D
+                            </p>
                           </div>
                         </div>
                       ))}
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+                  )}
+                </Card>
               )}
             </>
           )}

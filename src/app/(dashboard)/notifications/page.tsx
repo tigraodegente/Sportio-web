@@ -1,122 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Trophy, Coins, MessageSquare, Target, Users, CheckCheck, Swords, Calendar, PartyPopper, BellRing } from "lucide-react";
+import { Bell, Trophy, Coins, MessageSquare, Target, Users, CheckCheck, Swords, Calendar, PartyPopper, BellRing, Loader2, Heart, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
-interface Notification {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  icon: React.ComponentType<{ className?: string }>;
-  iconColor: string;
-  iconRing: string;
-  time: string;
-  timeGroup: "today" | "yesterday" | "earlier";
-  isRead: boolean;
+const typeConfig: Record<string, { icon: React.ComponentType<{ className?: string }>; iconColor: string; iconRing: string }> = {
+  match_result: { icon: Swords, iconColor: "text-red-600 bg-red-100", iconRing: "ring-red-50" },
+  tournament_invite: { icon: Trophy, iconColor: "text-blue-600 bg-blue-100", iconRing: "ring-blue-50" },
+  bet_result: { icon: Target, iconColor: "text-green-600 bg-green-100", iconRing: "ring-green-50" },
+  challenge_complete: { icon: Calendar, iconColor: "text-orange-600 bg-orange-100", iconRing: "ring-orange-50" },
+  follow: { icon: Users, iconColor: "text-blue-600 bg-blue-100", iconRing: "ring-blue-50" },
+  comment: { icon: MessageSquare, iconColor: "text-purple-600 bg-purple-100", iconRing: "ring-purple-50" },
+  like: { icon: Heart, iconColor: "text-pink-600 bg-pink-100", iconRing: "ring-pink-50" },
+  system: { icon: Bell, iconColor: "text-slate-600 bg-slate-100", iconRing: "ring-slate-50" },
+  gcoin_received: { icon: Coins, iconColor: "text-amber-600 bg-amber-100", iconRing: "ring-amber-50" },
+};
+
+function getTimeGroup(date: Date): "today" | "yesterday" | "earlier" {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const hours = diff / (1000 * 60 * 60);
+  if (hours < 24) return "today";
+  if (hours < 48) return "yesterday";
+  return "earlier";
 }
 
-const notifications: Notification[] = [
-  {
-    id: "1",
-    type: "tournament",
-    title: "Inscricao Confirmada",
-    message: "Sua inscricao na Copa Beach Tennis SP foi confirmada. O torneio comeca em 3 dias!",
-    icon: Trophy,
-    iconColor: "text-blue-600 bg-blue-100",
-    iconRing: "ring-blue-50",
-    time: "5min",
-    timeGroup: "today",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "gcoin",
-    title: "GCoins Recebidos",
-    message: "Voce recebeu 2.500 GCoins como premio do torneio Beach Tennis Open.",
-    icon: Coins,
-    iconColor: "text-amber-600 bg-amber-100",
-    iconRing: "ring-amber-50",
-    time: "1h",
-    timeGroup: "today",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "social",
-    title: "Novo Seguidor",
-    message: "Rafael Costa comecou a seguir voce.",
-    icon: Users,
-    iconColor: "text-blue-600 bg-blue-100",
-    iconRing: "ring-blue-50",
-    time: "2h",
-    timeGroup: "today",
-    isRead: false,
-  },
-  {
-    id: "4",
-    type: "bet",
-    title: "Palpite Ganho!",
-    message: "Seu palpite na partida Lucas vs Andre foi correto! Voce ganhou 180 GCoins.",
-    icon: Target,
-    iconColor: "text-green-600 bg-green-100",
-    iconRing: "ring-green-50",
-    time: "3h",
-    timeGroup: "yesterday",
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "chat",
-    title: "Nova Mensagem",
-    message: "Rafael Costa: Bora treinar amanha?",
-    icon: MessageSquare,
-    iconColor: "text-purple-600 bg-purple-100",
-    iconRing: "ring-purple-50",
-    time: "4h",
-    timeGroup: "yesterday",
-    isRead: true,
-  },
-  {
-    id: "6",
-    type: "tournament",
-    title: "Torneio Proximo",
-    message: "O torneio Liga CrossFit Brasil comeca amanha. Nao esqueca de fazer check-in!",
-    icon: Calendar,
-    iconColor: "text-orange-600 bg-orange-100",
-    iconRing: "ring-orange-50",
-    time: "6h",
-    timeGroup: "yesterday",
-    isRead: true,
-  },
-  {
-    id: "7",
-    type: "match",
-    title: "Partida Agendada",
-    message: "Sua proxima partida contra Andre Santos esta agendada para amanha as 15h.",
-    icon: Swords,
-    iconColor: "text-red-600 bg-red-100",
-    iconRing: "ring-red-50",
-    time: "8h",
-    timeGroup: "earlier",
-    isRead: true,
-  },
-  {
-    id: "8",
-    type: "system",
-    title: "Nivel Atualizado",
-    message: "Parabens! Voce subiu para o Nivel 15. Continue jogando para desbloquear mais recompensas!",
-    icon: Bell,
-    iconColor: "text-slate-600 bg-slate-100",
-    iconRing: "ring-slate-50",
-    time: "1d",
-    timeGroup: "earlier",
-    isRead: true,
-  },
-];
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const mins = Math.floor(diff / (1000 * 60));
+  if (mins < 1) return "agora";
+  if (mins < 60) return `${mins}min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+}
 
 const timeGroupLabels: Record<string, string> = {
   today: "Hoje",
@@ -125,27 +47,48 @@ const timeGroupLabels: Record<string, string> = {
 };
 
 export default function NotificationsPage() {
-  const [notifs, setNotifs] = useState(notifications);
-  const unreadCount = notifs.filter((n) => !n.isRead).length;
-  const allRead = unreadCount === 0;
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
 
-  const markAllAsRead = () => {
-    setNotifs((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
+  const notifications = trpc.notification.list.useQuery({
+    unreadOnly: showUnreadOnly,
+    limit: 50,
+  });
+  const unreadCount = trpc.notification.unreadCount.useQuery();
 
-  const markAsRead = (id: string) => {
-    setNotifs((prev) => prev.map((n) => n.id === id ? { ...n, isRead: true } : n));
-  };
+  const markRead = trpc.notification.markRead.useMutation({
+    onSuccess: () => {
+      notifications.refetch();
+      unreadCount.refetch();
+    },
+  });
+  const markAllRead = trpc.notification.markAllRead.useMutation({
+    onSuccess: () => {
+      notifications.refetch();
+      unreadCount.refetch();
+    },
+  });
+
+  const notifs = notifications.data ?? [];
+  const unread = unreadCount.data ?? 0;
+  const allRead = unread === 0;
 
   // Group notifications by time period
-  const groups = notifs.reduce<Record<string, Notification[]>>((acc, notif) => {
-    const group = notif.timeGroup;
+  const groups = notifs.reduce<Record<string, typeof notifs>>((acc, notif) => {
+    const group = getTimeGroup(new Date(notif.createdAt));
     if (!acc[group]) acc[group] = [];
     acc[group].push(notif);
     return acc;
   }, {});
 
   const groupOrder = ["today", "yesterday", "earlier"];
+
+  if (notifications.isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -158,10 +101,10 @@ export default function NotificationsPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Notificacoes</h1>
             <p className="text-sm text-slate-500">
-              {unreadCount > 0 ? (
+              {unread > 0 ? (
                 <span className="flex items-center gap-1.5">
                   <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  {unreadCount} nao lidas
+                  {unread} nao lidas
                 </span>
               ) : (
                 "Tudo em dia!"
@@ -169,16 +112,32 @@ export default function NotificationsPage() {
             </p>
           </div>
         </div>
-        {unreadCount > 0 && (
-          <Button variant="outline" size="sm" onClick={markAllAsRead} className="shadow-sm gap-1.5">
-            <CheckCheck className="w-4 h-4 text-blue-600" />
-            Marcar todas como lidas
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+            className={cn("shadow-sm gap-1.5", showUnreadOnly && "bg-blue-50 border-blue-200")}
+          >
+            {showUnreadOnly ? "Todas" : "Nao lidas"}
           </Button>
-        )}
+          {unread > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => markAllRead.mutate()}
+              disabled={markAllRead.isPending}
+              className="shadow-sm gap-1.5"
+            >
+              <CheckCheck className="w-4 h-4 text-blue-600" />
+              Marcar todas
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* All-read celebration state */}
-      {allRead && (
+      {allRead && !showUnreadOnly && (
         <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-blue-50 via-green-50 to-teal-50 border border-blue-100">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center flex-shrink-0">
             <PartyPopper className="w-6 h-6 text-blue-600" />
@@ -187,6 +146,16 @@ export default function NotificationsPage() {
             <p className="text-sm font-semibold text-blue-900">Tudo em dia!</p>
             <p className="text-xs text-blue-600 mt-0.5">Voce leu todas as suas notificacoes. Continue assim!</p>
           </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {notifs.length === 0 && !notifications.isLoading && (
+        <div className="text-center py-16">
+          <Bell className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 font-medium">
+            {showUnreadOnly ? "Nenhuma notificacao nao lida" : "Nenhuma notificacao ainda"}
+          </p>
         </div>
       )}
 
@@ -212,11 +181,14 @@ export default function NotificationsPage() {
             <Card className="overflow-hidden p-0 sm:p-0">
               <div className="divide-y divide-slate-100">
                 {groupNotifs.map((notif) => {
-                  const Icon = notif.icon;
+                  const config = typeConfig[notif.type] ?? typeConfig.system;
+                  const Icon = config.icon;
                   return (
                     <div
                       key={notif.id}
-                      onClick={() => markAsRead(notif.id)}
+                      onClick={() => {
+                        if (!notif.isRead) markRead.mutate({ id: notif.id });
+                      }}
                       className={cn(
                         "flex items-start gap-4 p-4 sm:p-5 transition-all duration-300 cursor-pointer group",
                         !notif.isRead
@@ -224,16 +196,14 @@ export default function NotificationsPage() {
                           : "bg-white hover:bg-slate-50/50 border-l-[3px] border-l-transparent"
                       )}
                     >
-                      {/* Icon Container - Larger with ring decoration */}
                       <div className={cn(
                         "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ring-4 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md",
-                        notif.iconColor,
-                        notif.iconRing
+                        config.iconColor,
+                        config.iconRing
                       )}>
                         <Icon className="w-5 h-5" />
                       </div>
 
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -250,9 +220,8 @@ export default function NotificationsPage() {
                               </span>
                             )}
                           </div>
-                          {/* Timestamp pill */}
                           <span className="text-[11px] font-medium text-slate-400 bg-slate-100 rounded-full px-2.5 py-0.5 whitespace-nowrap flex-shrink-0">
-                            {notif.time}
+                            {formatTimeAgo(new Date(notif.createdAt))}
                           </span>
                         </div>
                         <p className={cn(

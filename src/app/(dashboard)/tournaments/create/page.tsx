@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Trophy, ArrowLeft, Info, Users, MapPin, ScrollText, Eye, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { trpc } from "@/lib/trpc";
 
 const sportOptions = [
   { value: "futebol", label: "Futebol" },
@@ -25,6 +27,20 @@ const sportOptions = [
   { value: "ciclismo", label: "Ciclismo" },
 ];
 
+const formatOptions = [
+  { value: "single_elimination", label: "Eliminacao Simples" },
+  { value: "double_elimination", label: "Eliminacao Dupla" },
+  { value: "round_robin", label: "Todos contra Todos" },
+  { value: "swiss", label: "Suico" },
+  { value: "league", label: "Liga" },
+];
+
+const levelOptions = [
+  { value: "A", label: "A - Profissional" },
+  { value: "B", label: "B - Intermediario" },
+  { value: "C", label: "C - Amador" },
+];
+
 const steps = [
   { id: 1, label: "Basico", icon: Info },
   { id: 2, label: "Participantes", icon: Users },
@@ -32,16 +48,101 @@ const steps = [
   { id: 4, label: "Regras", icon: ScrollText },
 ];
 
-export default function CreateTournamentPage() {
-  const [loading, setLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState(1);
+interface FormData {
+  name: string;
+  description: string;
+  sportId: string;
+  format: string;
+  level: string;
+  minParticipants: number;
+  maxParticipants: number;
+  entryFee: number;
+  prizePool: number;
+  isOnline: boolean;
+  city: string;
+  state: string;
+  address: string;
+  startDate: string;
+  endDate: string;
+  registrationDeadline: string;
+  rules: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    // TODO: Call tRPC mutation
-    setTimeout(() => setLoading(false), 1000);
+export default function CreateTournamentPage() {
+  const router = useRouter();
+  const [activeStep, setActiveStep] = useState(1);
+  const [error, setError] = useState<string | null>(null);
+
+  const [form, setForm] = useState<FormData>({
+    name: "",
+    description: "",
+    sportId: "",
+    format: "single_elimination",
+    level: "",
+    minParticipants: 4,
+    maxParticipants: 32,
+    entryFee: 0,
+    prizePool: 0,
+    isOnline: false,
+    city: "",
+    state: "",
+    address: "",
+    startDate: "",
+    endDate: "",
+    registrationDeadline: "",
+    rules: "",
+  });
+
+  const createMutation = trpc.tournament.create.useMutation({
+    onSuccess: (data) => {
+      router.push(`/tournaments/${data?.id ?? ""}`);
+    },
+    onError: (err) => {
+      setError(err.message || "Erro ao criar torneio. Tente novamente.");
+    },
+  });
+
+  const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!form.name || form.name.length < 3) {
+      setError("O nome do torneio deve ter pelo menos 3 caracteres.");
+      return;
+    }
+    if (!form.sportId) {
+      setError("Selecione um esporte.");
+      return;
+    }
+
+    createMutation.mutate({
+      name: form.name,
+      description: form.description || undefined,
+      rules: form.rules || undefined,
+      sportId: form.sportId,
+      format: form.format as "single_elimination" | "double_elimination" | "round_robin" | "swiss" | "league",
+      maxParticipants: form.maxParticipants,
+      minParticipants: form.minParticipants,
+      entryFee: form.entryFee,
+      entryFeeType: "gamification",
+      prizePool: form.prizePool,
+      city: form.city || undefined,
+      state: form.state || undefined,
+      address: form.address || undefined,
+      isOnline: form.isOnline,
+      level: form.level ? (form.level as "A" | "B" | "C") : undefined,
+      startDate: form.startDate || undefined,
+      endDate: form.endDate || undefined,
+      registrationDeadline: form.registrationDeadline || undefined,
+    });
+  };
+
+  const selectedSportLabel = sportOptions.find((s) => s.value === form.sportId)?.label ?? "--";
+  const selectedFormatLabel = formatOptions.find((f) => f.value === form.format)?.label ?? "--";
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -128,31 +229,44 @@ export default function CreateTournamentPage() {
               <CardTitle>Informacoes Basicas</CardTitle>
             </div>
             <CardContent className="mt-4 space-y-4">
-              <Input label="Nome do Torneio" placeholder="Ex: Copa Beach Tennis SP 2025" required />
-              <Textarea label="Descricao" placeholder="Descreva seu torneio..." rows={4} />
+              <Input
+                label="Nome do Torneio"
+                placeholder="Ex: Copa Beach Tennis SP 2025"
+                required
+                value={form.name}
+                onChange={(e) => updateField("name", e.target.value)}
+              />
+              <Textarea
+                label="Descricao"
+                placeholder="Descreva seu torneio..."
+                rows={4}
+                value={form.description}
+                onChange={(e) => updateField("description", e.target.value)}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Select label="Esporte" options={sportOptions} placeholder="Selecione" required />
                 <Select
-                  label="Formato"
-                  options={[
-                    { value: "single_elimination", label: "Eliminacao Simples" },
-                    { value: "double_elimination", label: "Eliminacao Dupla" },
-                    { value: "round_robin", label: "Todos contra Todos" },
-                    { value: "swiss", label: "Suico" },
-                    { value: "league", label: "Liga" },
-                  ]}
+                  label="Esporte"
+                  options={sportOptions}
                   placeholder="Selecione"
                   required
+                  value={form.sportId}
+                  onChange={(e) => updateField("sportId", e.target.value)}
+                />
+                <Select
+                  label="Formato"
+                  options={formatOptions}
+                  placeholder="Selecione"
+                  required
+                  value={form.format}
+                  onChange={(e) => updateField("format", e.target.value)}
                 />
               </div>
               <Select
                 label="Nivel"
-                options={[
-                  { value: "A", label: "A - Profissional" },
-                  { value: "B", label: "B - Intermediario" },
-                  { value: "C", label: "C - Amador" },
-                ]}
+                options={levelOptions}
                 placeholder="Selecione"
+                value={form.level}
+                onChange={(e) => updateField("level", e.target.value)}
               />
             </CardContent>
           </div>
@@ -174,12 +288,37 @@ export default function CreateTournamentPage() {
             </div>
             <CardContent className="mt-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Minimo de Participantes" type="number" min={2} defaultValue={4} />
-                <Input label="Maximo de Participantes" type="number" min={2} max={256} defaultValue={32} />
+                <Input
+                  label="Minimo de Participantes"
+                  type="number"
+                  min={2}
+                  value={form.minParticipants}
+                  onChange={(e) => updateField("minParticipants", Number(e.target.value))}
+                />
+                <Input
+                  label="Maximo de Participantes"
+                  type="number"
+                  min={2}
+                  max={256}
+                  value={form.maxParticipants}
+                  onChange={(e) => updateField("maxParticipants", Number(e.target.value))}
+                />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Taxa de Inscricao (GCoins)" type="number" min={0} defaultValue={0} />
-                <Input label="Premiacao Total (GCoins)" type="number" min={0} defaultValue={0} />
+                <Input
+                  label="Taxa de Inscricao (GCoins)"
+                  type="number"
+                  min={0}
+                  value={form.entryFee}
+                  onChange={(e) => updateField("entryFee", Number(e.target.value))}
+                />
+                <Input
+                  label="Premiacao Total (GCoins)"
+                  type="number"
+                  min={0}
+                  value={form.prizePool}
+                  onChange={(e) => updateField("prizePool", Number(e.target.value))}
+                />
               </div>
             </CardContent>
           </div>
@@ -202,19 +341,58 @@ export default function CreateTournamentPage() {
             <CardContent className="mt-4 space-y-4">
               <div className="flex items-center gap-4 mb-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" className="rounded border-slate-300 text-blue-600" />
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 text-blue-600"
+                    checked={form.isOnline}
+                    onChange={(e) => updateField("isOnline", e.target.checked)}
+                  />
                   <span className="text-sm text-slate-700">Torneio Online</span>
                 </label>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Cidade" placeholder="Ex: Sao Paulo" />
-                <Input label="Estado" placeholder="Ex: SP" />
-              </div>
-              <Input label="Endereco" placeholder="Endereco do local" />
+              {!form.isOnline && (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Input
+                      label="Cidade"
+                      placeholder="Ex: Sao Paulo"
+                      value={form.city}
+                      onChange={(e) => updateField("city", e.target.value)}
+                    />
+                    <Input
+                      label="Estado"
+                      placeholder="Ex: SP"
+                      value={form.state}
+                      onChange={(e) => updateField("state", e.target.value)}
+                    />
+                  </div>
+                  <Input
+                    label="Endereco"
+                    placeholder="Endereco do local"
+                    value={form.address}
+                    onChange={(e) => updateField("address", e.target.value)}
+                  />
+                </>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Input label="Data Inicio" type="date" />
-                <Input label="Data Fim" type="date" />
-                <Input label="Prazo Inscricao" type="date" />
+                <Input
+                  label="Data Inicio"
+                  type="date"
+                  value={form.startDate}
+                  onChange={(e) => updateField("startDate", e.target.value)}
+                />
+                <Input
+                  label="Data Fim"
+                  type="date"
+                  value={form.endDate}
+                  onChange={(e) => updateField("endDate", e.target.value)}
+                />
+                <Input
+                  label="Prazo Inscricao"
+                  type="date"
+                  value={form.registrationDeadline}
+                  onChange={(e) => updateField("registrationDeadline", e.target.value)}
+                />
               </div>
             </CardContent>
           </div>
@@ -239,6 +417,8 @@ export default function CreateTournamentPage() {
                 label="Regras do Torneio"
                 placeholder="Descreva as regras do torneio..."
                 rows={6}
+                value={form.rules}
+                onChange={(e) => updateField("rules", e.target.value)}
               />
             </CardContent>
           </div>
@@ -258,29 +438,36 @@ export default function CreateTournamentPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="bg-white/80 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-500 mb-0.5">Esporte</p>
-              <p className="text-sm font-semibold text-slate-700">--</p>
+              <p className="text-sm font-semibold text-slate-700">{selectedSportLabel}</p>
             </div>
             <div className="bg-white/80 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-500 mb-0.5">Formato</p>
-              <p className="text-sm font-semibold text-slate-700">--</p>
+              <p className="text-sm font-semibold text-slate-700">{selectedFormatLabel}</p>
             </div>
             <div className="bg-white/80 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-500 mb-0.5">Vagas</p>
-              <p className="text-sm font-semibold text-slate-700">4 - 32</p>
+              <p className="text-sm font-semibold text-slate-700">{form.minParticipants} - {form.maxParticipants}</p>
             </div>
             <div className="bg-white/80 rounded-xl p-3 text-center">
               <p className="text-xs text-slate-500 mb-0.5">Premiacao</p>
-              <p className="text-sm font-semibold text-blue-600">0 GCoins</p>
+              <p className="text-sm font-semibold text-blue-600">{form.prizePool.toLocaleString()} GCoins</p>
             </div>
           </div>
         </div>
+
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Submit */}
         <div className="flex gap-3 justify-end">
           <Link href="/tournaments">
             <Button variant="ghost" size="lg">Cancelar</Button>
           </Link>
-          <Button type="submit" size="lg" loading={loading}>
+          <Button type="submit" size="lg" loading={createMutation.isPending}>
             <Trophy className="w-5 h-5" />
             Criar Torneio
           </Button>
