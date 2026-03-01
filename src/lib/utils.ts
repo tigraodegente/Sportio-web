@@ -40,6 +40,35 @@ export function formatCurrency(amount: number): string {
  * Handles accented characters, special chars, and multiple spaces/dashes.
  * Example: "Beach Tennis" -> "beach-tennis" | "Corrida de Rua" -> "corrida-de-rua"
  */
+/**
+ * Formats a date as a relative time string in Portuguese.
+ * Example: "2 horas atrás", "há 3 dias"
+ */
+export function formatDistanceToNow(date: Date | string): string {
+  const now = new Date();
+  const d = typeof date === "string" ? new Date(date) : date;
+  const diffMs = now.getTime() - d.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
+  const diffMonths = Math.floor(diffDays / 30);
+
+  if (diffSeconds < 60) return "agora";
+  if (diffMinutes < 60) return `${diffMinutes}min`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  if (diffWeeks < 4) return `${diffWeeks}sem`;
+  if (diffMonths < 12) return `${diffMonths}m`;
+  return d.toLocaleDateString("pt-BR");
+}
+
+/**
+ * Converts a string into a URL-friendly slug.
+ * Handles accented characters, special chars, and multiple spaces/dashes.
+ * Example: "Beach Tennis" -> "beach-tennis" | "Corrida de Rua" -> "corrida-de-rua"
+ */
 export function slugify(text: string): string {
   return text
     .toString()

@@ -127,10 +127,10 @@ export interface Stats {
 }
 
 export const STATS: Stats = {
-  athletes: "12.500+",
-  tournaments: "850",
-  totalAthletes: "500k+",
-  sports: "13",
+  athletes: "Milhares",
+  tournaments: "Centenas",
+  totalAthletes: "Milhares",
+  sports: "13+",
 };
 
 // ============================================
@@ -151,7 +151,7 @@ export const USER_TYPES: UserType[] = [
     id: "athletes",
     name: "Atletas",
     description:
-      "Crie seu perfil esportivo, acompanhe estatísticas, conquiste GCoins e conecte-se com outros atletas.",
+      "Compita em torneios, ganhe GCoins com vitorias e transforme seu talento esportivo em renda real via PIX.",
     icon: "Users",
     href: "/athletes",
     color: "text-emerald-500",
@@ -160,46 +160,46 @@ export const USER_TYPES: UserType[] = [
     id: "organizers",
     name: "Organizadores",
     description:
-      "Crie e gerencie torneios, controle inscrições, brackets e resultados em uma plataforma completa.",
+      "Crie torneios, gerencie inscricoes e brackets. Lucre organizando eventos esportivos profissionais.",
     icon: "CalendarDays",
     href: "/organizers",
     color: "text-blue-500",
   },
   {
+    id: "trainers",
+    name: "Treinadores",
+    description:
+      "Conecte-se com atletas, organize treinos e campeonatos. Aumente sua renda e visibilidade como treinador.",
+    icon: "ShieldCheck",
+    href: "/athletes",
+    color: "text-amber-500",
+  },
+  {
     id: "brands",
     name: "Marcas",
     description:
-      "Patrocine eventos, conecte-se com atletas e aumente a visibilidade da sua marca no esporte.",
+      "Patrocine atletas e eventos, aumente a visibilidade da sua marca no universo esportivo.",
     icon: "Building2",
     href: "/brands",
     color: "text-purple-500",
   },
   {
-    id: "fans",
-    name: "Fãs",
-    description:
-      "Acompanhe seus atletas favoritos, torneios ao vivo e interaja com a comunidade esportiva.",
-    icon: "Heart",
-    href: "/fans",
-    color: "text-red-500",
-  },
-  {
-    id: "bettors",
-    name: "Palpiteiros",
-    description:
-      "Use seus GCoins para dar palpites em torneios, desafios e competições. Diversão garantida!",
-    icon: "TrendingUp",
-    href: "/bettors",
-    color: "text-amber-500",
-  },
-  {
     id: "referees",
-    name: "Árbitros",
+    name: "Arbitros",
     description:
-      "Cadastre-se como árbitro, seja escalado para partidas e torneios, e construa sua reputação.",
+      "Seja escalado para partidas e torneios, construa sua reputacao e ganhe por arbitrar eventos.",
     icon: "ShieldCheck",
     href: "/referees",
     color: "text-slate-500",
+  },
+  {
+    id: "fans",
+    name: "Fas e Palpiteiros",
+    description:
+      "Acompanhe torneios ao vivo, de palpites com GCoins e interaja com a comunidade esportiva.",
+    icon: "Heart",
+    href: "/fans",
+    color: "text-red-500",
   },
 ];
 
