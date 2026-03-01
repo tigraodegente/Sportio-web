@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trophy, ArrowLeft, Info, Users, MapPin, ScrollText, Eye, Check } from "lucide-react";
+import { Trophy, ArrowLeft, Info, Users, MapPin, ScrollText, Eye, Check, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,6 +101,17 @@ export default function CreateTournamentPage() {
       setError(err.message || "Erro ao criar torneio. Tente novamente.");
     },
   });
+
+  const rulesTemplateQuery = trpc.tournament.getRulesTemplate.useQuery(
+    { sportSlug: form.sportId },
+    { enabled: !!form.sportId }
+  );
+
+  const handleApplyDefaultRules = () => {
+    if (rulesTemplateQuery.data?.formatted) {
+      updateField("rules", rulesTemplateQuery.data.formatted);
+    }
+  };
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -412,7 +423,46 @@ export default function CreateTournamentPage() {
               </div>
               <CardTitle>Regras</CardTitle>
             </div>
-            <CardContent className="mt-4">
+            <CardContent className="mt-4 space-y-4">
+              {form.sportId && rulesTemplateQuery.isLoading && (
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Carregando regras padrao...
+                </div>
+              )}
+              {form.sportId && rulesTemplateQuery.data && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                      <p className="text-sm font-semibold text-blue-900">
+                        Regras padrao disponiveis para {selectedSportLabel}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleApplyDefaultRules}
+                      className="shrink-0"
+                    >
+                      Usar regras padrao
+                    </Button>
+                  </div>
+                  <div className="text-xs text-blue-800 space-y-1">
+                    <p><span className="font-medium">Duracao:</span> {rulesTemplateQuery.data.template.matchDuration}</p>
+                    <p><span className="font-medium">Pontuacao:</span> {rulesTemplateQuery.data.template.scoring}</p>
+                    <p><span className="font-medium">Jogadores:</span> {rulesTemplateQuery.data.template.players}</p>
+                  </div>
+                </div>
+              )}
+              {form.sportId && !rulesTemplateQuery.isLoading && !rulesTemplateQuery.data && (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p className="text-sm text-slate-500">
+                    Nao ha regras padrao cadastradas para este esporte. Preencha manualmente abaixo.
+                  </p>
+                </div>
+              )}
               <Textarea
                 label="Regras do Torneio"
                 placeholder="Descreva as regras do torneio..."

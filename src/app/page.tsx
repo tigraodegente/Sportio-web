@@ -123,7 +123,7 @@ function HeroSection() {
         {[
           { Icon: Target, top: "15%", left: "8%", delay: "0s", size: "h-10 w-10" },
           { Icon: Sun, top: "25%", right: "12%", delay: "1s", size: "h-8 w-8" },
-          { Icon: Circle, bottom: "30%", left: "15%", delay: "2s", size: "h-8 w-8" },
+          { Icon: Gamepad2, bottom: "30%", left: "15%", delay: "2s", size: "h-8 w-8" },
           { Icon: Trophy, top: "10%", right: "30%", delay: "2.5s", size: "h-8 w-8" },
         ].map((item, i) => (
           <div
@@ -427,22 +427,54 @@ function GCoinsEconomySection() {
 // SPORTS GRID Section
 // ============================================
 
+function getSportCategory(sportId: string): string {
+  const esportIds = ["league-of-legends", "counter-strike", "valorant", "fortnite", "fifa-ea-fc", "free-fire", "dota-2", "rocket-league"];
+  const gameIds = ["truco", "poker", "xadrez", "damas", "sinuca-bilhar", "domino", "buraco", "uno"];
+  if (esportIds.includes(sportId)) return "esports";
+  if (gameIds.includes(sportId)) return "games";
+  return "sports";
+}
+
 function SportsGridSection() {
   const sportColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
     "text-emerald-500": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-400 to-blue-600" },
+    "text-emerald-600": { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", gradient: "from-emerald-400 to-emerald-600" },
     "text-amber-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-amber-500" },
+    "text-amber-800": { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", gradient: "from-amber-500 to-amber-700" },
+    "text-amber-900": { bg: "bg-amber-50", text: "text-amber-800", border: "border-amber-200", gradient: "from-amber-600 to-amber-800" },
     "text-blue-500": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-400 to-blue-600" },
+    "text-blue-600": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-500 to-blue-700" },
+    "text-blue-800": { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", gradient: "from-blue-600 to-blue-800" },
     "text-red-500": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
+    "text-red-600": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
+    "text-red-700": { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", gradient: "from-red-500 to-red-700" },
     "text-yellow-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-amber-500" },
     "text-orange-500": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
-    "text-purple-500": { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", gradient: "from-purple-400 to-purple-600" },
     "text-orange-600": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
+    "text-purple-500": { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", gradient: "from-purple-400 to-purple-600" },
     "text-cyan-500": { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200", gradient: "from-cyan-400 to-cyan-600" },
+    "text-cyan-600": { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200", gradient: "from-cyan-500 to-cyan-700" },
     "text-lime-500": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", gradient: "from-teal-400 to-teal-600" },
     "text-pink-500": { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200", gradient: "from-pink-400 to-pink-600" },
-    "text-red-600": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
     "text-teal-500": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", gradient: "from-teal-400 to-teal-600" },
+    "text-sky-500": { bg: "bg-sky-50", text: "text-sky-600", border: "border-sky-200", gradient: "from-sky-400 to-sky-600" },
+    "text-sky-600": { bg: "bg-sky-50", text: "text-sky-600", border: "border-sky-200", gradient: "from-sky-500 to-sky-700" },
+    "text-violet-500": { bg: "bg-violet-50", text: "text-violet-600", border: "border-violet-200", gradient: "from-violet-400 to-violet-600" },
+    "text-slate-700": { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200", gradient: "from-slate-500 to-slate-700" },
+    "text-rose-500": { bg: "bg-rose-50", text: "text-rose-600", border: "border-rose-200", gradient: "from-rose-400 to-rose-600" },
+    "text-green-600": { bg: "bg-green-50", text: "text-green-600", border: "border-green-200", gradient: "from-green-400 to-green-600" },
+    "text-green-800": { bg: "bg-green-50", text: "text-green-700", border: "border-green-200", gradient: "from-green-600 to-green-800" },
+    "text-gray-400": { bg: "bg-gray-50", text: "text-gray-500", border: "border-gray-200", gradient: "from-gray-400 to-gray-600" },
+    "text-gray-600": { bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-200", gradient: "from-gray-500 to-gray-700" },
   };
+
+  const sportsSports = SPORTS.filter((s) => getSportCategory(s.id) === "sports");
+  const esportsSports = SPORTS.filter((s) => getSportCategory(s.id) === "esports");
+  const gamesSports = SPORTS.filter((s) => getSportCategory(s.id) === "games");
+
+  const MOBILE_LIMIT = 9;
+  const mobileSports = SPORTS.slice(0, MOBILE_LIMIT);
+  const remainingCount = SPORTS.length - MOBILE_LIMIT;
 
   return (
     <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
@@ -450,19 +482,19 @@ function SportsGridSection() {
         <div className="text-center mb-12 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Sparkles className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-700">Diversas modalidades</span>
+            <span className="text-sm font-semibold text-blue-700">Mais de 40 modalidades</span>
           </div>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Encontre Seu <span className="text-blue-600">Esporte</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
-            Do futebol ao e-sports, encontre a modalidade perfeita para ganhar com esporte
+            Do futebol ao e-sports, dos jogos de mesa as artes marciais — encontre a modalidade perfeita para ganhar com esporte
           </p>
         </div>
 
-        {/* Mobile: 3-col */}
+        {/* Mobile: 3-col, limited to first 9 + "ver todos" card */}
         <div className="grid grid-cols-3 gap-2.5 sm:hidden">
-          {SPORTS.map((sport) => {
+          {mobileSports.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
             const colors = sportColors[sport.color] || sportColors["text-blue-500"];
             return (
@@ -474,26 +506,104 @@ function SportsGridSection() {
               </div>
             );
           })}
+          {remainingCount > 0 && (
+            <a href="/sports" className="flex flex-col items-center justify-center text-center rounded-xl border border-blue-200 bg-blue-50 py-4 px-2 shadow-sm transition-colors hover:bg-blue-100">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 mb-2">
+                <ArrowRight className="h-5 w-5 text-blue-600" />
+              </div>
+              <h3 className="text-[10px] font-bold text-blue-600 leading-tight">+{remainingCount} mais</h3>
+            </a>
+          )}
         </div>
 
-        {/* Desktop */}
-        <div className="hidden sm:grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
-          {SPORTS.map((sport) => {
-            const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
-            const colors = sportColors[sport.color] || sportColors["text-blue-500"];
-            return (
-              <div key={sport.id} className={cn("group relative rounded-2xl border bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl cursor-pointer", colors.border, "hover:border-transparent")}>
-                <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100", colors.gradient)} />
-                <div className="relative">
-                  <div className={cn("mb-5 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500", colors.bg, "group-hover:bg-white/20")}>
-                    <IconComponent className={cn("h-6 w-6 transition-colors duration-500", colors.text, "group-hover:text-white")} />
-                  </div>
-                  <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-white transition-colors duration-500">{sport.name}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-white/80 transition-colors duration-500">{sport.description}</p>
-                </div>
+        {/* Desktop: grouped by category with headers */}
+        <div className="hidden sm:block space-y-10">
+          {/* Esportes Tradicionais */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                <Medal className="h-4 w-4 text-blue-600" />
               </div>
-            );
-          })}
+              <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Esportes Tradicionais</h4>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+            <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sportsSports.map((sport) => {
+                const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
+                const colors = sportColors[sport.color] || sportColors["text-blue-500"];
+                return (
+                  <div key={sport.id} className={cn("group relative rounded-2xl border bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl cursor-pointer", colors.border, "hover:border-transparent")}>
+                    <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100", colors.gradient)} />
+                    <div className="relative">
+                      <div className={cn("mb-5 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500", colors.bg, "group-hover:bg-white/20")}>
+                        <IconComponent className={cn("h-6 w-6 transition-colors duration-500", colors.text, "group-hover:text-white")} />
+                      </div>
+                      <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-white transition-colors duration-500">{sport.name}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-white/80 transition-colors duration-500">{sport.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* E-Sports */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
+                <Gamepad2 className="h-4 w-4 text-purple-600" />
+              </div>
+              <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider">E-Sports</h4>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+            <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {esportsSports.map((sport) => {
+                const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
+                const colors = sportColors[sport.color] || sportColors["text-blue-500"];
+                return (
+                  <div key={sport.id} className={cn("group relative rounded-2xl border bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl cursor-pointer", colors.border, "hover:border-transparent")}>
+                    <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100", colors.gradient)} />
+                    <div className="relative">
+                      <div className={cn("mb-5 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500", colors.bg, "group-hover:bg-white/20")}>
+                        <IconComponent className={cn("h-6 w-6 transition-colors duration-500", colors.text, "group-hover:text-white")} />
+                      </div>
+                      <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-white transition-colors duration-500">{sport.name}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-white/80 transition-colors duration-500">{sport.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Jogos de Mesa */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
+                <Dices className="h-4 w-4 text-amber-600" />
+              </div>
+              <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Jogos de Mesa</h4>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+            <div className="grid sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {gamesSports.map((sport) => {
+                const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
+                const colors = sportColors[sport.color] || sportColors["text-blue-500"];
+                return (
+                  <div key={sport.id} className={cn("group relative rounded-2xl border bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl cursor-pointer", colors.border, "hover:border-transparent")}>
+                    <div className={cn("absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100", colors.gradient)} />
+                    <div className="relative">
+                      <div className={cn("mb-5 flex h-12 w-12 items-center justify-center rounded-xl transition-all duration-500", colors.bg, "group-hover:bg-white/20")}>
+                        <IconComponent className={cn("h-6 w-6 transition-colors duration-500", colors.text, "group-hover:text-white")} />
+                      </div>
+                      <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-white transition-colors duration-500">{sport.name}</h3>
+                      <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 group-hover:text-white/80 transition-colors duration-500">{sport.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </SectionContainer>
     </section>

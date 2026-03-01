@@ -7,7 +7,20 @@ import {
   Calendar,
   ArrowRight,
   Newspaper,
+  Target,
+  Sun,
+  Footprints,
+  Dumbbell,
+  Trophy,
+  TrendingUp,
+  Dice5,
+  Flag,
+  Apple,
+  Camera,
+  GraduationCap,
+  Coins,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBlogPosts } from "@/lib/blog-data";
 
@@ -21,6 +34,26 @@ export const metadata: Metadata = {
       "Dicas, estratégias e histórias de sucesso para ganhar dinheiro real com esporte.",
   },
 };
+
+const coverIconMap: Record<string, LucideIcon> = {
+  target: Target,
+  sun: Sun,
+  footprints: Footprints,
+  dumbbell: Dumbbell,
+  trophy: Trophy,
+  "trending-up": TrendingUp,
+  dice: Dice5,
+  flag: Flag,
+  apple: Apple,
+  camera: Camera,
+  "graduation-cap": GraduationCap,
+  coins: Coins,
+};
+
+function CoverIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = coverIconMap[name] || Trophy;
+  return <Icon className={className} />;
+}
 
 const sportFilters = [
   { id: "todos", label: "Todos" },
@@ -127,9 +160,9 @@ export default function BlogPage() {
 
               {/* Card body */}
               <div className="flex flex-1 flex-col p-6">
-                {/* Emoji cover */}
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 text-2xl">
-                  {post.coverImage}
+                {/* Cover icon */}
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100">
+                  <CoverIcon name={post.coverImage} className="h-7 w-7 text-blue-600" />
                 </div>
 
                 {/* Title */}

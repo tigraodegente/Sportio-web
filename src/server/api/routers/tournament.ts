@@ -1,9 +1,15 @@
 import { z } from "zod";
 import { eq, desc, and, ilike } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { tournaments, enrollments, matches } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
 import { getRuleTemplate, formatRulesAsText, getAllRuleTemplates } from "@/server/services/rules-engine";
+import {
+  generateBracket as generateBracketService,
+  advanceWinner as advanceWinnerService,
+  getStandings as getStandingsService,
+} from "@/server/services/bracket-generator";
 
 export const tournamentRouter = createTRPCRouter({
   // List tournaments
@@ -222,5 +228,97 @@ export const tournamentRouter = createTRPCRouter({
   listRuleTemplates: publicProcedure
     .query(async () => {
       return getAllRuleTemplates();
+    }),
+
+  // Generate bracket / draw
+  generateBracket: protectedProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      // Verify user is the organizer
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+      });
+
+      if (!tournament) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Torneio nao encontrado.",
+        });
+      }
+
+      if (tournament.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Apenas o organizador pode gerar as chaves.",
+        });
+      }
+
+      try {
+        await generateBracketService(ctx.db, input.tournamentId);
+        return { success: true };
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao gerar as chaves do torneio.",
+        });
+      }
+    }),
+
+  // Advance winner after match completion
+  advanceWinner: protectedProcedure
+    .input(z.object({ matchId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      // Verify the match exists and get the tournament to check organizer
+      const match = await ctx.db.query.matches.findFirst({
+        where: eq(matches.id, input.matchId),
+        with: { tournament: true },
+      });
+
+      if (!match) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Partida nao encontrada.",
+        });
+      }
+
+      if (match.tournament?.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Apenas o organizador pode avancar o vencedor.",
+        });
+      }
+
+      try {
+        await advanceWinnerService(ctx.db, input.matchId);
+        return { success: true };
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao avancar o vencedor.",
+        });
+      }
+    }),
+
+  // Get standings
+  standings: publicProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        return await getStandingsService(ctx.db, input.tournamentId);
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Erro ao buscar classificacao.",
+        });
+      }
     }),
 });
