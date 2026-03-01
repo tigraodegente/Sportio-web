@@ -2,6 +2,7 @@
 
 import { Menu, Search, Bell, Coins } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 import { useUIStore } from "@/stores/ui-store";
 import { trpc } from "@/lib/trpc";
 import Link from "next/link";
@@ -22,6 +23,10 @@ export function DashboardHeader() {
         >
           <Menu className="w-5 h-5" />
         </button>
+
+        <Link href="/social" className="lg:hidden">
+          <SportioLogo className="h-7" />
+        </Link>
 
         <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 w-72 hover:border-slate-300 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
           <Search className="w-4 h-4 text-slate-400" />
