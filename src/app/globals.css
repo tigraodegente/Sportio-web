@@ -213,165 +213,179 @@
    Base Styles
    ============================================ */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 
-body {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    sans-serif;
-  background-color: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  min-height: 100dvh;
-  overflow-x: hidden;
+  body {
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      sans-serif;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
 }
 
 /* ============================================
    Selection Styles
    ============================================ */
 
-::selection {
-  background-color: var(--color-primary-500);
-  color: var(--color-text-inverse);
-}
+@layer base {
+  ::selection {
+    background-color: var(--color-primary-500);
+    color: var(--color-text-inverse);
+  }
 
-::-moz-selection {
-  background-color: var(--color-primary-500);
-  color: var(--color-text-inverse);
+  ::-moz-selection {
+    background-color: var(--color-primary-500);
+    color: var(--color-text-inverse);
+  }
 }
 
 /* ============================================
    Scrollbar Styles
    ============================================ */
 
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+@layer base {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-full);
-}
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-full);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-secondary-300);
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-bg-secondary);
-  transition: background var(--transition-fast);
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-secondary-300);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-bg-secondary);
+    transition: background var(--transition-fast);
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-500);
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-500);
+  }
 
-/* Firefox scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-secondary-300) var(--color-bg-secondary);
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary-300) var(--color-bg-secondary);
+  }
 }
 
 /* ============================================
    Focus Styles
    ============================================ */
 
-:focus-visible {
-  outline: 2px solid var(--color-primary-500);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 /* ============================================
    Utility Classes
    ============================================ */
 
-.text-gradient-primary {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+@layer utilities {
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.text-gradient-accent {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .text-gradient-accent {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.text-gradient-hero {
-  background: linear-gradient(135deg, #3b82f6, #fbbf24);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .text-gradient-hero {
+    background: linear-gradient(135deg, #3b82f6, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
-.bg-gradient-sportio {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500), var(--color-accent-500));
-}
+  .bg-gradient-sportio {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-500), var(--color-accent-500));
+  }
 
-.bg-gradient-dark {
-  background: linear-gradient(180deg, var(--color-secondary-900), var(--color-secondary-950));
-}
+  .bg-gradient-dark {
+    background: linear-gradient(180deg, var(--color-secondary-900), var(--color-secondary-950));
+  }
 
-.bg-gradient-warm {
-  background: linear-gradient(180deg, var(--color-bg-primary), var(--color-bg-secondary));
-}
+  .bg-gradient-warm {
+    background: linear-gradient(180deg, var(--color-bg-primary), var(--color-bg-secondary));
+  }
 
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 
-.glass-dark {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  .glass-dark {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 }
 
 /* ============================================
    Animation Utilities
    ============================================ */
 
-.animate-delay-100 {
-  animation-delay: 100ms;
-}
+@layer utilities {
+  .animate-delay-100 {
+    animation-delay: 100ms;
+  }
 
-.animate-delay-200 {
-  animation-delay: 200ms;
-}
+  .animate-delay-200 {
+    animation-delay: 200ms;
+  }
 
-.animate-delay-300 {
-  animation-delay: 300ms;
-}
+  .animate-delay-300 {
+    animation-delay: 300ms;
+  }
 
-.animate-delay-400 {
-  animation-delay: 400ms;
-}
+  .animate-delay-400 {
+    animation-delay: 400ms;
+  }
 
-.animate-delay-500 {
-  animation-delay: 500ms;
+  .animate-delay-500 {
+    animation-delay: 500ms;
+  }
 }
