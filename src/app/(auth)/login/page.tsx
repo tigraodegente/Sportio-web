@@ -49,7 +49,7 @@ export default function LoginPage() {
     <div>
       {/* Mobile logo */}
       <div className="lg:hidden flex items-center gap-3 mb-8">
-        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-emerald-800 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/20">
+        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/20">
           <Coins className="w-6 h-6 text-white drop-shadow-sm" />
           <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
         </div>
@@ -110,10 +110,10 @@ export default function LoginPage() {
 
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+            <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
             <span className="text-sm text-slate-600">Lembrar-me</span>
           </label>
-          <Link href="/login" className="text-sm text-emerald-600 hover:text-emerald-700">
+          <Link href="/login" className="text-sm text-blue-600 hover:text-blue-700">
             Esqueceu a senha?
           </Link>
         </div>
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Nao tem conta?{" "}
-        <Link href="/register" className="text-emerald-600 hover:text-emerald-700 font-medium">
+        <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
           Cadastre-se gratis
         </Link>
       </p>

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 const sportColors: Record<string, { bg: string; text: string; gradient: string; border: string }> = {
   "Beach Tennis": { bg: "bg-orange-100", text: "text-orange-700", gradient: "from-orange-400 to-orange-600", border: "border-l-orange-500" },
   "CrossFit": { bg: "bg-purple-100", text: "text-purple-700", gradient: "from-purple-400 to-purple-600", border: "border-l-purple-500" },
-  "Futebol": { bg: "bg-emerald-100", text: "text-emerald-700", gradient: "from-emerald-400 to-emerald-600", border: "border-l-emerald-500" },
+  "Futebol": { bg: "bg-blue-100", text: "text-blue-700", gradient: "from-blue-400 to-blue-600", border: "border-l-blue-500" },
   "Volei": { bg: "bg-blue-100", text: "text-blue-700", gradient: "from-blue-400 to-blue-600", border: "border-l-blue-500" },
   "Futevolei": { bg: "bg-cyan-100", text: "text-cyan-700", gradient: "from-cyan-400 to-cyan-600", border: "border-l-cyan-500" },
 };
@@ -117,7 +117,7 @@ export default function BetsPage() {
                     <div className="flex-1 text-right">
                       <p className="text-sm font-semibold text-slate-900 truncate">{match.player1}</p>
                       <div className="flex items-center justify-end gap-1 mt-0.5">
-                        <span className="inline-flex items-center px-2 py-0.5 bg-emerald-50 border border-emerald-200/50 rounded-md text-xs font-bold text-emerald-700">
+                        <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 border border-blue-200/50 rounded-md text-xs font-bold text-blue-700">
                           {match.odds1}x
                         </span>
                         {match.oddsChange1 === "up" ? (
@@ -137,7 +137,7 @@ export default function BetsPage() {
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900 truncate">{match.player2}</p>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <span className="inline-flex items-center px-2 py-0.5 bg-emerald-50 border border-emerald-200/50 rounded-md text-xs font-bold text-emerald-700">
+                        <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 border border-blue-200/50 rounded-md text-xs font-bold text-blue-700">
                           {match.odds2}x
                         </span>
                         {match.oddsChange2 === "up" ? (
@@ -253,22 +253,22 @@ export default function BetsPage() {
                 onClick={() => setSelectedPlayer(1)}
                 className={`relative p-4 rounded-xl border-2 text-center transition-all duration-200 ${
                   selectedPlayer === 1
-                    ? "border-emerald-500 bg-emerald-50/50 shadow-lg shadow-emerald-500/10 ring-2 ring-emerald-500/20"
-                    : "border-slate-200 hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-500/5"
+                    ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20"
+                    : "border-slate-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-500/5"
                 }`}
               >
                 {selectedPlayer === 1 && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 )}
-                <p className={`font-semibold truncate ${selectedPlayer === 1 ? "text-emerald-800" : "text-slate-900"}`}>
+                <p className={`font-semibold truncate ${selectedPlayer === 1 ? "text-blue-800" : "text-slate-900"}`}>
                   {selectedMatch.player1}
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-1">
-                  <p className="text-lg font-bold text-emerald-600">{selectedMatch.odds1}x</p>
+                  <p className="text-lg font-bold text-blue-600">{selectedMatch.odds1}x</p>
                   {selectedMatch.oddsChange1 === "up" ? (
                     <ArrowUpRight className="w-3.5 h-3.5 text-green-500" />
                   ) : (
@@ -280,22 +280,22 @@ export default function BetsPage() {
                 onClick={() => setSelectedPlayer(2)}
                 className={`relative p-4 rounded-xl border-2 text-center transition-all duration-200 ${
                   selectedPlayer === 2
-                    ? "border-emerald-500 bg-emerald-50/50 shadow-lg shadow-emerald-500/10 ring-2 ring-emerald-500/20"
-                    : "border-slate-200 hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-500/5"
+                    ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20"
+                    : "border-slate-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-500/5"
                 }`}
               >
                 {selectedPlayer === 2 && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 )}
-                <p className={`font-semibold truncate ${selectedPlayer === 2 ? "text-emerald-800" : "text-slate-900"}`}>
+                <p className={`font-semibold truncate ${selectedPlayer === 2 ? "text-blue-800" : "text-slate-900"}`}>
                   {selectedMatch.player2}
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-1">
-                  <p className="text-lg font-bold text-emerald-600">{selectedMatch.odds2}x</p>
+                  <p className="text-lg font-bold text-blue-600">{selectedMatch.odds2}x</p>
                   {selectedMatch.oddsChange2 === "up" ? (
                     <ArrowUpRight className="w-3.5 h-3.5 text-green-500" />
                   ) : (
@@ -307,10 +307,10 @@ export default function BetsPage() {
 
             <Input label="Quantidade (GCoins)" type="number" placeholder="0" min={1} />
 
-            <div className="bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl p-4 border border-emerald-200/50">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">Retorno potencial:</span>
-                <span className="font-bold text-emerald-700">0 GCoins</span>
+                <span className="font-bold text-blue-700">0 GCoins</span>
               </div>
             </div>
 

@@ -22,7 +22,7 @@ const sportEmojiMap: Record<string, string> = {
 const sportGradientMap: Record<string, string> = {
   "bg-yellow-500": "from-yellow-400 to-amber-500",
   "bg-red-500": "from-red-400 to-rose-600",
-  "bg-green-500": "from-green-400 to-emerald-600",
+  "bg-green-500": "from-green-400 to-blue-600",
   "bg-purple-500": "from-purple-400 to-violet-600",
   "bg-blue-500": "from-blue-400 to-indigo-600",
 };
@@ -179,7 +179,7 @@ export default function TournamentsPage() {
             {mockTournaments.map((tournament) => {
               const fillPercent = Math.round((tournament.participants / tournament.maxParticipants) * 100);
               const sportEmoji = sportEmojiMap[tournament.sport] || "\u{1F3C6}";
-              const gradient = sportGradientMap[tournament.sportColor] || "from-emerald-400 to-emerald-600";
+              const gradient = sportGradientMap[tournament.sportColor] || "from-blue-400 to-blue-600";
 
               return (
                 <Link key={tournament.id} href={`/tournaments/${tournament.id}`}>
@@ -196,7 +196,7 @@ export default function TournamentsPage() {
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-lg text-slate-900 mb-1.5 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+                    <h3 className="font-bold text-lg text-slate-900 mb-1.5 line-clamp-2 leading-snug group-hover:text-blue-700 transition-colors">
                       {tournament.name}
                     </h3>
                     <p className="text-sm text-slate-500 mb-4 flex items-center gap-1.5">
@@ -234,7 +234,7 @@ export default function TournamentsPage() {
                                   ? "bg-gradient-to-r from-red-400 to-red-500"
                                   : fillPercent >= 75
                                     ? "bg-gradient-to-r from-amber-400 to-amber-500"
-                                    : "bg-gradient-to-r from-emerald-400 to-emerald-500"
+                                    : "bg-gradient-to-r from-blue-400 to-blue-500"
                               }`}
                               style={{ width: `${fillPercent}%` }}
                             />
@@ -248,12 +248,12 @@ export default function TournamentsPage() {
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                           tournament.entryFee > 0
                             ? "bg-slate-100"
-                            : "bg-emerald-50"
+                            : "bg-blue-50"
                         }`}>
                           <Ticket className={`w-4 h-4 ${
                             tournament.entryFee > 0
                               ? "text-slate-500"
-                              : "text-emerald-600"
+                              : "text-blue-600"
                           }`} />
                         </div>
                         <div>
@@ -263,7 +263,7 @@ export default function TournamentsPage() {
                               {tournament.entryFee} GCoins
                             </p>
                           ) : (
-                            <span className="inline-block px-2 py-0.5 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-full ring-1 ring-emerald-200/50">
+                            <span className="inline-block px-2 py-0.5 text-xs font-bold text-blue-700 bg-blue-50 rounded-full ring-1 ring-blue-200/50">
                               Gratis
                             </span>
                           )}

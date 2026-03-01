@@ -136,7 +136,7 @@ export default function SocialPage() {
           <div ref={loadMoreRef} className="py-4">
             {feedQuery.isFetchingNextPage && (
               <div className="flex justify-center">
-                <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+                <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
               </div>
             )}
             {!feedQuery.hasNextPage && allPosts.length > 0 && (

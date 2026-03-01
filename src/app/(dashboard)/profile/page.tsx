@@ -45,7 +45,7 @@ const recentResults = [
 
 function getLevelGradient(level: string) {
   if (level === "A") return "from-amber-400 via-yellow-300 to-amber-500";
-  if (level === "B") return "from-emerald-400 via-emerald-300 to-emerald-500";
+  if (level === "B") return "from-blue-400 via-blue-300 to-blue-500";
   return "from-slate-400 via-slate-300 to-slate-500";
 }
 
@@ -61,7 +61,7 @@ export default function ProfilePage() {
       {/* Profile Header */}
       <Card className="relative overflow-hidden">
         {/* Gradient banner with decorative elements */}
-        <div className="absolute top-0 left-0 right-0 h-36 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900">
+        <div className="absolute top-0 left-0 right-0 h-36 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
           {/* Large circle blur top-right */}
           <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl" />
           {/* Smaller circle blur */}
@@ -81,7 +81,7 @@ export default function ProfilePage() {
         <div className="relative pt-20 flex flex-col sm:flex-row gap-4 items-start">
           {/* Avatar with glow ring effect */}
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full opacity-50 blur-sm group-hover:opacity-75 transition-opacity duration-300" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full opacity-50 blur-sm group-hover:opacity-75 transition-opacity duration-300" />
             <Avatar name={profile.name} size="xl" className="relative ring-4 ring-white shadow-xl" />
           </div>
 
@@ -116,10 +116,10 @@ export default function ProfilePage() {
                 Membro desde {profile.joinedAt}
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100">
-                  <Star className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100">
+                  <Star className="w-3.5 h-3.5 text-blue-600" />
                 </span>
-                <span className="font-semibold text-emerald-700">Nivel {profile.level}</span>
+                <span className="font-semibold text-blue-700">Nivel {profile.level}</span>
               </span>
             </div>
           </div>
@@ -135,15 +135,15 @@ export default function ProfilePage() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-slate-100">
           <div className="text-center group cursor-pointer rounded-xl py-2 transition-all duration-200 hover:bg-slate-50">
-            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">{profile.stats.followers.toLocaleString()}</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">{profile.stats.followers.toLocaleString()}</p>
             <p className="text-xs font-medium text-slate-500 mt-0.5">Seguidores</p>
           </div>
           <div className="text-center group cursor-pointer rounded-xl py-2 transition-all duration-200 hover:bg-slate-50">
-            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">{profile.stats.following}</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">{profile.stats.following}</p>
             <p className="text-xs font-medium text-slate-500 mt-0.5">Seguindo</p>
           </div>
           <div className="text-center group cursor-pointer rounded-xl py-2 transition-all duration-200 hover:bg-slate-50">
-            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors">{profile.stats.tournaments}</p>
+            <p className="text-xl sm:text-2xl font-extrabold text-slate-900 group-hover:text-blue-700 transition-colors">{profile.stats.tournaments}</p>
             <p className="text-xs font-medium text-slate-500 mt-0.5">Torneios</p>
           </div>
           <div className="text-center group cursor-pointer rounded-xl py-2 transition-all duration-200 hover:bg-amber-50/80">
@@ -182,8 +182,8 @@ export default function ProfilePage() {
       <Card className="relative overflow-hidden">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-emerald-100">
-              <TrendingUp className="w-4.5 h-4.5 text-emerald-600" />
+            <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-blue-100">
+              <TrendingUp className="w-4.5 h-4.5 text-blue-600" />
             </span>
             <CardTitle>Progresso</CardTitle>
           </div>
@@ -194,7 +194,7 @@ export default function ProfilePage() {
 
         <div className="flex items-center gap-3">
           {/* Level start icon */}
-          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-bold text-sm shadow-md shadow-emerald-500/25 flex-shrink-0">
+          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white font-bold text-sm shadow-md shadow-blue-500/25 flex-shrink-0">
             {profile.level}
           </div>
 
@@ -202,7 +202,7 @@ export default function ProfilePage() {
           <div className="flex-1 relative">
             <div className="w-full bg-slate-200/80 rounded-full h-5 overflow-hidden">
               <div
-                className="relative bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-500 rounded-full h-5 transition-all duration-1000 ease-out"
+                className="relative bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 rounded-full h-5 transition-all duration-1000 ease-out"
                 style={{ width: `${xpPercent}%` }}
               >
                 {/* Shimmer effect */}
@@ -257,7 +257,7 @@ export default function ProfilePage() {
                             sport.level === "A"
                               ? "shadow-sm shadow-amber-200/50"
                               : sport.level === "B"
-                              ? "shadow-sm shadow-emerald-200/50"
+                              ? "shadow-sm shadow-blue-200/50"
                               : ""
                           }
                         >
@@ -346,13 +346,13 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-4">
                       {/* Icon with glow effect and scale on hover */}
                       <div className="relative flex-shrink-0">
-                        <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 rounded-2xl bg-blue-400/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="relative flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                           <span className="text-3xl animate-glow-pulse">{a.icon}</span>
                         </div>
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors duration-200">{a.title}</p>
+                        <p className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors duration-200">{a.title}</p>
                         <p className="text-xs text-slate-500 mt-0.5">{a.description}</p>
                         <p className="text-[10px] text-slate-400 mt-1 font-medium">{a.date}</p>
                       </div>

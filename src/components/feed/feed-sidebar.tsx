@@ -29,7 +29,7 @@ export function FeedSidebar({ currentUserId }: FeedSidebarProps) {
       {/* Trending Posts */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-emerald-500" />
+          <TrendingUp className="w-5 h-5 text-blue-500" />
           <CardTitle className="text-base">Em alta</CardTitle>
         </div>
 
@@ -56,7 +56,7 @@ export function FeedSidebar({ currentUserId }: FeedSidebarProps) {
             <div key={post.id} className="flex gap-3 items-start group cursor-pointer">
               <Avatar src={post.user.image} name={post.user.name} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-emerald-600 transition-colors">
+                <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                   {post.user.name}
                 </p>
                 <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">

@@ -37,7 +37,7 @@ export function BottomNav() {
                 href={item.href}
                 className="flex flex-col items-center justify-center -mt-4"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-lg shadow-emerald-500/30 transition-transform active:scale-95">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-500/30 transition-transform active:scale-95">
                   <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
                 </div>
               </Link>
@@ -50,7 +50,7 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1 transition-colors",
-                isActive ? "text-emerald-600" : "text-slate-400"
+                isActive ? "text-blue-600" : "text-slate-400"
               )}
             >
               <Icon
@@ -65,7 +65,7 @@ export function BottomNav() {
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-emerald-500" />
+                <div className="absolute bottom-1 w-5 h-0.5 rounded-full bg-blue-500" />
               )}
             </Link>
           );

@@ -51,10 +51,10 @@ export default function TournamentDetailPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-2xl p-6 lg:p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 lg:p-8 text-white relative overflow-hidden">
         {/* Decorative blur elements for depth */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4 pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10">
@@ -72,24 +72,24 @@ export default function TournamentDetailPage() {
           </div>
 
           <h1 className="text-2xl lg:text-3xl font-bold mb-2">{tournament.name}</h1>
-          <p className="text-emerald-100 mb-6 max-w-2xl">{tournament.description}</p>
+          <p className="text-blue-100 mb-6 max-w-2xl">{tournament.description}</p>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4 text-emerald-200" />
+                <MapPin className="w-4 h-4 text-blue-200" />
               </div>
               <span className="text-sm">{tournament.city}</span>
             </div>
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                <Calendar className="w-4 h-4 text-emerald-200" />
+                <Calendar className="w-4 h-4 text-blue-200" />
               </div>
               <span className="text-sm">{tournament.startDate}</span>
             </div>
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center shrink-0">
-                <Users className="w-4 h-4 text-emerald-200" />
+                <Users className="w-4 h-4 text-blue-200" />
               </div>
               <div className="flex-1 min-w-0">
                 <span className="text-sm">{tournament.participants}/{tournament.maxParticipants}</span>
@@ -222,7 +222,7 @@ export default function TournamentDetailPage() {
                   {participants.map((p, index) => (
                     <div
                       key={p.id}
-                      className={`flex items-center justify-between py-3.5 px-3 rounded-lg transition-colors hover:bg-emerald-500/5 ${
+                      className={`flex items-center justify-between py-3.5 px-3 rounded-lg transition-colors hover:bg-blue-500/5 ${
                         index % 2 === 0 ? "bg-slate-50/50" : "bg-white"
                       }`}
                     >
@@ -250,8 +250,8 @@ export default function TournamentDetailPage() {
                   {[1, 2].map((round) => (
                     <div key={round}>
                       <div className="flex items-center gap-2 mb-4">
-                        <div className="w-7 h-7 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                          <span className="text-xs font-bold text-emerald-600">{round}</span>
+                        <div className="w-7 h-7 rounded-full bg-blue-500/10 flex items-center justify-center">
+                          <span className="text-xs font-bold text-blue-600">{round}</span>
                         </div>
                         <h4 className="text-sm font-bold text-slate-700">
                           {round === 1 ? "Quartas de Final" : "Semifinal"}
@@ -276,15 +276,15 @@ export default function TournamentDetailPage() {
                               >
                                 {/* Player 1 */}
                                 <div className={`flex items-center justify-between px-4 py-2.5 ${
-                                  p1IsWinner ? "bg-emerald-500/5" : ""
+                                  p1IsWinner ? "bg-blue-500/5" : ""
                                 }`}>
                                   <div className="flex items-center gap-2.5">
                                     {p1IsWinner && (
-                                      <Trophy className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                      <Trophy className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                                     )}
                                     <span className={`text-sm ${
                                       p1IsWinner
-                                        ? "font-bold text-emerald-700"
+                                        ? "font-bold text-blue-700"
                                         : isCompleted
                                           ? "text-slate-400"
                                           : "text-slate-700 font-medium"
@@ -294,7 +294,7 @@ export default function TournamentDetailPage() {
                                   </div>
                                   {match.score && (
                                     <span className={`text-xs font-mono ${
-                                      p1IsWinner ? "text-emerald-600 font-semibold" : "text-slate-400"
+                                      p1IsWinner ? "text-blue-600 font-semibold" : "text-slate-400"
                                     }`}>
                                       {match.score.split(", ")[0]}
                                     </span>
@@ -310,15 +310,15 @@ export default function TournamentDetailPage() {
 
                                 {/* Player 2 */}
                                 <div className={`flex items-center justify-between px-4 py-2.5 ${
-                                  p2IsWinner ? "bg-emerald-500/5" : ""
+                                  p2IsWinner ? "bg-blue-500/5" : ""
                                 }`}>
                                   <div className="flex items-center gap-2.5">
                                     {p2IsWinner && (
-                                      <Trophy className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                                      <Trophy className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                                     )}
                                     <span className={`text-sm ${
                                       p2IsWinner
-                                        ? "font-bold text-emerald-700"
+                                        ? "font-bold text-blue-700"
                                         : isCompleted
                                           ? "text-slate-400"
                                           : "text-slate-700 font-medium"
@@ -328,7 +328,7 @@ export default function TournamentDetailPage() {
                                   </div>
                                   {match.score && (
                                     <span className={`text-xs font-mono ${
-                                      p2IsWinner ? "text-emerald-600 font-semibold" : "text-slate-400"
+                                      p2IsWinner ? "text-blue-600 font-semibold" : "text-slate-400"
                                     }`}>
                                       {match.score.split(", ")[1]}
                                     </span>
@@ -364,8 +364,8 @@ export default function TournamentDetailPage() {
                         key={i}
                         className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
                       >
-                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <span className="text-sm font-bold text-emerald-600">{ruleNumber || i + 1}</span>
+                        <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-sm font-bold text-blue-600">{ruleNumber || i + 1}</span>
                         </div>
                         <p className="text-slate-700 text-sm leading-relaxed pt-1.5">{ruleText}</p>
                       </div>
