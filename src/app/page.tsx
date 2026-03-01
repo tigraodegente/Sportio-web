@@ -85,7 +85,7 @@ function SectionContainer({
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-28 sm:pt-40 pb-16 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-24 sm:pt-40 pb-16 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
       {/* Gradient orbs */}
       <div className="absolute inset-0">
         <div className="absolute top-[-20%] left-[-10%] h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] rounded-full bg-blue-500/20 blur-[120px] animate-float" />
@@ -230,9 +230,9 @@ function HeroSection() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+                className="group flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6 transition-all duration-300 hover:bg-white/10 hover:border-white/20"
               >
-                <div className={cn("mx-auto mb-2.5 sm:mb-3 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
+                <div className={cn("mb-2.5 sm:mb-3 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
                   <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-900" />
                 </div>
                 <div className="text-xl sm:text-3xl font-black text-white">{stat.value}</div>
