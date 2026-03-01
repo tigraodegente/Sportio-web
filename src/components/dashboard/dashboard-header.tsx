@@ -3,10 +3,14 @@
 import { Menu, Search, Bell, Coins } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { useUIStore } from "@/stores/ui-store";
+import { trpc } from "@/lib/trpc";
 import Link from "next/link";
 
 export function DashboardHeader() {
   const { toggleSidebar } = useUIStore();
+  const user = trpc.user.me.useQuery(undefined, { retry: false });
+  const unreadCount = trpc.notification.unreadCount.useQuery(undefined, { refetchInterval: 15000 });
+  const hasUnread = (unreadCount.data ?? 0) > 0;
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-lg border-b border-slate-100 flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
@@ -44,13 +48,17 @@ export function DashboardHeader() {
           className="relative p-2.5 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all"
         >
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
+          {hasUnread && (
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white" />
+          )}
         </Link>
 
         <Link href="/profile" className="flex items-center gap-2 pl-2 border-l border-slate-100 ml-1">
-          <Avatar name="Meu Perfil" size="sm" />
+          <Avatar src={user.data?.image} name={user.data?.name ?? "Perfil"} size="sm" />
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold text-slate-900 leading-tight">Perfil</p>
+            <p className="text-sm font-semibold text-slate-900 leading-tight truncate max-w-[120px]">
+              {user.data?.name ?? "Perfil"}
+            </p>
             <p className="text-[10px] text-slate-400 leading-tight">Minha conta</p>
           </div>
         </Link>
