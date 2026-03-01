@@ -52,6 +52,12 @@ export default function GCoinsPage() {
   const summary = trpc.gcoin.summary.useQuery();
   const history = trpc.gcoin.history.useQuery({ limit: 20 });
 
+  // User search for transfer
+  const userSearchResults = trpc.user.search.useQuery(
+    { query: transferSearch, limit: 10 },
+    { enabled: transferSearch.length >= 2 && !selectedUser }
+  );
+
   // tRPC mutations
   const transfer = trpc.gcoin.transfer.useMutation({
     onSuccess: () => {
@@ -443,6 +449,43 @@ export default function GCoinsPage() {
               setTransferError("");
             }}
           />
+
+          {/* Search results */}
+          {transferSearch.length >= 2 && !selectedUser && (
+            <div className="max-h-40 overflow-y-auto border border-slate-200 rounded-xl">
+              {userSearchResults.isLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                </div>
+              ) : !userSearchResults.data?.items?.length ? (
+                <p className="text-sm text-slate-400 text-center py-4">Nenhum usuario encontrado</p>
+              ) : (
+                userSearchResults.data.items.map((u) => (
+                  <button
+                    key={u.id}
+                    onClick={() => {
+                      setSelectedUser({
+                        id: u.id,
+                        name: u.name,
+                        email: u.email,
+                        avatar: u.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() ?? "",
+                      });
+                      setTransferSearch(u.name);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-blue-50 transition-colors text-left"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                      {u.name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-900 truncate">{u.name}</p>
+                      <p className="text-xs text-slate-400 truncate">{u.email}</p>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
 
           {/* Selected user preview */}
           {selectedUser && (

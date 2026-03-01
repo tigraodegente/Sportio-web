@@ -370,7 +370,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Compita em torneios, ganhe GCoins com vitorias e transforme seu talento esportivo em renda real via PIX.",
     icon: "Users",
-    href: "/athletes",
+    href: "/register",
     color: "text-emerald-500",
   },
   {
@@ -379,8 +379,17 @@ export const USER_TYPES: UserType[] = [
     description:
       "Crie torneios, gerencie inscricoes e brackets. Lucre organizando eventos esportivos profissionais.",
     icon: "CalendarDays",
-    href: "/organizers",
+    href: "/register",
     color: "text-blue-500",
+  },
+  {
+    id: "brands",
+    name: "Marcas e Patrocinadores",
+    description:
+      "Patrocine atletas e torneios, de produtos como premio, compre GCoins e aumente a visibilidade da sua marca.",
+    icon: "Building2",
+    href: "/register",
+    color: "text-purple-500",
   },
   {
     id: "trainers",
@@ -388,17 +397,8 @@ export const USER_TYPES: UserType[] = [
     description:
       "Conecte-se com atletas, organize treinos e campeonatos. Aumente sua renda e visibilidade como treinador.",
     icon: "ShieldCheck",
-    href: "/athletes",
+    href: "/register",
     color: "text-amber-500",
-  },
-  {
-    id: "brands",
-    name: "Marcas",
-    description:
-      "Patrocine atletas e eventos, aumente a visibilidade da sua marca no universo esportivo.",
-    icon: "Building2",
-    href: "/brands",
-    color: "text-purple-500",
   },
   {
     id: "referees",
@@ -406,16 +406,16 @@ export const USER_TYPES: UserType[] = [
     description:
       "Seja escalado para partidas e torneios, construa sua reputacao e ganhe por arbitrar eventos.",
     icon: "ShieldCheck",
-    href: "/referees",
+    href: "/register",
     color: "text-slate-500",
   },
   {
     id: "fans",
-    name: "Fas e Palpiteiros",
+    name: "Fas e Comunidade",
     description:
-      "Acompanhe torneios ao vivo, de palpites com GCoins e interaja com a comunidade esportiva.",
+      "Qualquer pessoa pode acompanhar torneios ao vivo, dar palpites com GCoins e interagir com a comunidade. Basta se cadastrar!",
     icon: "Heart",
-    href: "/fans",
+    href: "/register",
     color: "text-red-500",
   },
 ];

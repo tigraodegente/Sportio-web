@@ -3,6 +3,8 @@ import { eq, desc } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { matches } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
+import { settleBets, cancelMatchBets } from "@/server/services/bet-settlement";
+import { createNotification } from "@/server/services/notification-service";
 
 export const matchRouter = createTRPCRouter({
   // Get match by ID
@@ -88,7 +90,34 @@ export const matchRouter = createTRPCRouter({
               tournamentId: match.tournamentId,
             }).catch(() => {});
           }
+
+          // Settle all bets for this match
+          settleBets(matchId, input.winnerId).catch(() => {});
+
+          // Notify winner and loser
+          createNotification({
+            userId: input.winnerId,
+            type: "match",
+            title: "Vitoria!",
+            message: `Voce venceu por ${input.score1} x ${input.score2} no torneio "${match.tournament?.name}"`,
+            data: { matchId, tournamentId: match.tournamentId },
+          }).catch(() => {});
+
+          if (loserId) {
+            createNotification({
+              userId: loserId,
+              type: "match",
+              title: "Resultado da partida",
+              message: `Resultado: ${input.score2} x ${input.score1} no torneio "${match.tournament?.name}"`,
+              data: { matchId, tournamentId: match.tournamentId },
+            }).catch(() => {});
+          }
         }
+      }
+
+      // Cancel bets if match is cancelled
+      if (input.status === "cancelled") {
+        cancelMatchBets(matchId).catch(() => {});
       }
 
       return updated;

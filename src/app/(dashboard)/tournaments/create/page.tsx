@@ -11,22 +11,6 @@ import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc";
 
-const sportOptions = [
-  { value: "futebol", label: "Futebol" },
-  { value: "beach-tennis", label: "Beach Tennis" },
-  { value: "crossfit", label: "CrossFit" },
-  { value: "corrida", label: "Corrida" },
-  { value: "volei", label: "Volei" },
-  { value: "futevolei", label: "Futevolei" },
-  { value: "esports", label: "E-Sports" },
-  { value: "basquete", label: "Basquete" },
-  { value: "natacao", label: "Natacao" },
-  { value: "tenis", label: "Tenis" },
-  { value: "skate", label: "Skate" },
-  { value: "lutas", label: "Lutas" },
-  { value: "ciclismo", label: "Ciclismo" },
-];
-
 const formatOptions = [
   { value: "single_elimination", label: "Eliminacao Simples" },
   { value: "double_elimination", label: "Eliminacao Dupla" },
@@ -73,6 +57,14 @@ export default function CreateTournamentPage() {
   const [activeStep, setActiveStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch sports from DB for proper UUID references
+  const sportsQuery = trpc.social.getSports.useQuery();
+  const sportOptions = (sportsQuery.data ?? []).map((s: { id: string; name: string; slug: string }) => ({
+    value: s.id,
+    label: s.name,
+    slug: s.slug,
+  }));
+
   const [form, setForm] = useState<FormData>({
     name: "",
     description: "",
@@ -102,9 +94,11 @@ export default function CreateTournamentPage() {
     },
   });
 
+  // Look up the sport slug from the selected UUID for rules template
+  const selectedSportSlug = sportOptions.find((s: { value: string; slug: string }) => s.value === form.sportId)?.slug ?? "";
   const rulesTemplateQuery = trpc.tournament.getRulesTemplate.useQuery(
-    { sportSlug: form.sportId },
-    { enabled: !!form.sportId }
+    { sportSlug: selectedSportSlug },
+    { enabled: !!selectedSportSlug }
   );
 
   const handleApplyDefaultRules = () => {
@@ -152,7 +146,7 @@ export default function CreateTournamentPage() {
     });
   };
 
-  const selectedSportLabel = sportOptions.find((s) => s.value === form.sportId)?.label ?? "--";
+  const selectedSportLabel = sportOptions.find((s: { value: string; label: string }) => s.value === form.sportId)?.label ?? "--";
   const selectedFormatLabel = formatOptions.find((f) => f.value === form.format)?.label ?? "--";
 
   return (

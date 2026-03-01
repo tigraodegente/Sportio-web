@@ -5,22 +5,24 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Coins, Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Heart, Target, Shield } from "lucide-react";
+import { Coins, Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Shield, Dumbbell, Apple, Camera, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 
 const roles = [
-  { id: "athlete", label: "Atleta", icon: Trophy, description: "Competir em torneios e ganhar GCoins" },
-  { id: "organizer", label: "Organizador", icon: Briefcase, description: "Criar e gerenciar torneios" },
-  { id: "brand", label: "Marca", icon: Megaphone, description: "Patrocinar e impulsionar sua marca" },
-  { id: "fan", label: "Fa", icon: Heart, description: "Acompanhar e torcer" },
-  { id: "bettor", label: "Palpiteiro", icon: Target, description: "Fazer palpites e ganhar GCoins" },
-  { id: "referee", label: "Arbitro", icon: Shield, description: "Validar partidas e resultados" },
+  { id: "athlete", label: "Atleta", icon: Trophy, description: "Competir em torneios e ganhar GCoins", primary: true },
+  { id: "organizer", label: "Organizador", icon: Briefcase, description: "Criar e gerenciar torneios", primary: true },
+  { id: "brand", label: "Marca", icon: Megaphone, description: "Patrocinar e impulsionar sua marca", primary: true },
+  { id: "referee", label: "Arbitro", icon: Shield, description: "Validar partidas e resultados", primary: false },
+  { id: "trainer", label: "Treinador", icon: Dumbbell, description: "Treinar e orientar atletas", primary: false },
+  { id: "nutritionist", label: "Nutricionista", icon: Apple, description: "Nutricao esportiva e dietas", primary: false },
+  { id: "photographer", label: "Fotografo", icon: Camera, description: "Registrar momentos esportivos", primary: false },
+  { id: "arena_owner", label: "Dono de Arena", icon: Building2, description: "Gerenciar espacos esportivos", primary: false },
 ];
 
-type RoleId = "athlete" | "organizer" | "brand" | "fan" | "bettor" | "referee";
+type RoleId = "athlete" | "organizer" | "brand" | "referee" | "trainer" | "nutritionist" | "photographer" | "arena_owner";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -189,8 +191,13 @@ export default function RegisterPage() {
         </>
       ) : (
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-2 mb-6 sm:gap-3">
-            {roles.map((role) => {
+          <p className="text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 mb-4 text-center font-medium">
+            Todos os usuarios podem acompanhar torneios, dar palpites e interagir na comunidade automaticamente.
+          </p>
+
+          <p className="text-xs text-slate-500 mb-3 font-semibold uppercase tracking-wider">Perfis principais</p>
+          <div className="grid grid-cols-3 gap-2 mb-4 sm:gap-3">
+            {roles.filter(r => r.primary).map((role) => {
               const Icon = role.icon;
               const isSelected = selectedRoles.includes(role.id);
               return (
@@ -213,8 +220,32 @@ export default function RegisterPage() {
             })}
           </div>
 
+          <p className="text-xs text-slate-500 mb-3 font-semibold uppercase tracking-wider">Outros perfis</p>
+          <div className="grid grid-cols-2 gap-2 mb-4 sm:gap-3 sm:grid-cols-3">
+            {roles.filter(r => !r.primary).map((role) => {
+              const Icon = role.icon;
+              const isSelected = selectedRoles.includes(role.id);
+              return (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => toggleRole(role.id)}
+                  className={cn(
+                    "flex flex-col items-center gap-1.5 p-2.5 rounded-xl border-2 transition-all text-center sm:gap-2 sm:p-3",
+                    isSelected
+                      ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md shadow-blue-500/10 ring-1 ring-blue-600/20"
+                      : "border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 text-slate-600"
+                  )}
+                >
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-[10px] font-medium sm:text-xs">{role.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
           <p className="text-xs text-slate-500 mb-4 text-center">
-            Voce pode ter multiplos perfis. Selecione todos que se aplicam.
+            Selecione um ou mais perfis. Voce pode alterar depois nas configuracoes.
           </p>
 
           <div className="flex gap-3">
@@ -226,7 +257,6 @@ export default function RegisterPage() {
               size="lg"
               loading={loading}
               className="flex-1"
-              disabled={selectedRoles.length === 0}
             >
               Criar conta
             </Button>

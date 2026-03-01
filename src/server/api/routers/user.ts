@@ -2,8 +2,9 @@ import { z } from "zod";
 import { eq, ilike, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { users, userRoles, userSports, followers } from "@/server/db/schema";
+import { users, userRoles, userSports, followers, userSettings } from "@/server/db/schema";
 import bcrypt from "bcryptjs";
+import { notifyNewFollower } from "@/server/services/notification-service";
 
 export const userRouter = createTRPCRouter({
   // Register new user
@@ -15,7 +16,7 @@ export const userRouter = createTRPCRouter({
         password: z.string().min(8),
         roles: z.array(
           z.enum(["athlete", "organizer", "brand", "fan", "bettor", "referee", "trainer", "nutritionist", "photographer", "arena_owner"])
-        ).min(1),
+        ).default([]),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -48,12 +49,20 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      for (const role of input.roles) {
+      // Always add "fan" role - every user is a fan by default
+      const allRoles = new Set<"athlete" | "organizer" | "brand" | "fan" | "bettor" | "referee" | "trainer" | "nutritionist" | "photographer" | "arena_owner">(["fan", ...input.roles]);
+      for (const role of allRoles) {
         await ctx.db
           .insert(userRoles)
           .values({ userId: user.id, role })
           .onConflictDoNothing();
       }
+
+      // Create default user settings
+      await ctx.db
+        .insert(userSettings)
+        .values({ userId: user.id })
+        .onConflictDoNothing();
 
       return { id: user.id, email: user.email };
     }),
@@ -96,7 +105,7 @@ export const userRouter = createTRPCRouter({
         instagram: z.string().max(100).optional(),
         twitter: z.string().max(100).optional(),
         youtube: z.string().max(100).optional(),
-        image: z.string().url().optional(),
+        image: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -176,6 +185,14 @@ export const userRouter = createTRPCRouter({
         .insert(followers)
         .values({ followerId: ctx.session.user.id, followingId: input.userId })
         .onConflictDoNothing();
+
+      // Notify the user being followed
+      const follower = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: { name: true },
+      });
+      notifyNewFollower(input.userId, follower?.name ?? "Alguem", ctx.session.user.id).catch(() => {});
+
       return { success: true };
     }),
 
@@ -227,5 +244,137 @@ export const userRouter = createTRPCRouter({
         limit: input.limit,
       });
       return query;
+    }),
+
+  // Get user settings
+  getSettings: protectedProcedure.query(async ({ ctx }) => {
+    let settings = await ctx.db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, ctx.session.user.id),
+    });
+    if (!settings) {
+      const [created] = await ctx.db
+        .insert(userSettings)
+        .values({ userId: ctx.session.user.id })
+        .onConflictDoNothing()
+        .returning();
+      settings = created ?? null;
+    }
+    return settings;
+  }),
+
+  // Update notification preferences
+  updateNotificationPrefs: protectedProcedure
+    .input(
+      z.object({
+        notifyTournaments: z.boolean().optional(),
+        notifyMatches: z.boolean().optional(),
+        notifyGcoins: z.boolean().optional(),
+        notifySocial: z.boolean().optional(),
+        notifyChat: z.boolean().optional(),
+        notifyBets: z.boolean().optional(),
+        notifyMarketing: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Upsert settings
+      const existing = await ctx.db.query.userSettings.findFirst({
+        where: eq(userSettings.userId, ctx.session.user.id),
+      });
+
+      if (existing) {
+        const [updated] = await ctx.db
+          .update(userSettings)
+          .set({ ...input, updatedAt: new Date() })
+          .where(eq(userSettings.userId, ctx.session.user.id))
+          .returning();
+        return updated;
+      } else {
+        const [created] = await ctx.db
+          .insert(userSettings)
+          .values({ userId: ctx.session.user.id, ...input })
+          .returning();
+        return created;
+      }
+    }),
+
+  // Update privacy preferences
+  updatePrivacyPrefs: protectedProcedure
+    .input(
+      z.object({
+        publicProfile: z.boolean().optional(),
+        showResults: z.boolean().optional(),
+        showGcoins: z.boolean().optional(),
+        allowMessages: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.db.query.userSettings.findFirst({
+        where: eq(userSettings.userId, ctx.session.user.id),
+      });
+
+      if (existing) {
+        const [updated] = await ctx.db
+          .update(userSettings)
+          .set({ ...input, updatedAt: new Date() })
+          .where(eq(userSettings.userId, ctx.session.user.id))
+          .returning();
+        return updated;
+      } else {
+        const [created] = await ctx.db
+          .insert(userSettings)
+          .values({ userId: ctx.session.user.id, ...input })
+          .returning();
+        return created;
+      }
+    }),
+
+  // Change password
+  changePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1),
+        newPassword: z.string().min(8),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: { password: true },
+      });
+
+      if (!user?.password) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Conta nao usa senha (login social)",
+        });
+      }
+
+      const valid = await bcrypt.compare(input.currentPassword, user.password);
+      if (!valid) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Senha atual incorreta",
+        });
+      }
+
+      const hashed = await bcrypt.hash(input.newPassword, 12);
+      await ctx.db
+        .update(users)
+        .set({ password: hashed, updatedAt: new Date() })
+        .where(eq(users.id, ctx.session.user.id));
+
+      return { success: true };
+    }),
+
+  // Save PIX key
+  savePixKey: protectedProcedure
+    .input(z.object({ pixKey: z.string().min(1).max(255) }))
+    .mutation(async ({ ctx, input }) => {
+      const [updated] = await ctx.db
+        .update(users)
+        .set({ pixKey: input.pixKey, updatedAt: new Date() })
+        .where(eq(users.id, ctx.session.user.id))
+        .returning();
+      return updated;
     }),
 });

@@ -5,6 +5,7 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { tournaments, enrollments, matches } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
 import { getRuleTemplate, formatRulesAsText, getAllRuleTemplates } from "@/server/services/rules-engine";
+import { notifyTournamentEnrollment } from "@/server/services/notification-service";
 import {
   generateBracket as generateBracketService,
   advanceWinner as advanceWinnerService,
@@ -187,6 +188,9 @@ export const tournamentRouter = createTRPCRouter({
           sportId: tournament.sportId,
           tournamentId: input.tournamentId,
         }).catch(() => {});
+
+        // Notify the user about enrollment confirmation
+        notifyTournamentEnrollment(ctx.session.user.id, tournament.name, input.tournamentId).catch(() => {});
       }
 
       return enrollment;

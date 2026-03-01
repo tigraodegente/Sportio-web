@@ -21,6 +21,7 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
   const [focusedCompose, setFocusedCompose] = useState(false);
   const [selectedSportId, setSelectedSportId] = useState<string | undefined>();
   const [showSportPicker, setShowSportPicker] = useState(false);
+  const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
 
   const utils = trpc.useUtils();
 
@@ -31,16 +32,42 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
       setContent("");
       setSelectedSportId(undefined);
       setFocusedCompose(false);
+      setImagesPreviews([]);
       onPostCreated?.();
       utils.social.feed.invalidate();
     },
   });
+
+  const handleImageUpload = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/jpeg,image/png,image/webp";
+    input.multiple = true;
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (!files) return;
+      Array.from(files).forEach((file) => {
+        if (file.size > 5 * 1024 * 1024) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagesPreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+    input.click();
+  };
+
+  const removeImage = (index: number) => {
+    setImagesPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = () => {
     if (!content.trim()) return;
     createPost.mutate({
       content: content.trim(),
       sportId: selectedSportId,
+      images: imagesPreviews.length > 0 ? imagesPreviews : undefined,
     });
   };
 
@@ -79,6 +106,24 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
             rows={focusedCompose ? 3 : 2}
           />
 
+          {/* Image previews */}
+          {imagesPreviews.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {imagesPreviews.map((img, idx) => (
+                <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Selected sport tag */}
           {selectedSport && (
             <div className="flex items-center gap-2 mb-3">
@@ -96,7 +141,7 @@ export function CreatePostForm({ currentUser, onPostCreated }: CreatePostFormPro
 
           <div className="flex items-center justify-between pt-3 border-t border-slate-100">
             <div className="flex gap-1">
-              <button className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <button onClick={handleImageUpload} className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                 <ImageIcon className="w-5 h-5" />
               </button>
               <button className="p-2 rounded-xl text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all duration-200">

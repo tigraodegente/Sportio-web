@@ -30,6 +30,31 @@ export const userRoleEnum = pgEnum("user_role", [
   "admin",
 ]);
 
+export const sponsorshipStatusEnum = pgEnum("sponsorship_status", [
+  "pending",
+  "active",
+  "paused",
+  "completed",
+  "rejected",
+]);
+
+export const adPlacementEnum = pgEnum("ad_placement", [
+  "feed_banner",
+  "sidebar",
+  "tournament_sponsor",
+  "profile_banner",
+  "challenge_sponsor",
+  "post_promoted",
+]);
+
+export const campaignTypeEnum = pgEnum("campaign_type", [
+  "banner",
+  "product_giveaway",
+  "gcoin_reward",
+  "tournament_sponsor",
+  "challenge_sponsor",
+]);
+
 export const levelEnum = pgEnum("level", ["A", "B", "C"]);
 
 export const verificationStatusEnum = pgEnum("verification_status", [
@@ -696,9 +721,90 @@ export const blogPosts = pgTable(
   ]
 );
 
+// Brand Campaigns (sponsorship)
+export const brandCampaigns = pgTable(
+  "brand_campaigns",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    brandUserId: uuid("brand_user_id")
+      .notNull()
+      .references(() => users.id),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    type: campaignTypeEnum("type").notNull(),
+    placement: adPlacementEnum("placement").notNull(),
+    status: sponsorshipStatusEnum("status").default("pending"),
+    budget: decimal("budget", { precision: 12, scale: 2 }).default("0"),
+    spent: decimal("spent", { precision: 12, scale: 2 }).default("0"),
+    imageUrl: text("image_url"),
+    linkUrl: text("link_url"),
+    targetSportId: uuid("target_sport_id").references(() => sports.id),
+    targetTournamentId: uuid("target_tournament_id").references(() => tournaments.id),
+    impressions: integer("impressions").default(0),
+    clicks: integer("clicks").default(0),
+    productName: varchar("product_name", { length: 255 }),
+    productDescription: text("product_description"),
+    productImage: text("product_image"),
+    gcoinRewardAmount: decimal("gcoin_reward_amount", { precision: 10, scale: 2 }),
+    maxRedemptions: integer("max_redemptions"),
+    currentRedemptions: integer("current_redemptions").default(0),
+    startsAt: timestamp("starts_at"),
+    endsAt: timestamp("ends_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("brand_campaigns_brand_idx").on(table.brandUserId),
+    index("brand_campaigns_status_idx").on(table.status),
+    index("brand_campaigns_placement_idx").on(table.placement),
+  ]
+);
+
+// Campaign Redemptions (for product giveaways / gcoin rewards)
+export const campaignRedemptions = pgTable(
+  "campaign_redemptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    campaignId: uuid("campaign_id")
+      .notNull()
+      .references(() => brandCampaigns.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    redeemedAt: timestamp("redeemed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("campaign_redemptions_unique_idx").on(table.campaignId, table.userId),
+    index("campaign_redemptions_campaign_idx").on(table.campaignId),
+  ]
+);
+
+// User Settings (notification + privacy preferences)
+export const userSettings = pgTable("user_settings", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" })
+    .unique(),
+  // Notification preferences
+  notifyTournaments: boolean("notify_tournaments").default(true),
+  notifyMatches: boolean("notify_matches").default(true),
+  notifyGcoins: boolean("notify_gcoins").default(true),
+  notifySocial: boolean("notify_social").default(true),
+  notifyChat: boolean("notify_chat").default(true),
+  notifyBets: boolean("notify_bets").default(true),
+  notifyMarketing: boolean("notify_marketing").default(false),
+  // Privacy preferences
+  publicProfile: boolean("public_profile").default(true),
+  showResults: boolean("show_results").default(true),
+  showGcoins: boolean("show_gcoins").default(true),
+  allowMessages: boolean("allow_messages").default(true),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // ==================== RELATIONS ====================
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   accounts: many(accounts),
   sessions: many(sessions),
   roles: many(userRoles),
@@ -712,6 +818,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),
   followers: many(followers, { relationName: "following" }),
   following: many(followers, { relationName: "follower" }),
+  settings: one(userSettings, { fields: [users.id], references: [userSettings.userId] }),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -825,4 +932,20 @@ export const chatMembersRelations = relations(chatMembers, ({ one }) => ({
 export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
   room: one(chatRooms, { fields: [chatMessages.roomId], references: [chatRooms.id] }),
   sender: one(users, { fields: [chatMessages.senderId], references: [users.id] }),
+}));
+
+export const brandCampaignsRelations = relations(brandCampaigns, ({ one, many }) => ({
+  brandUser: one(users, { fields: [brandCampaigns.brandUserId], references: [users.id] }),
+  targetSport: one(sports, { fields: [brandCampaigns.targetSportId], references: [sports.id] }),
+  targetTournament: one(tournaments, { fields: [brandCampaigns.targetTournamentId], references: [tournaments.id] }),
+  redemptions: many(campaignRedemptions),
+}));
+
+export const campaignRedemptionsRelations = relations(campaignRedemptions, ({ one }) => ({
+  campaign: one(brandCampaigns, { fields: [campaignRedemptions.campaignId], references: [brandCampaigns.id] }),
+  user: one(users, { fields: [campaignRedemptions.userId], references: [users.id] }),
+}));
+
+export const userSettingsRelations = relations(userSettings, ({ one }) => ({
+  user: one(users, { fields: [userSettings.userId], references: [users.id] }),
 }));

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { eq, desc, and, sql, lt } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { posts, comments, likes, users, sports, followers } from "@/server/db/schema";
+import { notifyComment, notifyLike } from "@/server/services/notification-service";
 
 export const socialRouter = createTRPCRouter({
   // Feed with cursor-based pagination
@@ -161,6 +162,19 @@ export const socialRouter = createTRPCRouter({
         with: { user: true },
       });
 
+      // Notify post owner about the comment
+      const post = await ctx.db.query.posts.findFirst({
+        where: eq(posts.id, input.postId),
+        columns: { userId: true },
+      });
+      if (post && post.userId !== ctx.session.user.id) {
+        const commenter = await ctx.db.query.users.findFirst({
+          where: eq(users.id, ctx.session.user.id),
+          columns: { name: true },
+        });
+        notifyComment(post.userId, commenter?.name ?? "Alguem", input.postId).catch(() => {});
+      }
+
       return commentWithUser;
     }),
 
@@ -217,6 +231,19 @@ export const socialRouter = createTRPCRouter({
           .update(posts)
           .set({ likesCount: sql`${posts.likesCount} + 1` })
           .where(eq(posts.id, input.postId));
+
+        // Notify post owner about the like
+        const post = await ctx.db.query.posts.findFirst({
+          where: eq(posts.id, input.postId),
+          columns: { userId: true },
+        });
+        if (post && post.userId !== ctx.session.user.id) {
+          const liker = await ctx.db.query.users.findFirst({
+            where: eq(users.id, ctx.session.user.id),
+            columns: { name: true },
+          });
+          notifyLike(post.userId, liker?.name ?? "Alguem", input.postId).catch(() => {});
+        }
       }
       return { liked: true };
     }),
