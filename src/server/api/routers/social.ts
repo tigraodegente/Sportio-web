@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, lt } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { posts, comments, likes } from "@/server/db/schema";
+import { posts, comments, likes, users, sports, followers } from "@/server/db/schema";
 
 export const socialRouter = createTRPCRouter({
-  // Feed
+  // Feed with cursor-based pagination
   feed: publicProcedure
     .input(
       z.object({
@@ -16,16 +16,19 @@ export const socialRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const conditions = [eq(posts.isPublished, true)];
       if (input.sportId) conditions.push(eq(posts.sportId, input.sportId));
+      if (input.cursor) conditions.push(lt(posts.id, input.cursor));
 
       const results = await ctx.db.query.posts.findMany({
         where: and(...conditions),
         with: {
           user: true,
+          sport: true,
           comments: {
             limit: 3,
             orderBy: [desc(comments.createdAt)],
             with: { user: true },
           },
+          likes: true,
         },
         orderBy: [desc(posts.createdAt)],
         limit: input.limit + 1,
@@ -37,7 +40,42 @@ export const socialRouter = createTRPCRouter({
         nextCursor = next.id;
       }
 
-      return { items: results, nextCursor };
+      // Add isLiked flag for the current user
+      const userId = ctx.session?.user?.id;
+      const items = results.map((post) => ({
+        ...post,
+        isLiked: userId ? post.likes.some((l) => l.userId === userId) : false,
+        likes: undefined, // Don't send all likes to client
+      }));
+
+      return { items, nextCursor };
+    }),
+
+  // Get single post
+  getPost: publicProcedure
+    .input(z.object({ postId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.query.posts.findFirst({
+        where: eq(posts.id, input.postId),
+        with: {
+          user: true,
+          sport: true,
+          comments: {
+            orderBy: [desc(comments.createdAt)],
+            with: { user: true },
+          },
+          likes: true,
+        },
+      });
+
+      if (!post) return null;
+
+      const userId = ctx.session?.user?.id;
+      return {
+        ...post,
+        isLiked: userId ? post.likes.some((l) => l.userId === userId) : false,
+        likes: undefined,
+      };
     }),
 
   // Create post
@@ -62,6 +100,23 @@ export const socialRouter = createTRPCRouter({
         })
         .returning();
       return post;
+    }),
+
+  // Edit post
+  editPost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string().uuid(),
+        content: z.string().min(1).max(2000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [updated] = await ctx.db
+        .update(posts)
+        .set({ content: input.content, updatedAt: new Date() })
+        .where(and(eq(posts.id, input.postId), eq(posts.userId, ctx.session.user.id)))
+        .returning();
+      return updated;
     }),
 
   // Delete post
@@ -100,7 +155,29 @@ export const socialRouter = createTRPCRouter({
         .set({ commentsCount: sql`${posts.commentsCount} + 1` })
         .where(eq(posts.id, input.postId));
 
-      return comment;
+      // Return comment with user
+      const commentWithUser = await ctx.db.query.comments.findFirst({
+        where: eq(comments.id, comment!.id),
+        with: { user: true },
+      });
+
+      return commentWithUser;
+    }),
+
+  // Delete comment
+  deleteComment: protectedProcedure
+    .input(z.object({ commentId: z.string().uuid(), postId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .delete(comments)
+        .where(and(eq(comments.id, input.commentId), eq(comments.userId, ctx.session.user.id)));
+
+      await ctx.db
+        .update(posts)
+        .set({ commentsCount: sql`GREATEST(${posts.commentsCount} - 1, 0)` })
+        .where(eq(posts.id, input.postId));
+
+      return { success: true };
     }),
 
   // Toggle like
@@ -124,7 +201,7 @@ export const socialRouter = createTRPCRouter({
         if (input.postId) {
           await ctx.db
             .update(posts)
-            .set({ likesCount: sql`${posts.likesCount} - 1` })
+            .set({ likesCount: sql`GREATEST(${posts.likesCount} - 1, 0)` })
             .where(eq(posts.id, input.postId));
         }
         return { liked: false };
@@ -152,6 +229,66 @@ export const socialRouter = createTRPCRouter({
         where: eq(comments.postId, input.postId),
         with: { user: true },
         orderBy: [desc(comments.createdAt)],
+      });
+    }),
+
+  // Get available sports for filter
+  getSports: publicProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.sports.findMany({
+      where: eq(sports.isActive, true),
+      orderBy: [sports.name],
+    });
+  }),
+
+  // Get suggested users to follow
+  suggestedUsers: protectedProcedure
+    .input(z.object({ limit: z.number().min(1).max(10).default(5) }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Get users the current user already follows
+      const following = await ctx.db.query.followers.findMany({
+        where: eq(followers.followerId, userId),
+      });
+      const followingIds = following.map((f) => f.followingId);
+      followingIds.push(userId); // Exclude self
+
+      // Get users not yet followed
+      const suggested = await ctx.db.query.users.findMany({
+        where: followingIds.length > 0
+          ? and(sql`${users.id} NOT IN (${sql.join(followingIds.map(id => sql`${id}`), sql`, `)})`)
+          : undefined,
+        limit: input.limit,
+        columns: {
+          id: true,
+          name: true,
+          image: true,
+          bio: true,
+          city: true,
+        },
+      });
+
+      return suggested;
+    }),
+
+  // Get trending posts (most liked in last 7 days)
+  trending: publicProcedure
+    .input(z.object({ limit: z.number().min(1).max(10).default(5) }))
+    .query(async ({ ctx, input }) => {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      return ctx.db.query.posts.findMany({
+        where: and(
+          eq(posts.isPublished, true),
+          sql`${posts.createdAt} >= ${sevenDaysAgo}`
+        ),
+        with: {
+          user: { columns: { id: true, name: true, image: true } },
+          sport: true,
+        },
+        orderBy: [desc(posts.likesCount)],
+        limit: input.limit,
       });
     }),
 });
