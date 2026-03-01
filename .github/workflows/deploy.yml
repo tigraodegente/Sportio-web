@@ -80,10 +80,32 @@ jobs:
       - name: Build Project
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Debug - Show build output structure
+        run: |
+          echo "=== .vercel/output directory ==="
+          ls -la .vercel/output/ 2>/dev/null || echo "No .vercel/output dir"
+          echo "=== .vercel/output/config.json ==="
+          cat .vercel/output/config.json 2>/dev/null || echo "No config.json"
+          echo "=== .vercel directory ==="
+          ls -la .vercel/ 2>/dev/null || echo "No .vercel dir"
+          echo "=== project.json ==="
+          cat .vercel/project.json 2>/dev/null || echo "No project.json"
+
       - name: Deploy to Production
         id: deploy-prod
         run: |
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Starting deploy..."
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | tee /tmp/deploy-output.txt
+          DEPLOY_EXIT=${PIPESTATUS[0]}
+          echo "Deploy exit code: $DEPLOY_EXIT"
+          if [ $DEPLOY_EXIT -ne 0 ]; then
+            echo "### Deploy Failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/deploy-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          url=$(tail -1 /tmp/deploy-output.txt)
           echo "url=$url" >> $GITHUB_OUTPUT
           echo "### 🚀 Production Deployed" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY
