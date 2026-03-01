@@ -104,6 +104,20 @@ export default function TournamentDetailPage() {
     { enabled: !!tournamentId }
   );
 
+  // Build a map of player IDs to names from enrollment data
+  const playerNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    const enrollments = tournamentQuery.data?.enrollments;
+    if (enrollments) {
+      for (const enrollment of enrollments) {
+        if (enrollment.userId && enrollment.user?.name) {
+          map.set(enrollment.userId, enrollment.user.name);
+        }
+      }
+    }
+    return map;
+  }, [tournamentQuery.data?.enrollments]);
+
   const handleEnroll = () => {
     setEnrolling(true);
     setEnrollError(null);
@@ -166,19 +180,6 @@ export default function TournamentDetailPage() {
     tournament.format === "round_robin" ||
     tournament.format === "league" ||
     tournament.format === "swiss";
-
-  // Build a map of player IDs to names from enrollment data
-  const playerNameMap = useMemo(() => {
-    const map = new Map<string, string>();
-    if (tournament.enrollments) {
-      for (const enrollment of tournament.enrollments) {
-        if (enrollment.userId && enrollment.user?.name) {
-          map.set(enrollment.userId, enrollment.user.name);
-        }
-      }
-    }
-    return map;
-  }, [tournament.enrollments]);
 
   const getPlayerName = (playerId: string | null): string => {
     if (!playerId) return "TBD";
