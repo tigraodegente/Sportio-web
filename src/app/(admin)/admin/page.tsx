@@ -29,12 +29,28 @@ const roleLabels: Record<string, string> = {
   fan: "Fa",
   bettor: "Palpiteiro",
   referee: "Arbitro",
+  trainer: "Treinador",
+  nutritionist: "Nutricionista",
+  photographer: "Fotografo",
   arena_owner: "Arena",
   admin: "Admin",
 };
 
+const tournamentStatusLabels: Record<string, string> = {
+  draft: "Rascunho",
+  registration_open: "Inscricoes Abertas",
+  registration_closed: "Inscricoes Fechadas",
+  in_progress: "Em Andamento",
+  completed: "Finalizado",
+  cancelled: "Cancelado",
+};
+
 function LoadingSpinner({ className }: { className?: string }) {
-  return <Loader2 className={`animate-spin text-blue-500 ${className ?? "w-6 h-6"}`} />;
+  return (
+    <Loader2
+      className={`animate-spin text-blue-500 ${className ?? "w-6 h-6"}`}
+    />
+  );
 }
 
 function LoadingRow() {
@@ -49,7 +65,15 @@ function LoadingRow() {
   );
 }
 
-function EmptyState({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function EmptyState({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
@@ -67,9 +91,10 @@ export default function AdminPage() {
   // --- tRPC Queries ---
   const currentUser = trpc.user.me.useQuery(undefined, { retry: false });
 
+  // user.search requires query with min(1), so only query when there is input
   const usersQuery = trpc.user.search.useQuery(
-    { query: userSearch, limit: 20 },
-    { keepPreviousData: true }
+    { query: userSearch || "a", limit: 20 },
+    { enabled: userSearch.length > 0 }
   );
 
   const tournamentsQuery = trpc.tournament.list.useInfiniteQuery(
@@ -81,25 +106,31 @@ export default function AdminPage() {
 
   const rankingQuery = trpc.user.ranking.useQuery({ limit: 10 });
 
-  const unreadCount = trpc.notification.unreadCount.useQuery();
+  const unreadCount = trpc.notification.unreadCount.useQuery(undefined, {
+    retry: false,
+  });
 
   // --- Derived data ---
   const users = usersQuery.data?.items ?? [];
-  const totalUsers = users.length;
 
-  const allTournaments = tournamentsQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  const allTournaments =
+    tournamentsQuery.data?.pages.flatMap((page) => page.items) ?? [];
   const totalTournaments = allTournaments.length;
   const activeTournaments = allTournaments.filter(
-    (t) => t.status === "active" || t.status === "in_progress" || t.status === "open"
+    (t) =>
+      t.status === "in_progress" ||
+      t.status === "registration_open" ||
+      t.status === "registration_closed"
   ).length;
 
   const leaderboard = leaderboardQuery.data ?? [];
   const rankings = rankingQuery.data ?? [];
 
-  const notifications = unreadCount.data ?? 0;
+  const notifications =
+    typeof unreadCount.data === "number" ? unreadCount.data : 0;
 
   const isStatsLoading =
-    usersQuery.isLoading || tournamentsQuery.isLoading || leaderboardQuery.isLoading;
+    tournamentsQuery.isLoading || leaderboardQuery.isLoading;
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 lg:p-8">
@@ -148,18 +179,22 @@ export default function AdminPage() {
           ) : (
             <>
               <StatsCard
-                title="Usuarios Encontrados"
-                value={totalUsers.toLocaleString()}
-                change={userSearch ? `Busca: "${userSearch}"` : "Todos os usuarios"}
-                changeType="positive"
-                icon={<Users className="w-5 h-5" />}
-              />
-              <StatsCard
                 title="Torneios"
                 value={totalTournaments.toLocaleString()}
                 change={`${activeTournaments} ativos agora`}
-                changeType="neutral"
+                changeType="positive"
                 icon={<Trophy className="w-5 h-5" />}
+              />
+              <StatsCard
+                title="Torneios em Andamento"
+                value={
+                  allTournaments
+                    .filter((t) => t.status === "in_progress")
+                    .length.toLocaleString()
+                }
+                change="Em andamento agora"
+                changeType="neutral"
+                icon={<TrendingUp className="w-5 h-5" />}
               />
               <StatsCard
                 title="Top Palpiteiros"
@@ -169,11 +204,11 @@ export default function AdminPage() {
                 icon={<Coins className="w-5 h-5" />}
               />
               <StatsCard
-                title="Top Ranking"
+                title="Ranking Usuarios"
                 value={rankings.length.toLocaleString()}
                 change="Usuarios ranqueados"
                 changeType="positive"
-                icon={<TrendingUp className="w-5 h-5" />}
+                icon={<Users className="w-5 h-5" />}
               />
             </>
           )}
@@ -186,11 +221,15 @@ export default function AdminPage() {
               <Shield className="w-6 h-6 text-blue-600" />
               <div>
                 <p className="font-semibold text-blue-900">
-                  {notifications > 0
+                  {unreadCount.isLoading
+                    ? "Carregando..."
+                    : notifications > 0
                     ? `${notifications} Notificacoes Nao Lidas`
                     : "Nenhuma notificacao pendente"}
                 </p>
-                <p className="text-sm text-blue-700">Notificacoes da plataforma</p>
+                <p className="text-sm text-blue-700">
+                  Notificacoes da plataforma
+                </p>
               </div>
             </div>
           </Card>
@@ -199,7 +238,9 @@ export default function AdminPage() {
               <Trophy className="w-6 h-6 text-blue-600" />
               <div>
                 <p className="font-semibold text-blue-900">
-                  {totalTournaments} Torneios Cadastrados
+                  {tournamentsQuery.isLoading
+                    ? "Carregando..."
+                    : `${totalTournaments} Torneios Cadastrados`}
                 </p>
                 <p className="text-sm text-blue-700">
                   {activeTournaments} ativos no momento
@@ -235,99 +276,107 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-slate-200">
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
-                            Usuario
-                          </th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
-                            Tipo
-                          </th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
-                            Cidade
-                          </th>
-                          <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
-                            Status
-                          </th>
-                          <th className="text-right text-xs font-medium text-slate-500 py-3 px-2">
-                            Acoes
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {usersQuery.isLoading && <LoadingRow />}
+                  {!userSearch && (
+                    <EmptyState
+                      icon={<Search className="w-7 h-7 text-slate-300" />}
+                      title="Buscar usuarios"
+                      description="Digite um nome no campo de busca para encontrar usuarios."
+                    />
+                  )}
 
-                        {!usersQuery.isLoading && users.length === 0 && (
-                          <tr>
-                            <td colSpan={5}>
-                              <EmptyState
-                                icon={<Users className="w-7 h-7 text-slate-300" />}
-                                title="Nenhum usuario encontrado"
-                                description={
-                                  userSearch
-                                    ? `Nenhum resultado para "${userSearch}". Tente outro termo.`
-                                    : "Nenhum usuario cadastrado ainda."
-                                }
-                              />
-                            </td>
+                  {userSearch && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-slate-200">
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Usuario
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Cidade
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Nivel
+                            </th>
+                            <th className="text-left text-xs font-medium text-slate-500 py-3 px-2">
+                              Status
+                            </th>
+                            <th className="text-right text-xs font-medium text-slate-500 py-3 px-2">
+                              Acoes
+                            </th>
                           </tr>
-                        )}
+                        </thead>
+                        <tbody>
+                          {usersQuery.isLoading && <LoadingRow />}
 
-                        {users.map((user) => (
-                          <tr
-                            key={user.id}
-                            className="border-b border-slate-50 hover:bg-slate-50"
-                          >
-                            <td className="py-3 px-2">
-                              <div className="flex items-center gap-2">
-                                <Avatar
-                                  src={user.image}
-                                  name={user.name}
-                                  size="sm"
+                          {!usersQuery.isLoading && users.length === 0 && (
+                            <tr>
+                              <td colSpan={5}>
+                                <EmptyState
+                                  icon={
+                                    <Users className="w-7 h-7 text-slate-300" />
+                                  }
+                                  title="Nenhum usuario encontrado"
+                                  description={`Nenhum resultado para "${userSearch}". Tente outro termo.`}
                                 />
-                                <div>
-                                  <p className="text-sm font-medium text-slate-900">
-                                    {user.name}
-                                  </p>
-                                  <p className="text-xs text-slate-500">
-                                    {user.email}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-2">
-                              <Badge>
-                                {roleLabels[user.role] || user.role}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-2 text-sm text-slate-500">
-                              {user.city || "—"}
-                            </td>
-                            <td className="py-3 px-2">
-                              <Badge
-                                variant={
-                                  user.isVerified ? "success" : "info"
-                                }
-                              >
-                                {user.isVerified ? "Verificado" : "Pendente"}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-2 text-right">
-                              <Button variant="ghost" size="sm">
-                                Ver
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                              </td>
+                            </tr>
+                          )}
 
-                  {usersQuery.isFetching && !usersQuery.isLoading && (
-                    <div className="flex justify-center py-3">
-                      <LoadingSpinner className="w-4 h-4" />
+                          {users.map((user) => (
+                            <tr
+                              key={user.id}
+                              className="border-b border-slate-50 hover:bg-slate-50"
+                            >
+                              <td className="py-3 px-2">
+                                <div className="flex items-center gap-2">
+                                  <Avatar
+                                    src={user.image}
+                                    name={user.name}
+                                    size="sm"
+                                  />
+                                  <div>
+                                    <p className="text-sm font-medium text-slate-900">
+                                      {user.name}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                      {user.email}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-3 px-2 text-sm text-slate-500">
+                                {user.city || "—"}
+                              </td>
+                              <td className="py-3 px-2">
+                                <Badge variant="primary">
+                                  Nivel {user.level ?? 1}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-2">
+                                <Badge
+                                  variant={
+                                    user.isVerified ? "success" : "info"
+                                  }
+                                >
+                                  {user.isVerified ? "Verificado" : "Pendente"}
+                                </Badge>
+                              </td>
+                              <td className="py-3 px-2 text-right">
+                                <Button variant="ghost" size="sm">
+                                  Ver
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+                      {usersQuery.isFetching && !usersQuery.isLoading && (
+                        <div className="flex justify-center py-3">
+                          <LoadingSpinner className="w-4 h-4" />
+                        </div>
+                      )}
                     </div>
                   )}
                 </Card>
@@ -344,13 +393,14 @@ export default function AdminPage() {
                     </div>
                   )}
 
-                  {!tournamentsQuery.isLoading && allTournaments.length === 0 && (
-                    <EmptyState
-                      icon={<Trophy className="w-7 h-7 text-slate-300" />}
-                      title="Nenhum torneio encontrado"
-                      description="Nenhum torneio cadastrado na plataforma ainda."
-                    />
-                  )}
+                  {!tournamentsQuery.isLoading &&
+                    allTournaments.length === 0 && (
+                      <EmptyState
+                        icon={<Trophy className="w-7 h-7 text-slate-300" />}
+                        title="Nenhum torneio encontrado"
+                        description="Nenhum torneio cadastrado na plataforma ainda."
+                      />
+                    )}
 
                   {allTournaments.length > 0 && (
                     <div className="space-y-3">
@@ -368,25 +418,29 @@ export default function AdminPage() {
                                 {tournament.name}
                               </p>
                               <p className="text-xs text-slate-500">
-                                {tournament.sport?.name ?? "Esporte"} &middot;{" "}
-                                {tournament.location || "Local nao definido"}
+                                {tournament.sport?.name ?? "Esporte"}{" "}
+                                &middot;{" "}
+                                {tournament.city || "Local nao definido"}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <Badge
                               variant={
-                                tournament.status === "active" ||
                                 tournament.status === "in_progress" ||
-                                tournament.status === "open"
+                                tournament.status === "registration_open"
                                   ? "success"
-                                  : tournament.status === "completed" ||
-                                    tournament.status === "finished"
+                                  : tournament.status === "completed"
                                   ? "default"
+                                  : tournament.status === "cancelled"
+                                  ? "danger"
                                   : "info"
                               }
                             >
-                              {tournament.status}
+                              {tournament.status
+                                ? tournamentStatusLabels[tournament.status] ??
+                                  tournament.status
+                                : "Rascunho"}
                             </Badge>
                             <Button variant="ghost" size="sm">
                               Ver
@@ -428,7 +482,9 @@ export default function AdminPage() {
 
                   {!leaderboardQuery.isLoading && leaderboard.length === 0 && (
                     <EmptyState
-                      icon={<ListOrdered className="w-7 h-7 text-slate-300" />}
+                      icon={
+                        <ListOrdered className="w-7 h-7 text-slate-300" />
+                      }
                       title="Nenhum palpiteiro no leaderboard"
                       description="O leaderboard de palpites aparecera aqui quando houver dados."
                     />
@@ -438,7 +494,7 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       {leaderboard.map((entry, index) => (
                         <div
-                          key={entry.userId ?? index}
+                          key={entry.userId}
                           className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
                         >
                           <div
@@ -454,25 +510,21 @@ export default function AdminPage() {
                           >
                             {index + 1}
                           </div>
-                          <Avatar
-                            src={entry.user?.image}
-                            name={entry.user?.name}
-                            size="sm"
-                          />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-slate-900 truncate">
-                              {entry.user?.name ?? "Usuario"}
+                              {entry.userId.slice(0, 8)}...
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {entry.totalBets} palpites
                             </p>
                           </div>
                           <div className="text-right flex-shrink-0">
                             <p className="text-sm font-bold text-blue-600">
-                              {entry.points ?? entry.score ?? 0} pts
+                              {entry.totalWins} acertos
                             </p>
-                            {entry.wins != null && (
-                              <p className="text-xs text-slate-500">
-                                {entry.wins} acertos
-                              </p>
-                            )}
+                            <p className="text-xs text-slate-500">
+                              Lucro: {Number(entry.totalProfit).toFixed(0)} GC
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -507,7 +559,7 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       {rankings.map((entry, index) => (
                         <div
-                          key={entry.userId ?? index}
+                          key={entry.id}
                           className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
                         >
                           <div
@@ -524,29 +576,27 @@ export default function AdminPage() {
                             {index + 1}
                           </div>
                           <Avatar
-                            src={entry.user?.image}
-                            name={entry.user?.name}
+                            src={entry.user.image}
+                            name={entry.user.name}
                             size="sm"
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-slate-900 truncate">
-                              {entry.user?.name ?? "Usuario"}
+                              {entry.user.name}
                             </p>
-                            {entry.user?.city && (
-                              <p className="text-xs text-slate-500">
-                                {entry.user.city}
-                              </p>
-                            )}
+                            <p className="text-xs text-slate-500">
+                              {entry.user.city ?? ""}{" "}
+                              {entry.level ? `· Nivel ${entry.level}` : ""}
+                            </p>
                           </div>
                           <div className="text-right flex-shrink-0">
                             <p className="text-sm font-bold text-blue-600">
-                              {entry.points ?? entry.score ?? 0} pts
+                              {Number(entry.rating).toFixed(0)} rating
                             </p>
-                            {entry.sport && (
-                              <p className="text-xs text-slate-500">
-                                {entry.sport.name}
-                              </p>
-                            )}
+                            <p className="text-xs text-slate-500">
+                              {entry.sport.name} · {entry.wins ?? 0}V{" "}
+                              {entry.losses ?? 0}D
+                            </p>
                           </div>
                         </div>
                       ))}
