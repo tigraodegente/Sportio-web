@@ -1,45 +1,132 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Send, Plus, Phone, Video, MoreVertical, ImageIcon, Smile, Users, MessageSquareText, Sparkles, Mic, CheckCheck } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Search,
+  Send,
+  Plus,
+  Phone,
+  Video,
+  MoreVertical,
+  ImageIcon,
+  Smile,
+  Users,
+  MessageSquareText,
+  Sparkles,
+  Mic,
+  CheckCheck,
+  Loader2,
+} from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
-const conversations = [
-  { id: "1", name: "Rafael Costa", lastMessage: "Bora treinar amanha?", time: "2min", unread: 2, online: true, isGroup: false },
-  { id: "2", name: "Equipe Beach Tennis", lastMessage: "Pedro: Confirmados pro torneio!", time: "15min", unread: 5, online: false, isGroup: true, members: 8 },
-  { id: "3", name: "Andre Santos", lastMessage: "Parabens pela vitoria!", time: "1h", unread: 0, online: true, isGroup: false },
-  { id: "4", name: "Maria Silva", lastMessage: "Vi seu treino, muito bom!", time: "2h", unread: 0, online: false, isGroup: false },
-  { id: "5", name: "Grupo CrossFit SP", lastMessage: "Thiago: Treino as 6h amanha", time: "3h", unread: 0, online: false, isGroup: true, members: 24 },
-  { id: "6", name: "Carlos Organizador", lastMessage: "Inscricao confirmada!", time: "1d", unread: 0, online: false, isGroup: false },
-];
+function formatTime(date: Date | string) {
+  const d = new Date(date);
+  return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
 
-const messages = [
-  { id: "1", senderId: "other", content: "E ai Lucas! Tudo bem?", time: "14:30" },
-  { id: "2", senderId: "me", content: "Tudo otimo! E voce?", time: "14:31" },
-  { id: "3", senderId: "other", content: "Bem demais! Vi que voce ganhou o torneio de Beach Tennis. Parabens!", time: "14:32" },
-  { id: "4", senderId: "me", content: "Valeu mano! Foi uma competicao muito boa. Nivel alto dos jogadores.", time: "14:33" },
-  { id: "5", senderId: "other", content: "Bora treinar amanha? Posso reservar a quadra na Arena Sportio", time: "14:35" },
-  { id: "6", senderId: "me", content: "Bora! Pode ser as 18h?", time: "14:36" },
-  { id: "7", senderId: "other", content: "Perfeito! Reservo e te mando a confirmacao", time: "14:37" },
-  { id: "8", senderId: "other", content: "Bora treinar amanha?", time: "14:38" },
-];
+function formatRelativeTime(date: Date | string) {
+  const now = new Date();
+  const d = new Date(date);
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 1) return "agora";
+  if (diffMin < 60) return `${diffMin}min`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+}
+
+function getRoomDisplayName(
+  room: {
+    name?: string | null;
+    isGroup?: boolean | null;
+    members: { user: { id: string; name: string } }[];
+  },
+  currentUserId: string | undefined
+) {
+  if (room.isGroup && room.name) return room.name;
+  const otherMember = room.members.find((m) => m.user.id !== currentUserId);
+  return otherMember?.user.name ?? "Chat";
+}
+
+function getRoomImage(
+  room: {
+    image?: string | null;
+    isGroup?: boolean | null;
+    members: { user: { id: string; image?: string | null } }[];
+  },
+  currentUserId: string | undefined
+) {
+  if (room.image) return room.image;
+  if (!room.isGroup) {
+    const otherMember = room.members.find((m) => m.user.id !== currentUserId);
+    return otherMember?.user.image ?? null;
+  }
+  return null;
+}
 
 export default function ChatPage() {
-  const [selectedChat, setSelectedChat] = useState<string | null>("1");
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [messageInput, setMessageInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const selectedConversation = conversations.find((c) => c.id === selectedChat);
+  const me = trpc.user.me.useQuery();
+  const currentUserId = me.data?.id;
+
+  const rooms = trpc.chat.myRooms.useQuery(undefined, {
+    refetchInterval: 5000,
+  });
+
+  const messages = trpc.chat.messages.useQuery(
+    { roomId: selectedChat!, limit: 50 },
+    { enabled: !!selectedChat, refetchInterval: 3000 }
+  );
+
+  const sendMessage = trpc.chat.sendMessage.useMutation({
+    onSuccess: () => {
+      messages.refetch();
+      rooms.refetch();
+    },
+  });
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.data?.items]);
+
+  const filteredRooms = (rooms.data ?? []).filter((room) => {
+    if (!searchQuery.trim()) return true;
+    const name = getRoomDisplayName(room, currentUserId);
+    return name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  const selectedRoom = (rooms.data ?? []).find((r) => r.id === selectedChat);
+
+  const handleSend = () => {
+    if (!messageInput.trim() || !selectedChat) return;
+    sendMessage.mutate({
+      roomId: selectedChat,
+      content: messageInput.trim(),
+    });
+    setMessageInput("");
+  };
 
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-lg shadow-slate-200/50">
       {/* Chat List Panel */}
-      <div className={cn(
-        "w-full sm:w-80 border-r border-slate-100 flex flex-col",
-        selectedChat && "hidden sm:flex"
-      )}>
+      <div
+        className={cn(
+          "w-full sm:w-80 border-r border-slate-100 flex flex-col",
+          selectedChat && "hidden sm:flex"
+        )}
+      >
         {/* Gradient Header with Search */}
         <div className="bg-gradient-to-b from-slate-50 to-white p-4 border-b border-slate-100">
           <div className="flex items-center justify-between mb-3">
@@ -47,11 +134,13 @@ export default function ChatPage() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm shadow-blue-500/25">
                 <MessageSquareText className="w-4 h-4 text-white" />
               </div>
-              <h2 className="text-lg font-bold text-slate-900 tracking-tight">Mensagens</h2>
+              <h2 className="text-lg font-bold text-slate-900 tracking-tight">
+                Mensagens
+              </h2>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold text-blue-600 bg-blue-50 rounded-full px-2.5 py-0.5 border border-blue-100">
-                {conversations.filter(c => c.unread > 0).length} novas
+                {filteredRooms.length} conversas
               </span>
             </div>
           </div>
@@ -69,60 +158,81 @@ export default function ChatPage() {
 
         {/* Conversation List */}
         <div className="flex-1 overflow-y-auto">
-          {conversations.map((conv) => (
-            <button
-              key={conv.id}
-              onClick={() => setSelectedChat(conv.id)}
-              className={cn(
-                "w-full flex items-center gap-3 p-4 hover:bg-slate-50/80 transition-all duration-200 text-left relative group",
-                selectedChat === conv.id && "bg-blue-50/70 border-l-2 border-blue-500",
-                selectedChat !== conv.id && "border-l-2 border-transparent"
-              )}
-            >
-              <div className="relative">
-                <Avatar name={conv.name} size="md" />
-                {conv.online && (
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 rounded-full ring-2 ring-white">
-                    <span className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-75" />
-                  </span>
-                )}
-                {conv.isGroup && (
-                  <span className="absolute -bottom-1 -right-1 bg-gradient-to-br from-slate-700 to-slate-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                    <Users className="w-3 h-3" />
-                  </span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className={cn(
-                    "text-sm font-semibold truncate",
-                    conv.unread > 0 ? "text-slate-900" : "text-slate-700"
-                  )}>{conv.name}</p>
-                  <span className={cn(
-                    "text-xs whitespace-nowrap ml-2",
-                    conv.unread > 0 ? "text-blue-600 font-medium" : "text-slate-400"
-                  )}>{conv.time}</span>
-                </div>
-                <div className="flex items-center gap-1 mt-0.5">
-                  {conv.unread === 0 && (
-                    <CheckCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+          {rooms.isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+              <p className="text-sm text-slate-400">Carregando conversas...</p>
+            </div>
+          ) : filteredRooms.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <MessageSquareText className="w-10 h-10 text-slate-300" />
+              <p className="text-sm text-slate-400">
+                {searchQuery
+                  ? "Nenhuma conversa encontrada"
+                  : "Nenhuma conversa ainda"}
+              </p>
+            </div>
+          ) : (
+            filteredRooms.map((room) => {
+              const displayName = getRoomDisplayName(room, currentUserId);
+              const roomImage = getRoomImage(room, currentUserId);
+              const lastMessage = room.messages?.[0];
+
+              return (
+                <button
+                  key={room.id}
+                  onClick={() => setSelectedChat(room.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-4 hover:bg-slate-50/80 transition-all duration-200 text-left relative group",
+                    selectedChat === room.id &&
+                      "bg-blue-50/70 border-l-2 border-blue-500",
+                    selectedChat !== room.id && "border-l-2 border-transparent"
                   )}
-                  <p className={cn(
-                    "text-xs truncate",
-                    conv.unread > 0 ? "text-slate-700 font-medium" : "text-slate-500"
-                  )}>{conv.lastMessage}</p>
-                </div>
-              </div>
-              {conv.unread > 0 && (
-                <span className="relative flex-shrink-0">
-                  <span className="bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                    {conv.unread}
-                  </span>
-                  <span className="absolute inset-0 bg-blue-500 rounded-full animate-ping opacity-20" />
-                </span>
-              )}
-            </button>
-          ))}
+                >
+                  <div className="relative">
+                    <Avatar
+                      name={displayName}
+                      src={roomImage}
+                      size="md"
+                    />
+                    {room.isGroup && (
+                      <span className="absolute -bottom-1 -right-1 bg-gradient-to-br from-slate-700 to-slate-600 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                        <Users className="w-3 h-3" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold truncate text-slate-900">
+                        {displayName}
+                      </p>
+                      {lastMessage && (
+                        <span className="text-xs whitespace-nowrap ml-2 text-slate-400">
+                          {formatRelativeTime(lastMessage.createdAt)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {lastMessage ? (
+                        <p className="text-xs truncate text-slate-500">
+                          {lastMessage.content}
+                        </p>
+                      ) : (
+                        <p className="text-xs truncate text-slate-400 italic">
+                          Nenhuma mensagem ainda
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {room.isGroup && (
+                    <span className="text-[10px] text-slate-400 flex-shrink-0">
+                      {room.members.length} membros
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          )}
         </div>
 
         {/* New Chat Button */}
@@ -135,35 +245,49 @@ export default function ChatPage() {
       </div>
 
       {/* Chat Area */}
-      {selectedChat ? (
+      {selectedChat && selectedRoom ? (
         <div className="flex-1 flex flex-col bg-gradient-to-b from-slate-50/30 to-white">
           {/* Chat Header */}
           <div className="h-16 flex items-center justify-between px-5 border-b border-slate-100 bg-white/80 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <button className="sm:hidden mr-1 p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors" onClick={() => setSelectedChat(null)}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <button
+                className="sm:hidden mr-1 p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors"
+                onClick={() => setSelectedChat(null)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
               </button>
               <div className="relative">
-                <Avatar name={selectedConversation?.name} size="sm" className="ring-2 ring-blue-100" />
-                {selectedConversation?.online && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full ring-2 ring-white">
-                    <span className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-75" />
-                  </span>
-                )}
+                <Avatar
+                  name={getRoomDisplayName(selectedRoom, currentUserId)}
+                  src={getRoomImage(selectedRoom, currentUserId)}
+                  size="sm"
+                  className="ring-2 ring-blue-100"
+                />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-900 tracking-tight">{selectedConversation?.name}</p>
+                <p className="text-sm font-bold text-slate-900 tracking-tight">
+                  {getRoomDisplayName(selectedRoom, currentUserId)}
+                </p>
                 <div className="flex items-center gap-1.5">
-                  <span className={cn(
-                    "w-1.5 h-1.5 rounded-full",
-                    selectedConversation?.online ? "bg-blue-500" : "bg-slate-300"
-                  )} />
-                  <p className={cn(
-                    "text-xs font-medium",
-                    selectedConversation?.online ? "text-blue-600" : "text-slate-400"
-                  )}>
-                    {selectedConversation?.online ? "Online agora" : "Offline"}
-                  </p>
+                  {selectedRoom.isGroup ? (
+                    <p className="text-xs font-medium text-slate-400">
+                      {selectedRoom.members.length} membros
+                    </p>
+                  ) : (
+                    <p className="text-xs font-medium text-slate-400">Chat</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -183,42 +307,103 @@ export default function ChatPage() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
-            {/* Date divider */}
-            <div className="flex items-center gap-3 py-2">
-              <div className="flex-1 h-px bg-slate-200/60" />
-              <span className="text-[11px] font-medium text-slate-400 bg-slate-100/80 rounded-full px-3 py-1">Hoje</span>
-              <div className="flex-1 h-px bg-slate-200/60" />
-            </div>
-
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={cn(
-                  "flex",
-                  msg.senderId === "me" ? "justify-end" : "justify-start"
-                )}
-              >
-                <div
-                  className={cn(
-                    "max-w-[70%] rounded-2xl px-4 py-2.5 transition-all duration-200",
-                    msg.senderId === "me"
-                      ? "bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-br-md shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25"
-                      : "bg-white text-slate-900 rounded-bl-md border border-slate-100 shadow-sm shadow-slate-200/30 hover:shadow-md"
-                  )}
-                >
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
-                  <div className={cn(
-                    "flex items-center justify-end gap-1 mt-1",
-                    msg.senderId === "me" ? "text-blue-200" : "text-slate-400"
-                  )}>
-                    <p className="text-[10px]">{msg.time}</p>
-                    {msg.senderId === "me" && (
-                      <CheckCheck className="w-3 h-3" />
-                    )}
-                  </div>
-                </div>
+            {messages.isLoading ? (
+              <div className="flex flex-col items-center justify-center h-full gap-3">
+                <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+                <p className="text-sm text-slate-400">
+                  Carregando mensagens...
+                </p>
               </div>
-            ))}
+            ) : !messages.data?.items?.length ? (
+              <div className="flex flex-col items-center justify-center h-full gap-3">
+                <MessageSquareText className="w-10 h-10 text-slate-300" />
+                <p className="text-sm text-slate-400">
+                  Nenhuma mensagem ainda. Diga oi!
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Date divider */}
+                <div className="flex items-center gap-3 py-2">
+                  <div className="flex-1 h-px bg-slate-200/60" />
+                  <span className="text-[11px] font-medium text-slate-400 bg-slate-100/80 rounded-full px-3 py-1">
+                    Mensagens
+                  </span>
+                  <div className="flex-1 h-px bg-slate-200/60" />
+                </div>
+
+                {messages.data.items.map((msg) => {
+                  const isMe = msg.sender.id === currentUserId;
+                  const imageList: string[] =
+                    Array.isArray(msg.images) ? (msg.images as string[]) : [];
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "flex",
+                        isMe ? "justify-end" : "justify-start"
+                      )}
+                    >
+                      <div className="flex items-end gap-2 max-w-[70%]">
+                        {!isMe && (
+                          <Avatar
+                            name={msg.sender.name}
+                            src={msg.sender.image}
+                            size="sm"
+                            className="flex-shrink-0 mb-1"
+                          />
+                        )}
+                        <div>
+                          {!isMe && selectedRoom.isGroup && (
+                            <p className="text-[11px] font-medium text-slate-500 mb-1 ml-1">
+                              {msg.sender.name}
+                            </p>
+                          )}
+                          <div
+                            className={cn(
+                              "rounded-2xl px-4 py-2.5 transition-all duration-200",
+                              isMe
+                                ? "bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-br-md shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/25"
+                                : "bg-white text-slate-900 rounded-bl-md border border-slate-100 shadow-sm shadow-slate-200/30 hover:shadow-md"
+                            )}
+                          >
+                            <p className="text-sm leading-relaxed">
+                              {msg.content}
+                            </p>
+                            {imageList.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {imageList.map((img, idx) => (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img
+                                      key={idx}
+                                      src={img}
+                                      alt="Imagem"
+                                      className="rounded-lg max-w-[200px] max-h-[200px] object-cover"
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            <div
+                              className={cn(
+                                "flex items-center justify-end gap-1 mt-1",
+                                isMe ? "text-blue-200" : "text-slate-400"
+                              )}
+                            >
+                              <p className="text-[10px]">
+                                {formatTime(msg.createdAt)}
+                              </p>
+                              {isMe && <CheckCheck className="w-3 h-3" />}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </>
+            )}
           </div>
 
           {/* Message Input Area */}
@@ -242,14 +427,16 @@ export default function ChatPage() {
                 placeholder="Digite sua mensagem..."
                 className="flex-1 bg-transparent px-2 py-2.5 text-sm outline-none text-slate-900 placeholder:text-slate-400"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && messageInput.trim()) {
-                    setMessageInput("");
+                  if (e.key === "Enter" && !e.shiftKey && messageInput.trim()) {
+                    e.preventDefault();
+                    handleSend();
                   }
                 }}
               />
               <Button
                 size="icon"
-                disabled={!messageInput.trim()}
+                disabled={!messageInput.trim() || sendMessage.isPending}
+                onClick={handleSend}
                 className={cn(
                   "rounded-xl flex-shrink-0 transition-all duration-300",
                   messageInput.trim()
@@ -257,7 +444,11 @@ export default function ChatPage() {
                     : "bg-slate-200 text-slate-400 shadow-none"
                 )}
               >
-                <Send className="w-4 h-4" />
+                {sendMessage.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -273,9 +464,12 @@ export default function ChatPage() {
                 <MessageSquareText className="w-11 h-11 text-blue-500" />
               </div>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">Suas Mensagens</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">
+              Suas Mensagens
+            </h3>
             <p className="text-sm text-slate-500 leading-relaxed mb-6">
-              Selecione uma conversa ou inicie um novo chat com seus parceiros de treino.
+              Selecione uma conversa ou inicie um novo chat com seus parceiros
+              de treino.
             </p>
             <Button variant="outline" className="gap-2 shadow-sm">
               <Sparkles className="w-4 h-4 text-blue-500" />
@@ -285,13 +479,5 @@ export default function ChatPage() {
         </div>
       )}
     </div>
-  );
-}
-
-function MessageCircle(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-    </svg>
   );
 }

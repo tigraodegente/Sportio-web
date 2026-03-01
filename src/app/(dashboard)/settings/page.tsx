@@ -1,27 +1,92 @@
 "use client";
 
-import { useState } from "react";
-import { User, Bell, Shield, CreditCard, LogOut, Camera, Settings, AlertTriangle, Instagram, Twitter, Youtube, Check, Save, Users } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Bell, Shield, CreditCard, LogOut, Camera, Settings, AlertTriangle, Instagram, Twitter, Youtube, Check, Save, Users, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
-import { Select } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
 export default function SettingsPage() {
-  const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const handleSave = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+  const user = trpc.user.me.useQuery();
+  const updateProfile = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      user.refetch();
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
-    }, 1000);
+    },
+  });
+
+  const [saved, setSaved] = useState(false);
+
+  // Form state
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [bio, setBio] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [youtube, setYoutube] = useState("");
+
+  // Populate form when user data loads
+  useEffect(() => {
+    if (user.data) {
+      setName(user.data.name ?? "");
+      setPhone(user.data.phone ?? "");
+      setCity(user.data.city ?? "");
+      setState(user.data.state ?? "");
+      setBio(user.data.bio ?? "");
+      setInstagram(user.data.instagram ?? "");
+      setTwitter(user.data.twitter ?? "");
+      setYoutube(user.data.youtube ?? "");
+    }
+  }, [user.data]);
+
+  const handleSave = () => {
+    updateProfile.mutate({
+      name: name || undefined,
+      phone: phone || undefined,
+      city: city || undefined,
+      state: state || undefined,
+      bio: bio || undefined,
+      instagram: instagram || undefined,
+      twitter: twitter || undefined,
+      youtube: youtube || undefined,
+    });
   };
+
+  if (user.isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  if (user.error || !user.data) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+        <AlertCircle className="w-10 h-10 text-red-500" />
+        <p className="text-slate-600 font-medium">Erro ao carregar configuracoes</p>
+        <Button variant="outline" size="sm" onClick={() => user.refetch()}>
+          Tentar novamente
+        </Button>
+      </div>
+    );
+  }
+
+  const profile = user.data;
+
+  const initials = profile.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() ?? "";
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -60,9 +125,16 @@ export default function SettingsPage() {
                     {/* Avatar with camera overlay */}
                     <div className="flex items-center gap-4 mb-4">
                       <div className="relative group cursor-pointer">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold ring-4 ring-blue-100 ring-offset-2 ring-offset-white transition-all duration-300 group-hover:ring-blue-200">
-                          LM
-                        </div>
+                        {profile.image ? (
+                          <div className="w-20 h-20 rounded-full ring-4 ring-blue-100 ring-offset-2 ring-offset-white overflow-hidden transition-all duration-300 group-hover:ring-blue-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={profile.image} alt={profile.name} className="w-full h-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold ring-4 ring-blue-100 ring-offset-2 ring-offset-white transition-all duration-300 group-hover:ring-blue-200">
+                            {initials}
+                          </div>
+                        )}
                         <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                           <Camera className="w-6 h-6 text-white" />
                         </div>
@@ -79,22 +151,42 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input label="Nome" defaultValue="Lucas Mendes" />
-                      <Input label="Email" type="email" defaultValue="lucas@email.com" disabled />
+                      <Input
+                        label="Nome"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                      />
+                      <Input label="Email" type="email" value={profile.email} disabled />
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <Input label="Telefone" defaultValue="(11) 99999-9999" />
-                      <Select
-                        label="Cidade"
-                        options={[
-                          { value: "sp", label: "Sao Paulo, SP" },
-                          { value: "rj", label: "Rio de Janeiro, RJ" },
-                          { value: "bh", label: "Belo Horizonte, MG" },
-                        ]}
-                        defaultValue="sp"
+                      <Input
+                        label="Telefone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(11) 99999-9999"
                       />
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <Input
+                          label="Cidade"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          placeholder="Sao Paulo"
+                        />
+                        <Input
+                          label="Estado"
+                          value={state}
+                          onChange={(e) => setState(e.target.value)}
+                          placeholder="SP"
+                        />
+                      </div>
                     </div>
-                    <Textarea label="Bio" defaultValue="Atleta de Beach Tennis e CrossFit." rows={3} />
+                    <Textarea
+                      label="Bio"
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      rows={3}
+                      placeholder="Conte um pouco sobre voce..."
+                    />
                   </CardContent>
                 </Card>
 
@@ -113,7 +205,12 @@ export default function SettingsPage() {
                         <Instagram className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input label="Instagram" placeholder="@seuusuario" defaultValue="lucasmendes" />
+                        <Input
+                          label="Instagram"
+                          placeholder="@seuusuario"
+                          value={instagram}
+                          onChange={(e) => setInstagram(e.target.value)}
+                        />
                       </div>
                     </div>
                     {/* Twitter */}
@@ -122,7 +219,12 @@ export default function SettingsPage() {
                         <Twitter className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input label="Twitter" placeholder="@seuusuario" defaultValue="lucasmendes" />
+                        <Input
+                          label="Twitter"
+                          placeholder="@seuusuario"
+                          value={twitter}
+                          onChange={(e) => setTwitter(e.target.value)}
+                        />
                       </div>
                     </div>
                     {/* YouTube */}
@@ -131,16 +233,29 @@ export default function SettingsPage() {
                         <Youtube className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <Input label="YouTube" placeholder="URL do canal" />
+                        <Input
+                          label="YouTube"
+                          placeholder="URL do canal"
+                          value={youtube}
+                          onChange={(e) => setYoutube(e.target.value)}
+                        />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
+                {/* Error message */}
+                {updateProfile.error && (
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <p>Erro ao salvar: {updateProfile.error.message}</p>
+                  </div>
+                )}
+
                 {/* Save Button with success animation */}
                 <div className="flex justify-end">
                   <Button
-                    loading={loading}
+                    loading={updateProfile.isPending}
                     onClick={handleSave}
                     className={cn(
                       "min-w-[180px] transition-all duration-300",
