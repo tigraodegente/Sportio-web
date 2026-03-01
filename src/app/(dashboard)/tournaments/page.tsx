@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import { Plus, Search, MapPin, Calendar, Users, Trophy, Ticket, Loader2, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle } from "lucide-react";
+import { Plus, Search, MapPin, Calendar, Users, Trophy, Ticket, Loader2, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle, Mail } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -329,12 +329,20 @@ export default function TournamentsPage() {
           <h1 className="text-2xl font-bold text-slate-900">Torneios</h1>
           <p className="text-slate-500">Encontre e participe de torneios esportivos</p>
         </div>
-        <Link href="/tournaments/create">
-          <Button>
-            <Plus className="w-4 h-4" />
-            Criar Torneio
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/tournaments/invites">
+            <Button variant="ghost" className="relative">
+              <Mail className="w-4 h-4" />
+              Convites
+            </Button>
+          </Link>
+          <Link href="/tournaments/create">
+            <Button>
+              <Plus className="w-4 h-4" />
+              Criar Torneio
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

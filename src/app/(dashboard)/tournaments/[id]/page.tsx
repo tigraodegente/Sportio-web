@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle, BarChart3 } from "lucide-react";
+import { Trophy, MapPin, Calendar, Users, Coins, Share2, Swords, Loader2, AlertCircle, Sun, Dumbbell, Target, Gamepad2, Footprints, Circle, BarChart3, Mail, Search, UserPlus, Building2, Check, X, Clock, Send } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -103,6 +103,47 @@ export default function TournamentDetailPage() {
     { tournamentId },
     { enabled: !!tournamentId }
   );
+
+  // Invite system state
+  const [inviteType, setInviteType] = useState<"athlete" | "sponsor">("athlete");
+  const [inviteSearch, setInviteSearch] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteTier, setInviteTier] = useState<"main" | "gold" | "silver" | "bronze">("gold");
+
+  const searchUsersQuery = trpc.tournament.searchUsersForInvite.useQuery(
+    { tournamentId, query: inviteSearch, type: inviteType },
+    { enabled: !!tournamentId && inviteSearch.length >= 2 }
+  );
+
+  const invitesListQuery = trpc.tournament.tournamentInvitesList.useQuery(
+    { tournamentId },
+    { enabled: !!tournamentId }
+  );
+
+  const sendInviteMutation = trpc.tournament.sendInvite.useMutation({
+    onSuccess: () => {
+      invitesListQuery.refetch();
+      searchUsersQuery.refetch();
+      setInviteMessage("");
+    },
+  });
+
+  const cancelInviteMutation = trpc.tournament.cancelInvite.useMutation({
+    onSuccess: () => {
+      invitesListQuery.refetch();
+      searchUsersQuery.refetch();
+    },
+  });
+
+  const handleSendInvite = useCallback((userId: string) => {
+    sendInviteMutation.mutate({
+      tournamentId,
+      invitedUserId: userId,
+      type: inviteType,
+      message: inviteMessage || undefined,
+      suggestedTier: inviteType === "sponsor" ? inviteTier : undefined,
+    });
+  }, [tournamentId, inviteType, inviteMessage, inviteTier, sendInviteMutation]);
 
   // Build a map of player IDs to names from enrollment data
   const playerNameMap = useMemo(() => {
@@ -318,6 +359,9 @@ export default function TournamentDetailPage() {
             ? [{ id: "standings", label: "Classificacao" }]
             : []),
           { id: "rules", label: "Regras" },
+          ...(isOrganizer
+            ? [{ id: "invites", label: "Convites", icon: <Mail className="w-4 h-4" /> }]
+            : []),
         ]}
       >
         {(tab) => (
@@ -713,6 +757,263 @@ export default function TournamentDetailPage() {
                   </div>
                 )}
               </Card>
+            )}
+
+            {tab === "invites" && isOrganizer && (
+              <div className="space-y-6">
+                {/* Invite Type Toggle */}
+                <Card>
+                  <CardContent>
+                    <div className="flex items-center gap-3 mb-5">
+                      <Mail className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-base font-semibold text-slate-900">Enviar Convites</h3>
+                    </div>
+
+                    <div className="flex gap-2 mb-4">
+                      <button
+                        onClick={() => { setInviteType("athlete"); setInviteSearch(""); }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                          inviteType === "athlete"
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Atletas
+                      </button>
+                      <button
+                        onClick={() => { setInviteType("sponsor"); setInviteSearch(""); }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                          inviteType === "sponsor"
+                            ? "bg-amber-600 text-white shadow-md"
+                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                        }`}
+                      >
+                        <Building2 className="w-4 h-4" />
+                        Marcas
+                      </button>
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative mb-4">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder={inviteType === "athlete" ? "Buscar atleta por nome..." : "Buscar marca por nome..."}
+                        value={inviteSearch}
+                        onChange={(e) => setInviteSearch(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      />
+                    </div>
+
+                    {/* Message field */}
+                    <textarea
+                      placeholder="Mensagem personalizada (opcional)..."
+                      value={inviteMessage}
+                      onChange={(e) => setInviteMessage(e.target.value)}
+                      rows={2}
+                      className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 mb-4"
+                    />
+
+                    {/* Tier selector for sponsors */}
+                    {inviteType === "sponsor" && (
+                      <div className="mb-4">
+                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Tier sugerido</p>
+                        <div className="flex gap-2">
+                          {(["main", "gold", "silver", "bronze"] as const).map((tier) => {
+                            const tierConfig = {
+                              main: { label: "Principal", color: "bg-amber-500 text-white", border: "border-amber-400" },
+                              gold: { label: "Ouro", color: "bg-yellow-400 text-yellow-900", border: "border-yellow-400" },
+                              silver: { label: "Prata", color: "bg-slate-400 text-white", border: "border-slate-400" },
+                              bronze: { label: "Bronze", color: "bg-orange-600 text-white", border: "border-orange-500" },
+                            };
+                            const tc = tierConfig[tier];
+                            return (
+                              <button
+                                key={tier}
+                                onClick={() => setInviteTier(tier)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border-2 transition-all ${
+                                  inviteTier === tier
+                                    ? `${tc.color} ${tc.border} shadow-md scale-105`
+                                    : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                                }`}
+                              >
+                                {tc.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Search Results */}
+                    {inviteSearch.length >= 2 && (
+                      <div className="border border-slate-200 rounded-xl overflow-hidden">
+                        {searchUsersQuery.isLoading ? (
+                          <div className="flex justify-center py-8">
+                            <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                          </div>
+                        ) : searchUsersQuery.data && searchUsersQuery.data.length > 0 ? (
+                          <div className="divide-y divide-slate-100">
+                            {searchUsersQuery.data.map((user) => {
+                              const isDisabled = user.alreadyEnrolled || user.alreadySponsoring || user.inviteStatus === "pending" || user.inviteStatus === "accepted";
+                              const statusLabel =
+                                user.alreadyEnrolled ? "Ja inscrito" :
+                                user.alreadySponsoring ? "Ja patrocina" :
+                                user.inviteStatus === "pending" ? "Convite enviado" :
+                                user.inviteStatus === "accepted" ? "Aceito" :
+                                user.inviteStatus === "declined" ? "Recusou" :
+                                null;
+
+                              return (
+                                <div key={user.id} className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors">
+                                  <div className="flex items-center gap-3">
+                                    <Avatar name={user.name} size="sm" />
+                                    <div>
+                                      <p className="text-sm font-medium text-slate-900">{user.name}</p>
+                                      {user.city && (
+                                        <p className="text-xs text-slate-500">{user.city}{user.state ? `, ${user.state}` : ""}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    {statusLabel && (
+                                      <Badge variant={
+                                        user.alreadyEnrolled || user.inviteStatus === "accepted" ? "success" :
+                                        user.inviteStatus === "pending" ? "info" :
+                                        user.inviteStatus === "declined" ? "danger" : "default"
+                                      } className="text-[10px]">
+                                        {statusLabel}
+                                      </Badge>
+                                    )}
+                                    {!isDisabled && (
+                                      <Button
+                                        size="sm"
+                                        variant="primary"
+                                        onClick={() => handleSendInvite(user.id)}
+                                        loading={sendInviteMutation.isPending}
+                                        disabled={sendInviteMutation.isPending}
+                                        className="text-xs"
+                                      >
+                                        <Send className="w-3 h-3" />
+                                        Convidar
+                                      </Button>
+                                    )}
+                                    {user.inviteStatus === "declined" && (
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => handleSendInvite(user.id)}
+                                        loading={sendInviteMutation.isPending}
+                                        className="text-xs"
+                                      >
+                                        Reenviar
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center py-8 text-center">
+                            <Search className="w-8 h-8 text-slate-300 mb-2" />
+                            <p className="text-sm text-slate-500">
+                              {inviteType === "athlete" ? "Nenhum atleta encontrado" : "Nenhuma marca encontrada"}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {sendInviteMutation.isSuccess && (
+                      <p className="text-xs text-green-600 mt-3 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5" />
+                        Convite enviado com sucesso!
+                      </p>
+                    )}
+                    {sendInviteMutation.error && (
+                      <p className="text-xs text-red-500 mt-3">{sendInviteMutation.error.message}</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Sent Invites List */}
+                <Card>
+                  <CardContent>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Clock className="w-4 h-4 text-slate-500" />
+                      <h3 className="text-sm font-semibold text-slate-900">Convites Enviados</h3>
+                      {invitesListQuery.data && (
+                        <Badge variant="info" className="text-[10px]">{invitesListQuery.data.length}</Badge>
+                      )}
+                    </div>
+
+                    {invitesListQuery.isLoading ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                      </div>
+                    ) : invitesListQuery.data && invitesListQuery.data.length > 0 ? (
+                      <div className="space-y-2">
+                        {invitesListQuery.data.map((invite) => {
+                          const statusConfig = {
+                            pending: { label: "Pendente", variant: "info" as const, icon: Clock },
+                            accepted: { label: "Aceito", variant: "success" as const, icon: Check },
+                            declined: { label: "Recusado", variant: "danger" as const, icon: X },
+                            expired: { label: "Expirado", variant: "default" as const, icon: Clock },
+                          };
+                          const sc = statusConfig[invite.status as keyof typeof statusConfig] ?? statusConfig.pending;
+                          const StatusIcon = sc.icon;
+
+                          return (
+                            <div key={invite.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <Avatar name={invite.invitedUser?.name ?? "Usuario"} size="sm" />
+                                <div>
+                                  <p className="text-sm font-medium text-slate-900">{invite.invitedUser?.name ?? "Usuario"}</p>
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant={invite.type === "athlete" ? "primary" : "accent"} className="text-[10px]">
+                                      {invite.type === "athlete" ? "Atleta" : "Marca"}
+                                    </Badge>
+                                    {invite.suggestedTier && (
+                                      <span className="text-[10px] text-slate-400">
+                                        Tier: {invite.suggestedTier === "main" ? "Principal" : invite.suggestedTier === "gold" ? "Ouro" : invite.suggestedTier === "silver" ? "Prata" : "Bronze"}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={sc.variant} className="text-[10px] flex items-center gap-1">
+                                  <StatusIcon className="w-3 h-3" />
+                                  {sc.label}
+                                </Badge>
+                                {invite.status === "pending" && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-xs text-red-500 hover:text-red-600"
+                                    onClick={() => cancelInviteMutation.mutate({ inviteId: invite.id })}
+                                    loading={cancelInviteMutation.isPending}
+                                  >
+                                    Cancelar
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center py-8 text-center">
+                        <Mail className="w-8 h-8 text-slate-300 mb-2" />
+                        <p className="text-sm text-slate-500">Nenhum convite enviado ainda.</p>
+                        <p className="text-xs text-slate-400 mt-1">Use a busca acima para convidar atletas ou marcas.</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </>
         )}

@@ -8,7 +8,9 @@ import {
   matches,
   tournamentSponsors,
   tournamentPrizes,
+  tournamentInvites,
   users,
+  userRoles,
   gcoinTransactions,
 } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
@@ -17,6 +19,10 @@ import {
   notifyTournamentEnrollment,
   notifySponsorshipApproved,
   notifyPrizeAwarded,
+  notifyTournamentInviteAthlete,
+  notifyTournamentInviteSponsor,
+  notifyInviteAccepted,
+  notifyInviteDeclined,
 } from "@/server/services/notification-service";
 import {
   generateBracket as generateBracketService,
@@ -539,4 +545,315 @@ export const tournamentRouter = createTRPCRouter({
         });
       }
     }),
+
+  // ==================== INVITE SYSTEM ====================
+
+  // Search users to invite (filtered by role)
+  searchUsersForInvite: protectedProcedure
+    .input(
+      z.object({
+        tournamentId: z.string().uuid(),
+        query: z.string().min(1),
+        type: z.enum(["athlete", "sponsor"]),
+        limit: z.number().min(1).max(20).default(10),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Verify organizer
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+        columns: { organizerId: true },
+      });
+      if (!tournament || tournament.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode convidar" });
+      }
+
+      // Get users who already have the relevant role
+      const targetRole = input.type === "sponsor" ? "brand" : "athlete";
+      const usersWithRole = await ctx.db
+        .select({
+          id: users.id,
+          name: users.name,
+          image: users.image,
+          city: users.city,
+          state: users.state,
+        })
+        .from(users)
+        .innerJoin(userRoles, and(eq(userRoles.userId, users.id), eq(userRoles.role, targetRole)))
+        .where(ilike(users.name, `%${input.query}%`))
+        .limit(input.limit);
+
+      // Get already-invited users for this tournament + type
+      const existingInvites = await ctx.db.query.tournamentInvites.findMany({
+        where: and(
+          eq(tournamentInvites.tournamentId, input.tournamentId),
+          eq(tournamentInvites.type, input.type)
+        ),
+        columns: { invitedUserId: true, status: true },
+      });
+      const invitedMap = new Map(existingInvites.map(i => [i.invitedUserId, i.status]));
+
+      // For athlete invites, also check enrollments
+      let enrolledSet = new Set<string>();
+      if (input.type === "athlete") {
+        const existingEnrollments = await ctx.db.query.enrollments.findMany({
+          where: eq(enrollments.tournamentId, input.tournamentId),
+          columns: { userId: true },
+        });
+        enrolledSet = new Set(existingEnrollments.map(e => e.userId));
+      }
+
+      // For sponsor invites, also check existing sponsors
+      let sponsoredSet = new Set<string>();
+      if (input.type === "sponsor") {
+        const existingSponsors = await ctx.db.query.tournamentSponsors.findMany({
+          where: eq(tournamentSponsors.tournamentId, input.tournamentId),
+          columns: { brandUserId: true },
+        });
+        sponsoredSet = new Set(existingSponsors.map(s => s.brandUserId));
+      }
+
+      return usersWithRole.map(u => ({
+        ...u,
+        inviteStatus: invitedMap.get(u.id) ?? null,
+        alreadyEnrolled: enrolledSet.has(u.id),
+        alreadySponsoring: sponsoredSet.has(u.id),
+      }));
+    }),
+
+  // Send invite to athlete or brand
+  sendInvite: protectedProcedure
+    .input(
+      z.object({
+        tournamentId: z.string().uuid(),
+        invitedUserId: z.string().uuid(),
+        type: z.enum(["athlete", "sponsor"]),
+        message: z.string().max(500).optional(),
+        suggestedTier: z.enum(["main", "gold", "silver", "bronze"]).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+        columns: { id: true, organizerId: true, name: true },
+      });
+
+      if (!tournament) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Torneio nao encontrado" });
+      }
+      if (tournament.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode enviar convites" });
+      }
+
+      // Set expiration to 7 days from now
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      const [invite] = await ctx.db
+        .insert(tournamentInvites)
+        .values({
+          tournamentId: input.tournamentId,
+          invitedUserId: input.invitedUserId,
+          invitedByUserId: ctx.session.user.id,
+          type: input.type,
+          message: input.message,
+          suggestedTier: input.type === "sponsor" ? input.suggestedTier : undefined,
+          expiresAt,
+        })
+        .onConflictDoNothing()
+        .returning();
+
+      if (!invite) {
+        throw new TRPCError({ code: "CONFLICT", message: "Convite ja enviado para este usuario" });
+      }
+
+      // Get organizer name for notification
+      const organizer = await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: { name: true },
+      });
+
+      // Send notification
+      if (input.type === "athlete") {
+        notifyTournamentInviteAthlete(
+          input.invitedUserId,
+          organizer?.name ?? "Organizador",
+          tournament.name,
+          tournament.id,
+          invite.id
+        ).catch(() => {});
+      } else {
+        notifyTournamentInviteSponsor(
+          input.invitedUserId,
+          organizer?.name ?? "Organizador",
+          tournament.name,
+          tournament.id,
+          invite.id,
+          input.suggestedTier
+        ).catch(() => {});
+      }
+
+      return invite;
+    }),
+
+  // List invites sent for a tournament (organizer view)
+  tournamentInvitesList: protectedProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+        columns: { organizerId: true },
+      });
+      if (!tournament || tournament.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Acesso negado" });
+      }
+
+      return ctx.db.query.tournamentInvites.findMany({
+        where: eq(tournamentInvites.tournamentId, input.tournamentId),
+        with: {
+          invitedUser: { columns: { id: true, name: true, image: true, city: true } },
+        },
+        orderBy: [desc(tournamentInvites.createdAt)],
+      });
+    }),
+
+  // Cancel invite (organizer only)
+  cancelInvite: protectedProcedure
+    .input(z.object({ inviteId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const invite = await ctx.db.query.tournamentInvites.findFirst({
+        where: eq(tournamentInvites.id, input.inviteId),
+        with: { tournament: { columns: { organizerId: true } } },
+      });
+
+      if (!invite || invite.tournament?.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Acesso negado" });
+      }
+
+      if (invite.status !== "pending") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Convite ja foi respondido" });
+      }
+
+      await ctx.db.delete(tournamentInvites).where(eq(tournamentInvites.id, input.inviteId));
+      return { success: true };
+    }),
+
+  // List received invites (for the logged-in user)
+  myInvites: protectedProcedure
+    .input(
+      z.object({
+        status: z.enum(["pending", "accepted", "declined", "expired"]).optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const conditions = [eq(tournamentInvites.invitedUserId, ctx.session.user.id)];
+      if (input?.status) {
+        conditions.push(eq(tournamentInvites.status, input.status));
+      }
+
+      return ctx.db.query.tournamentInvites.findMany({
+        where: and(...conditions),
+        with: {
+          tournament: {
+            with: { sport: true, organizer: { columns: { id: true, name: true, image: true } } },
+          },
+          invitedBy: { columns: { id: true, name: true, image: true } },
+        },
+        orderBy: [desc(tournamentInvites.createdAt)],
+      });
+    }),
+
+  // Respond to an invite (accept/decline)
+  respondToInvite: protectedProcedure
+    .input(
+      z.object({
+        inviteId: z.string().uuid(),
+        response: z.enum(["accepted", "declined"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const invite = await ctx.db.query.tournamentInvites.findFirst({
+        where: and(
+          eq(tournamentInvites.id, input.inviteId),
+          eq(tournamentInvites.invitedUserId, ctx.session.user.id)
+        ),
+        with: {
+          tournament: { columns: { id: true, name: true, organizerId: true, sportId: true } },
+        },
+      });
+
+      if (!invite) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Convite nao encontrado" });
+      }
+
+      if (invite.status !== "pending") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Este convite ja foi respondido" });
+      }
+
+      // Check expiry
+      if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
+        await ctx.db
+          .update(tournamentInvites)
+          .set({ status: "expired", respondedAt: new Date() })
+          .where(eq(tournamentInvites.id, input.inviteId));
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Este convite expirou" });
+      }
+
+      // Update invite status
+      const [updated] = await ctx.db
+        .update(tournamentInvites)
+        .set({ status: input.response, respondedAt: new Date() })
+        .where(eq(tournamentInvites.id, input.inviteId))
+        .returning();
+
+      const userName = (await ctx.db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+        columns: { name: true },
+      }))?.name ?? "Usuario";
+
+      const tournamentName = invite.tournament?.name ?? "";
+      const organizerId = invite.tournament?.organizerId ?? "";
+
+      if (input.response === "accepted") {
+        // For athlete invite: auto-enroll
+        if (invite.type === "athlete" && invite.tournament) {
+          await ctx.db
+            .insert(enrollments)
+            .values({
+              tournamentId: invite.tournamentId,
+              userId: ctx.session.user.id,
+              status: "confirmed",
+            })
+            .onConflictDoNothing();
+
+          createAutoPost({
+            type: "tournament_enrolled",
+            userId: ctx.session.user.id,
+            data: { tournamentName },
+            sportId: invite.tournament.sportId,
+            tournamentId: invite.tournamentId,
+          }).catch(() => {});
+        }
+
+        notifyInviteAccepted(organizerId, userName, tournamentName, invite.tournamentId, invite.type).catch(() => {});
+      } else {
+        notifyInviteDeclined(organizerId, userName, tournamentName, invite.tournamentId, invite.type).catch(() => {});
+      }
+
+      return updated;
+    }),
+
+  // Count pending invites (for badge display)
+  pendingInvitesCount: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(tournamentInvites)
+      .where(
+        and(
+          eq(tournamentInvites.invitedUserId, ctx.session.user.id),
+          eq(tournamentInvites.status, "pending")
+        )
+      );
+    return result[0]?.count ?? 0;
+  }),
 });

@@ -188,6 +188,53 @@ export async function notifySponsorshipApproved(brandUserId: string, tournamentN
   });
 }
 
+// ==================== Invite notifications ====================
+
+export async function notifyTournamentInviteAthlete(userId: string, organizerName: string, tournamentName: string, tournamentId: string, inviteId: string) {
+  return createNotification({
+    userId,
+    type: "tournament",
+    title: "Convite para torneio!",
+    message: `${organizerName} convidou voce para participar do torneio "${tournamentName}"`,
+    data: { tournamentId, inviteId, inviteType: "athlete" },
+  });
+}
+
+export async function notifyTournamentInviteSponsor(userId: string, organizerName: string, tournamentName: string, tournamentId: string, inviteId: string, tier?: string) {
+  const tierLabel = tier === "main" ? "Principal" : tier === "gold" ? "Ouro" : tier === "silver" ? "Prata" : tier === "bronze" ? "Bronze" : "";
+  return createNotification({
+    userId,
+    type: "tournament",
+    title: "Convite para patrocinar!",
+    message: `${organizerName} convidou sua marca para patrocinar o torneio "${tournamentName}"${tierLabel ? ` como ${tierLabel}` : ""}`,
+    data: { tournamentId, inviteId, inviteType: "sponsor", tier },
+  });
+}
+
+export async function notifyInviteAccepted(organizerId: string, userName: string, tournamentName: string, tournamentId: string, inviteType: string) {
+  return createNotification({
+    userId: organizerId,
+    type: "tournament",
+    title: inviteType === "athlete" ? "Convite aceito!" : "Patrocinio aceito!",
+    message: inviteType === "athlete"
+      ? `${userName} aceitou o convite e se inscreveu no torneio "${tournamentName}"`
+      : `${userName} aceitou patrocinar o torneio "${tournamentName}"`,
+    data: { tournamentId, inviteType },
+  });
+}
+
+export async function notifyInviteDeclined(organizerId: string, userName: string, tournamentName: string, tournamentId: string, inviteType: string) {
+  return createNotification({
+    userId: organizerId,
+    type: "tournament",
+    title: "Convite recusado",
+    message: inviteType === "athlete"
+      ? `${userName} recusou o convite para o torneio "${tournamentName}"`
+      : `${userName} recusou patrocinar o torneio "${tournamentName}"`,
+    data: { tournamentId, inviteType },
+  });
+}
+
 export async function notifyPrizeAwarded(userId: string, tournamentName: string, placement: number, prizeDescription: string, tournamentId: string) {
   const placementLabels: Record<number, string> = { 1: "Campeao", 2: "Vice-campeao", 3: "Terceiro lugar" };
   const label = placementLabels[placement] ?? `${placement}o lugar`;

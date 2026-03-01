@@ -842,6 +842,40 @@ export const tournamentPrizes = pgTable(
   ]
 );
 
+// Tournament Invites (organizer invites athletes/brands)
+export const inviteTypeEnum = pgEnum("invite_type", ["athlete", "sponsor"]);
+export const inviteStatusEnum = pgEnum("invite_status", ["pending", "accepted", "declined", "expired"]);
+
+export const tournamentInvites = pgTable(
+  "tournament_invites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tournamentId: uuid("tournament_id")
+      .notNull()
+      .references(() => tournaments.id, { onDelete: "cascade" }),
+    invitedUserId: uuid("invited_user_id")
+      .notNull()
+      .references(() => users.id),
+    invitedByUserId: uuid("invited_by_user_id")
+      .notNull()
+      .references(() => users.id),
+    type: inviteTypeEnum("type").notNull(),
+    status: inviteStatusEnum("status").default("pending"),
+    message: text("message"),
+    // For sponsor invites: suggested tier
+    suggestedTier: sponsorTierEnum("suggested_tier"),
+    respondedAt: timestamp("responded_at"),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("tournament_invites_unique_idx").on(table.tournamentId, table.invitedUserId, table.type),
+    index("tournament_invites_tournament_idx").on(table.tournamentId),
+    index("tournament_invites_invited_idx").on(table.invitedUserId),
+    index("tournament_invites_status_idx").on(table.invitedUserId, table.status),
+  ]
+);
+
 // User Settings (notification + privacy preferences)
 export const userSettings = pgTable("user_settings", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -913,6 +947,7 @@ export const tournamentsRelations = relations(tournaments, ({ one, many }) => ({
   matches: many(matches),
   sponsors: many(tournamentSponsors),
   prizes: many(tournamentPrizes),
+  invites: many(tournamentInvites),
 }));
 
 export const enrollmentsRelations = relations(enrollments, ({ one }) => ({
@@ -1022,6 +1057,12 @@ export const tournamentPrizesRelations = relations(tournamentPrizes, ({ one }) =
   tournament: one(tournaments, { fields: [tournamentPrizes.tournamentId], references: [tournaments.id] }),
   sponsor: one(tournamentSponsors, { fields: [tournamentPrizes.sponsorId], references: [tournamentSponsors.id] }),
   awardedTo: one(users, { fields: [tournamentPrizes.awardedToUserId], references: [users.id] }),
+}));
+
+export const tournamentInvitesRelations = relations(tournamentInvites, ({ one }) => ({
+  tournament: one(tournaments, { fields: [tournamentInvites.tournamentId], references: [tournaments.id] }),
+  invitedUser: one(users, { fields: [tournamentInvites.invitedUserId], references: [users.id] }),
+  invitedBy: one(users, { fields: [tournamentInvites.invitedByUserId], references: [users.id] }),
 }));
 
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
