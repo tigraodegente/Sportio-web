@@ -27,7 +27,7 @@ export default function SettingsPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Page Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
           <Settings className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -48,11 +48,11 @@ export default function SettingsPage() {
           <>
             {tab === "profile" && (
               <div className="space-y-6">
-                {/* Profile Card with emerald accent */}
-                <Card className="border-l-4 border-l-emerald-500 overflow-visible">
+                {/* Profile Card with blue accent */}
+                <Card className="border-l-4 border-l-blue-500 overflow-visible">
                   <CardTitle className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <User className="w-3.5 h-3.5 text-emerald-600" />
+                    <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <User className="w-3.5 h-3.5 text-blue-600" />
                     </div>
                     Informacoes Pessoais
                   </CardTitle>
@@ -60,13 +60,13 @@ export default function SettingsPage() {
                     {/* Avatar with camera overlay */}
                     <div className="flex items-center gap-4 mb-4">
                       <div className="relative group cursor-pointer">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center text-emerald-600 text-2xl font-bold ring-4 ring-emerald-100 ring-offset-2 ring-offset-white transition-all duration-300 group-hover:ring-emerald-200">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-blue-600 text-2xl font-bold ring-4 ring-blue-100 ring-offset-2 ring-offset-white transition-all duration-300 group-hover:ring-blue-200">
                           LM
                         </div>
                         <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
                           <Camera className="w-6 h-6 text-white" />
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/30 ring-2 ring-white">
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/30 ring-2 ring-white">
                           <Camera className="w-3.5 h-3.5 text-white" />
                         </div>
                       </div>
@@ -144,7 +144,7 @@ export default function SettingsPage() {
                     onClick={handleSave}
                     className={cn(
                       "min-w-[180px] transition-all duration-300",
-                      saved && "bg-gradient-to-r from-emerald-500 to-green-500 shadow-lg shadow-emerald-500/30"
+                      saved && "bg-gradient-to-r from-blue-500 to-green-500 shadow-lg shadow-blue-500/30"
                     )}
                   >
                     {saved ? (
@@ -188,7 +188,7 @@ export default function SettingsPage() {
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
                         <input type="checkbox" className="sr-only peer" defaultChecked={item.defaultOn} />
-                        <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-emerald-600 peer-checked:to-emerald-500 transition-all duration-300"></div>
+                        <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 transition-all duration-300"></div>
                       </label>
                     </div>
                   ))}
@@ -218,7 +218,7 @@ export default function SettingsPage() {
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
                         <input type="checkbox" className="sr-only peer" defaultChecked={item.defaultOn} />
-                        <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-emerald-600 peer-checked:to-emerald-500 transition-all duration-300"></div>
+                        <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-500/20 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:shadow-sm after:transition-all after:duration-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-blue-500 transition-all duration-300"></div>
                       </label>
                     </div>
                   ))}

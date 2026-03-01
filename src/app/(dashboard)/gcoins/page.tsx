@@ -62,17 +62,17 @@ export default function GCoinsPage() {
       {/* Balance Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Real GCoins Card */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-800 text-white border-0">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white border-0">
           {/* Decorative blur circles */}
           <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-emerald-400/15 rounded-full blur-2xl" />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-blue-400/15 rounded-full blur-2xl" />
           <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-white/5 rounded-full blur-xl" />
           {/* Subtle pattern overlay */}
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
           <div className="relative">
-            <p className="text-emerald-200 text-xs sm:text-sm font-medium">GCoins Reais</p>
+            <p className="text-blue-200 text-xs sm:text-sm font-medium">GCoins Reais</p>
             <p className="text-3xl sm:text-4xl font-bold mt-1 tracking-tight">1.250,00</p>
-            <p className="text-emerald-300/80 text-xs mt-2">Saque disponivel via PIX</p>
+            <p className="text-blue-300/80 text-xs mt-2">Saque disponivel via PIX</p>
           </div>
         </Card>
 
@@ -92,7 +92,7 @@ export default function GCoinsPage() {
         </Card>
 
         {/* Total Balance Card - with gradient border effect */}
-        <div className="relative rounded-2xl p-[2px] bg-gradient-to-br from-emerald-400 via-emerald-500 to-amber-400">
+        <div className="relative rounded-2xl p-[2px] bg-gradient-to-br from-blue-400 via-blue-500 to-amber-400">
           <div className="rounded-[14px] bg-white p-5 sm:p-6 h-full">
             <p className="text-slate-500 text-xs sm:text-sm font-medium">Saldo Total</p>
             <p className="text-3xl sm:text-4xl font-bold text-slate-900 mt-1 tracking-tight">4.730,00</p>
@@ -140,7 +140,7 @@ export default function GCoinsPage() {
                     key={tx.id}
                     className={`flex items-center justify-between py-3 px-3 sm:px-4 rounded-xl transition-all duration-200 hover:bg-slate-50/80 group border-l-[3px] ${
                       tx.amount > 0
-                        ? "border-l-emerald-500"
+                        ? "border-l-blue-500"
                         : "border-l-red-400"
                     }`}
                   >
@@ -198,8 +198,8 @@ export default function GCoinsPage() {
                 onClick={() => setSelectedAmount(amount)}
                 className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-center group ${
                   selectedAmount === amount
-                    ? "border-emerald-500 bg-emerald-50/50 shadow-lg shadow-emerald-500/10 ring-2 ring-emerald-500/20"
-                    : "border-slate-200 hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-500/5"
+                    ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20"
+                    : "border-slate-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-500/5"
                 }`}
               >
                 {amount === 500 && (
@@ -209,13 +209,13 @@ export default function GCoinsPage() {
                   </span>
                 )}
                 <p className={`text-xl font-bold transition-colors ${
-                  selectedAmount === amount ? "text-emerald-700" : "text-slate-900 group-hover:text-emerald-700"
+                  selectedAmount === amount ? "text-blue-700" : "text-slate-900 group-hover:text-blue-700"
                 }`}>
                   {amount.toLocaleString()}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">R$ {(amount * 0.1).toFixed(2)}</p>
                 {selectedAmount === amount && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
@@ -236,10 +236,10 @@ export default function GCoinsPage() {
 
           <Input label="Digite um valor personalizado" type="number" placeholder="Quantidade de GCoins" />
 
-          <div className="bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl p-4 border border-emerald-200/50">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600">Total a pagar:</span>
-              <span className="font-bold text-emerald-700">
+              <span className="font-bold text-blue-700">
                 R$ {selectedAmount ? (selectedAmount * 0.1).toFixed(2) : "0,00"}
               </span>
             </div>
@@ -286,9 +286,9 @@ export default function GCoinsPage() {
                         setSelectedUser(user);
                         setTransferSearch(user.name);
                       }}
-                      className="flex items-center gap-3 w-full px-3 py-3 hover:bg-emerald-50/50 transition-colors text-left"
+                      className="flex items-center gap-3 w-full px-3 py-3 hover:bg-blue-50/50 transition-colors text-left"
                     >
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {user.avatar}
                       </div>
                       <div className="min-w-0">
@@ -313,8 +313,8 @@ export default function GCoinsPage() {
 
           {/* Selected user preview */}
           {selectedUser && (
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200/60">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-200/60">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                 {selectedUser.avatar}
               </div>
               <div className="min-w-0 flex-1">
@@ -335,7 +335,7 @@ export default function GCoinsPage() {
 
           <Input label="Quantidade" type="number" placeholder="0" />
           <p className="text-xs text-slate-400 flex items-center gap-1.5">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400" />
             Taxa de transferencia: 0 GCoins
           </p>
           <Button size="lg" className="w-full">

@@ -5,11 +5,12 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Coins, Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Heart, Target, Shield } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Heart, Target, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 
 const roles = [
   { id: "athlete", label: "Atleta", icon: Trophy, description: "Competir em torneios e ganhar GCoins" },
@@ -84,12 +85,8 @@ export default function RegisterPage() {
   return (
     <div>
       {/* Mobile logo */}
-      <div className="lg:hidden flex items-center gap-3 mb-8">
-        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-600 to-emerald-800 shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/20">
-          <Coins className="w-6 h-6 text-white drop-shadow-sm" />
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
-        </div>
-        <span className="text-2xl font-bold text-slate-900 tracking-tight">Sportio</span>
+      <div className="lg:hidden mb-8">
+        <SportioLogo className="h-10" />
       </div>
 
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Crie sua conta</h2>
@@ -103,22 +100,22 @@ export default function RegisterPage() {
           <div className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
             step >= 1
-              ? "bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/20"
+              ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/20"
               : "bg-slate-100 text-slate-400 border border-slate-200"
           )}>1</div>
           <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
-            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-emerald-500 to-emerald-600" : "w-0")} />
+            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-blue-500 to-blue-600" : "w-0")} />
           </div>
         </div>
         <div className="flex items-center gap-2 flex-1">
           <div className={cn(
             "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
             step >= 2
-              ? "bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-md shadow-emerald-500/30 ring-2 ring-emerald-400/20"
+              ? "bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md shadow-blue-500/30 ring-2 ring-blue-400/20"
               : "bg-slate-100 text-slate-400 border border-slate-200"
           )}>2</div>
           <div className="h-1.5 flex-1 rounded-full bg-slate-100 overflow-hidden">
-            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-emerald-500 to-emerald-600" : "w-0")} />
+            <div className={cn("h-full rounded-full transition-all duration-500 ease-out", step >= 2 ? "w-full bg-gradient-to-r from-blue-500 to-blue-600" : "w-0")} />
           </div>
         </div>
       </div>
@@ -201,8 +198,8 @@ export default function RegisterPage() {
                   className={cn(
                     "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center sm:gap-2 sm:p-4",
                     isSelected
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-700 shadow-md shadow-emerald-500/10 ring-1 ring-emerald-600/20"
-                      : "border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 text-slate-600"
+                      ? "border-blue-600 bg-blue-50 text-blue-700 shadow-md shadow-blue-500/10 ring-1 ring-blue-600/20"
+                      : "border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 text-slate-600"
                   )}
                 >
                   <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -236,7 +233,7 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         Ja tem conta?{" "}
-        <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-medium">
+        <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
           Fazer login
         </Link>
       </p>

@@ -52,7 +52,7 @@ export default function AdminPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-emerald-600" />
+              <Shield className="w-6 h-6 text-blue-600" />
               Painel Admin
             </h1>
             <p className="text-slate-500">Visao geral da plataforma Sportio</p>
@@ -204,7 +204,7 @@ export default function AdminPage() {
                           </div>
                           <div className="w-full bg-slate-100 rounded-full h-2">
                             <div
-                              className="bg-emerald-600 rounded-full h-2 transition-all"
+                              className="bg-blue-600 rounded-full h-2 transition-all"
                               style={{ width: `${item.percent}%` }}
                             />
                           </div>

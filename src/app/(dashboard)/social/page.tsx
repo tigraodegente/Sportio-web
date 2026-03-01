@@ -110,7 +110,7 @@ export default function SocialPage() {
       <Card
         className={`transition-all duration-300 ${
           focusedCompose
-            ? "ring-2 ring-emerald-500/30 border-emerald-200 shadow-lg shadow-emerald-500/5"
+            ? "ring-2 ring-blue-500/30 border-blue-200 shadow-lg shadow-blue-500/5"
             : ""
         }`}
       >
@@ -130,7 +130,7 @@ export default function SocialPage() {
             />
             <div className="flex items-center justify-between pt-3 border-t border-slate-100">
               <div className="flex gap-1">
-                <button className="p-2 rounded-xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200">
+                <button className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
                   <ImageIcon className="w-5 h-5" />
                 </button>
                 <button className="p-2 rounded-xl text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all duration-200">
@@ -205,7 +205,7 @@ export default function SocialPage() {
 
               {/* Comment button with count pill */}
               <button
-                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-emerald-600 px-3 py-1.5 rounded-xl hover:bg-emerald-50/50 transition-all duration-200"
+                className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-600 px-3 py-1.5 rounded-xl hover:bg-blue-50/50 transition-all duration-200"
                 onClick={() => toggleComments(post.id)}
               >
                 <MessageCircle className="w-4 h-4" />
@@ -251,7 +251,7 @@ export default function SocialPage() {
                 {post.commentsList.map((comment) => (
                   <div key={comment.id} className="flex gap-2.5 ml-2">
                     <Avatar name={comment.user.name} size="sm" />
-                    <div className="flex-1 border-l-2 border-emerald-200 pl-3">
+                    <div className="flex-1 border-l-2 border-blue-200 pl-3">
                       <div className="bg-slate-50/80 rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-bold text-slate-900">{comment.user.name}</span>
@@ -270,9 +270,9 @@ export default function SocialPage() {
                     <input
                       type="text"
                       placeholder="Escrever comentario..."
-                      className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 transition-all duration-200 placeholder:text-slate-400"
+                      className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-2.5 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 placeholder:text-slate-400"
                     />
-                    <Button size="sm" variant="ghost" className="hover:bg-emerald-50 hover:text-emerald-600 rounded-xl">
+                    <Button size="sm" variant="ghost" className="hover:bg-blue-50 hover:text-blue-600 rounded-xl">
                       <Send className="w-4 h-4" />
                     </Button>
                   </div>

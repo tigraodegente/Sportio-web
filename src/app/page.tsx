@@ -413,19 +413,18 @@ function GCoinsEconomySection() {
 
 function SportsGridSection() {
   const sportColors: Record<string, { bg: string; text: string; border: string; gradient: string }> = {
-    "text-emerald-500": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-400 to-blue-600" },
-    "text-amber-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-amber-500" },
     "text-blue-500": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", gradient: "from-blue-400 to-blue-600" },
+    "text-amber-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-amber-500" },
     "text-red-500": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
     "text-yellow-500": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", gradient: "from-yellow-400 to-amber-500" },
     "text-orange-500": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
     "text-purple-500": { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", gradient: "from-purple-400 to-purple-600" },
     "text-orange-600": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", gradient: "from-orange-400 to-orange-600" },
     "text-cyan-500": { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200", gradient: "from-cyan-400 to-cyan-600" },
-    "text-lime-500": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", gradient: "from-teal-400 to-teal-600" },
+    "text-green-500": { bg: "bg-green-50", text: "text-green-600", border: "border-green-200", gradient: "from-green-400 to-green-600" },
     "text-pink-500": { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200", gradient: "from-pink-400 to-pink-600" },
     "text-red-600": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", gradient: "from-red-400 to-red-600" },
-    "text-teal-500": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", gradient: "from-teal-400 to-teal-600" },
+    "text-slate-500": { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200", gradient: "from-slate-400 to-slate-600" },
   };
 
   return (
@@ -490,7 +489,6 @@ function SportsGridSection() {
 
 function UserTypesSection() {
   const typeColors: Record<string, { gradient: string }> = {
-    "text-emerald-500": { gradient: "from-blue-400 to-blue-600" },
     "text-blue-500": { gradient: "from-blue-400 to-blue-600" },
     "text-purple-500": { gradient: "from-purple-400 to-purple-600" },
     "text-red-500": { gradient: "from-red-400 to-red-600" },

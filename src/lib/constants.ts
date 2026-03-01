@@ -26,7 +26,7 @@ export const SPORTS: Sport[] = [
     id: "futebol",
     name: "Futebol",
     icon: "Goal",
-    color: "text-emerald-500",
+    color: "text-blue-500",
     description: "O esporte mais popular do Brasil. Participe de peladas, campeonatos e muito mais.",
   },
   {
@@ -89,7 +89,7 @@ export const SPORTS: Sport[] = [
     id: "tenis",
     name: "Tênis",
     icon: "Trophy",
-    color: "text-lime-500",
+    color: "text-green-500",
     description: "Singles ou duplas. Encontre adversários do seu nível e suba no ranking.",
   },
   {
@@ -110,7 +110,7 @@ export const SPORTS: Sport[] = [
     id: "ciclismo",
     name: "Ciclismo",
     icon: "Bike",
-    color: "text-teal-500",
+    color: "text-blue-500",
     description: "Road, MTB ou gravel. Rotas, pedais em grupo e competições ciclísticas.",
   },
 ];
@@ -154,7 +154,7 @@ export const USER_TYPES: UserType[] = [
       "Crie seu perfil esportivo, acompanhe estatísticas, conquiste GCoins e conecte-se com outros atletas.",
     icon: "Users",
     href: "/athletes",
-    color: "text-emerald-500",
+    color: "text-blue-500",
   },
   {
     id: "organizers",

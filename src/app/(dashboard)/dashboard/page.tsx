@@ -10,7 +10,7 @@ import Link from "next/link";
 const recentTournaments = [
   { id: "1", name: "Copa Beach Tennis SP", sport: "Beach Tennis", status: "in_progress", date: "15 Mar", prize: "5.000", color: "from-amber-400 to-amber-500" },
   { id: "2", name: "Liga CrossFit Brasil", sport: "CrossFit", status: "registration_open", date: "22 Mar", prize: "10.000", color: "from-red-400 to-red-500" },
-  { id: "3", name: "Torneio Futebol Society", sport: "Futebol", status: "completed", date: "10 Mar", prize: "3.000", color: "from-emerald-400 to-emerald-500" },
+  { id: "3", name: "Torneio Futebol Society", sport: "Futebol", status: "completed", date: "10 Mar", prize: "3.000", color: "from-blue-400 to-blue-500" },
 ];
 
 const recentBets = [
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <CardTitle>Torneios Recentes</CardTitle>
-            <Link href="/tournaments" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+            <Link href="/tournaments" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
               Ver todos <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
                 >
                   <div className={`w-1 h-12 rounded-full bg-gradient-to-b ${t.color} shrink-0`} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-emerald-600 transition-colors">{t.name}</p>
+                    <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">{t.name}</p>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                       <Calendar className="w-3 h-3" />
                       {t.sport} &middot; {t.date}
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <CardTitle>Palpites Recentes</CardTitle>
-            <Link href="/bets" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center gap-1">
+            <Link href="/bets" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
               Ver todos <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                   className="flex items-center gap-3 p-3 rounded-xl bg-slate-50"
                 >
                   <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center ${
-                    bet.status === "won" ? "bg-emerald-100 text-emerald-600" :
+                    bet.status === "won" ? "bg-blue-100 text-blue-600" :
                     bet.status === "lost" ? "bg-red-100 text-red-500" :
                     "bg-blue-100 text-blue-600"
                   }`}>
@@ -169,8 +169,8 @@ export default function DashboardPage() {
         <CardTitle className="mb-4">Acoes Rapidas</CardTitle>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Link href="/tournaments/create">
-            <Button variant="outline" size="lg" className="w-full flex-col gap-2 h-auto py-5 hover:border-emerald-300 hover:bg-emerald-50/50">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+            <Button variant="outline" size="lg" className="w-full flex-col gap-2 h-auto py-5 hover:border-blue-300 hover:bg-blue-50/50">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
                 <Trophy className="w-5 h-5" />
               </div>
               <span className="text-xs font-semibold">Criar Torneio</span>

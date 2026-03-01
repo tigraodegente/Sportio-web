@@ -26,8 +26,8 @@ const notifications: Notification[] = [
     title: "Inscricao Confirmada",
     message: "Sua inscricao na Copa Beach Tennis SP foi confirmada. O torneio comeca em 3 dias!",
     icon: Trophy,
-    iconColor: "text-emerald-600 bg-emerald-100",
-    iconRing: "ring-emerald-50",
+    iconColor: "text-blue-600 bg-blue-100",
+    iconRing: "ring-blue-50",
     time: "5min",
     timeGroup: "today",
     isRead: false,
@@ -152,7 +152,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
             <BellRing className="w-5 h-5 text-white" />
           </div>
           <div>
@@ -160,7 +160,7 @@ export default function NotificationsPage() {
             <p className="text-sm text-slate-500">
               {unreadCount > 0 ? (
                 <span className="flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                   {unreadCount} nao lidas
                 </span>
               ) : (
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
         </div>
         {unreadCount > 0 && (
           <Button variant="outline" size="sm" onClick={markAllAsRead} className="shadow-sm gap-1.5">
-            <CheckCheck className="w-4 h-4 text-emerald-600" />
+            <CheckCheck className="w-4 h-4 text-blue-600" />
             Marcar todas como lidas
           </Button>
         )}
@@ -179,13 +179,13 @@ export default function NotificationsPage() {
 
       {/* All-read celebration state */}
       {allRead && (
-        <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 via-green-50 to-teal-50 border border-emerald-100">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-green-100 flex items-center justify-center flex-shrink-0">
-            <PartyPopper className="w-6 h-6 text-emerald-600" />
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-blue-50 via-green-50 to-blue-50 border border-blue-100">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center flex-shrink-0">
+            <PartyPopper className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-emerald-900">Tudo em dia!</p>
-            <p className="text-xs text-emerald-600 mt-0.5">Voce leu todas as suas notificacoes. Continue assim!</p>
+            <p className="text-sm font-semibold text-blue-900">Tudo em dia!</p>
+            <p className="text-xs text-blue-600 mt-0.5">Voce leu todas as suas notificacoes. Continue assim!</p>
           </div>
         </div>
       )}
@@ -220,7 +220,7 @@ export default function NotificationsPage() {
                       className={cn(
                         "flex items-start gap-4 p-4 sm:p-5 transition-all duration-300 cursor-pointer group",
                         !notif.isRead
-                          ? "bg-gradient-to-r from-emerald-50/60 via-white to-white border-l-[3px] border-l-emerald-500 shadow-sm"
+                          ? "bg-gradient-to-r from-blue-50/60 via-white to-white border-l-[3px] border-l-blue-500 shadow-sm"
                           : "bg-white hover:bg-slate-50/50 border-l-[3px] border-l-transparent"
                       )}
                     >
@@ -245,8 +245,8 @@ export default function NotificationsPage() {
                             </p>
                             {!notif.isRead && (
                               <span className="relative flex-shrink-0">
-                                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full block" />
-                                <span className="absolute inset-0 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping opacity-40" />
+                                <span className="w-2.5 h-2.5 bg-blue-500 rounded-full block" />
+                                <span className="absolute inset-0 w-2.5 h-2.5 bg-blue-400 rounded-full animate-ping opacity-40" />
                               </span>
                             )}
                           </div>
