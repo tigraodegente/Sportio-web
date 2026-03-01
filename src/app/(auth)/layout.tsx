@@ -1,4 +1,5 @@
-import { Coins, Trophy, Star, Zap } from "lucide-react";
+import { Trophy, Star, Zap, Coins } from "lucide-react";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 import Link from "next/link";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -19,11 +20,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute top-40 left-1/3 w-3 h-3 bg-blue-300/20 rounded-full" />
         <div className="absolute top-60 right-1/3 w-2 h-2 bg-white/15 rounded-full" />
 
-        <Link href="/" className="flex items-center gap-2.5 text-white relative z-10">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-            <Coins className="w-6 h-6" />
-          </div>
-          <span className="text-2xl font-bold">Sportio</span>
+        <Link href="/" className="relative z-10">
+          <SportioLogo white className="h-10" />
         </Link>
 
         <div className="relative z-10">
@@ -38,15 +36,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </span>
           </h1>
           <p className="text-blue-100 text-lg max-w-md leading-relaxed">
-            Seja atleta, treinador, organizador ou arbitro — transforme sua
-            paixao pelo esporte em renda real com GCoins.
+            Seja atleta, treinador, organizador ou árbitro — transforme sua
+            paixão pelo esporte em renda real com GCoins.
           </p>
           <div className="mt-8 grid grid-cols-2 gap-3">
             {[
               { icon: Trophy, value: "Milhares", label: "de Profissionais" },
               { icon: Star, value: "Centenas", label: "de Torneios" },
               { icon: Coins, value: "13+", label: "Modalidades" },
-              { icon: Zap, value: "PIX", label: "Saque Instantaneo" },
+              { icon: Zap, value: "PIX", label: "Saque Instantâneo" },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 shadow-lg shadow-black/5 hover:bg-white/15 transition-colors duration-300">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-400/20 mb-2">

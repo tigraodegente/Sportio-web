@@ -28,25 +28,25 @@ const templates: Record<FeedEventType, (data: Record<string, unknown>) => string
   tournament_enrolled: (d) =>
     `Se inscreveu no torneio "${d.tournamentName}"! Hora de competir.`,
   tournament_created: (d) =>
-    `Criou o torneio "${d.tournamentName}". Inscricoes abertas!`,
+    `Criou o torneio "${d.tournamentName}". Inscrições abertas!`,
   match_won: (d) =>
-    `Venceu a partida contra ${d.opponentName} por ${d.score}! Avancando no torneio "${d.tournamentName}".`,
+    `Venceu a partida contra ${d.opponentName} por ${d.score}! Avançando no torneio "${d.tournamentName}".`,
   match_lost: (d) =>
     `Perdeu a partida contra ${d.opponentName} por ${d.score}. A jornada continua!`,
   tournament_won: (d) =>
-    `Campeao do torneio "${d.tournamentName}"! Conquista incrivel.`,
+    `Campeão do torneio "${d.tournamentName}"! Conquista incrível.`,
   challenge_joined: (d) =>
     `Aceitou o desafio "${d.challengeTitle}". Bora!`,
   challenge_completed: (d) =>
     `Completou o desafio "${d.challengeTitle}". Recompensa conquistada!`,
   bet_won: (d) =>
     `Acertou o palpite e ganhou ${d.amount} GCoins!`,
-  bet_lost: (d) =>
-    `Nao acertou o palpite dessa vez. Mais sorte na proxima!`,
+  bet_lost: () =>
+    `Não acertou o palpite dessa vez. Mais sorte na próxima!`,
   level_up: (d) =>
-    `Subiu para o nivel ${d.level}! Evoluindo cada vez mais.`,
+    `Subiu para o nível ${d.level}! Evoluindo cada vez mais.`,
   follow: (d) =>
-    `Comecou a seguir ${d.targetName}.`,
+    `Começou a seguir ${d.targetName}.`,
   achievement: (d) =>
     `Desbloqueou a conquista "${d.achievementName}".`,
 };

@@ -250,7 +250,7 @@ function TournamentGrid({ tournaments, loadMoreRef, isFetchingNextPage, hasNextP
           )}
           {!hasNextPage && tournaments.length > 0 && (
             <p className="text-center text-sm text-slate-400">
-              Voce viu todos os torneios
+              Você viu todos os torneios
             </p>
           )}
         </div>

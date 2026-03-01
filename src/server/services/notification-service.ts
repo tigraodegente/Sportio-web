@@ -59,8 +59,8 @@ export async function notifyTournamentEnrollment(userId: string, tournamentName:
   return createNotification({
     userId,
     type: "tournament",
-    title: "Inscricao confirmada",
-    message: `Voce se inscreveu no torneio "${tournamentName}"`,
+    title: "Inscrição confirmada",
+    message: `Você se inscreveu no torneio "${tournamentName}"`,
     data: { tournamentId },
   });
 }
@@ -68,8 +68,8 @@ export async function notifyTournamentEnrollment(userId: string, tournamentName:
 export async function notifyTournamentStart(userIds: string[], tournamentName: string, tournamentId: string) {
   return createBulkNotifications(userIds, {
     type: "tournament",
-    title: "Torneio comecou!",
-    message: `O torneio "${tournamentName}" esta em andamento`,
+    title: "Torneio começou!",
+    message: `O torneio "${tournamentName}" está em andamento`,
     data: { tournamentId },
   });
 }
@@ -78,10 +78,10 @@ export async function notifyBetResult(userId: string, won: boolean, amount: numb
   return createNotification({
     userId,
     type: "bet",
-    title: won ? "Palpite ganho!" : "Palpite nao acertou",
+    title: won ? "Palpite ganho!" : "Palpite não acertou",
     message: won
-      ? `Voce ganhou ${amount} GCoins no seu palpite!`
-      : "Nao foi dessa vez. Tente novamente!",
+      ? `Você ganhou ${amount} GCoins no seu palpite!`
+      : "Não foi dessa vez. Tente novamente!",
     data: { betId, won, amount },
   });
 }
@@ -91,7 +91,7 @@ export async function notifyNewFollower(userId: string, followerName: string, fo
     userId,
     type: "social",
     title: "Novo seguidor",
-    message: `${followerName} comecou a seguir voce`,
+    message: `${followerName} começou a seguir você`,
     data: { followerId },
   });
 }
@@ -100,7 +100,7 @@ export async function notifyComment(userId: string, commenterName: string, postI
   return createNotification({
     userId,
     type: "social",
-    title: "Novo comentario",
+    title: "Novo comentário",
     message: `${commenterName} comentou no seu post`,
     data: { postId },
   });
@@ -121,7 +121,7 @@ export async function notifyGcoinReceived(userId: string, amount: number, fromNa
     userId,
     type: "gcoin",
     title: "GCoins recebidos",
-    message: `Voce recebeu ${amount} GCoins de ${fromName}`,
+    message: `Você recebeu ${amount} GCoins de ${fromName}`,
     data: { amount },
   });
 }
@@ -131,7 +131,7 @@ export async function notifyChallengeComplete(userId: string, challengeTitle: st
     userId,
     type: "challenge",
     title: "Desafio completo!",
-    message: `Voce completou o desafio "${challengeTitle}" e ganhou ${reward} GCoins`,
+    message: `Você completou o desafio "${challengeTitle}" e ganhou ${reward} GCoins`,
     data: { challengeTitle, reward },
   });
 }
@@ -153,7 +153,7 @@ export async function notifyBrandReward(userId: string, brandName: string, amoun
     userId,
     type: "gcoin",
     title: "Recompensa de marca",
-    message: `Voce ganhou ${amount} GCoins da marca "${brandName}"`,
+    message: `Você ganhou ${amount} GCoins da marca "${brandName}"`,
     data: { campaignId, amount, brandName },
   });
 }
@@ -163,7 +163,7 @@ export async function notifyProductRedeemed(userId: string, brandName: string, p
     userId,
     type: "system",
     title: "Produto resgatado",
-    message: `Voce resgatou "${productName}" da marca "${brandName}". A marca entrara em contato para entrega.`,
+    message: `Você resgatou "${productName}" da marca "${brandName}". A marca entrará em contato para entrega.`,
     data: { campaignId, productName, brandName },
   });
 }
@@ -182,8 +182,8 @@ export async function notifySponsorshipApproved(brandUserId: string, tournamentN
   return createNotification({
     userId: brandUserId,
     type: "tournament",
-    title: "Patrocinio aprovado!",
-    message: `Seu patrocinio do torneio "${tournamentName}" foi aprovado. Sua marca ja esta visivel!`,
+    title: "Patrocínio aprovado!",
+    message: `Seu patrocínio do torneio "${tournamentName}" foi aprovado. Sua marca já está visível!`,
     data: { tournamentId },
   });
 }
@@ -195,7 +195,7 @@ export async function notifyTournamentInviteAthlete(userId: string, organizerNam
     userId,
     type: "tournament",
     title: "Convite para torneio!",
-    message: `${organizerName} convidou voce para participar do torneio "${tournamentName}"`,
+    message: `${organizerName} convidou você para participar do torneio "${tournamentName}"`,
     data: { tournamentId, inviteId, inviteType: "athlete" },
   });
 }
@@ -215,7 +215,7 @@ export async function notifyInviteAccepted(organizerId: string, userName: string
   return createNotification({
     userId: organizerId,
     type: "tournament",
-    title: inviteType === "athlete" ? "Convite aceito!" : "Patrocinio aceito!",
+    title: inviteType === "athlete" ? "Convite aceito!" : "Patrocínio aceito!",
     message: inviteType === "athlete"
       ? `${userName} aceitou o convite e se inscreveu no torneio "${tournamentName}"`
       : `${userName} aceitou patrocinar o torneio "${tournamentName}"`,
@@ -236,13 +236,13 @@ export async function notifyInviteDeclined(organizerId: string, userName: string
 }
 
 export async function notifyPrizeAwarded(userId: string, tournamentName: string, placement: number, prizeDescription: string, tournamentId: string) {
-  const placementLabels: Record<number, string> = { 1: "Campeao", 2: "Vice-campeao", 3: "Terceiro lugar" };
-  const label = placementLabels[placement] ?? `${placement}o lugar`;
+  const placementLabels: Record<number, string> = { 1: "Campeão", 2: "Vice-campeão", 3: "Terceiro lugar" };
+  const label = placementLabels[placement] ?? `${placement}º lugar`;
   return createNotification({
     userId,
     type: "tournament",
     title: `${label}!`,
-    message: `Parabens! Voce ficou em ${label} no torneio "${tournamentName}" e ganhou: ${prizeDescription}`,
+    message: `Parabéns! Você ficou em ${label} no torneio "${tournamentName}" e ganhou: ${prizeDescription}`,
     data: { tournamentId, placement, prizeDescription },
   });
 }

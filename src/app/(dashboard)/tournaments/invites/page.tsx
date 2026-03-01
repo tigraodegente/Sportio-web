@@ -111,7 +111,7 @@ export default function InvitesPage() {
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 text-center">
           <PartyPopper className="w-10 h-10 text-green-500 mx-auto mb-2" />
           <p className="font-semibold text-green-800">Tudo em dia!</p>
-          <p className="text-sm text-green-600 mt-1">Voce nao tem convites pendentes.</p>
+          <p className="text-sm text-green-600 mt-1">Você não tem convites pendentes.</p>
         </div>
       )}
 
@@ -289,7 +289,7 @@ export default function InvitesPage() {
             <Mail className="w-8 h-8 text-slate-300" />
           </div>
           <h3 className="text-lg font-semibold text-slate-900 mb-1">Nenhum convite</h3>
-          <p className="text-sm text-slate-500">Voce ainda nao recebeu nenhum convite para torneios.</p>
+          <p className="text-sm text-slate-500">Você ainda não recebeu nenhum convite para torneios.</p>
         </div>
       )}
     </div>

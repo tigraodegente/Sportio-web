@@ -5,7 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Coins, Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Shield, Dumbbell, Apple, Camera, Building2 } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Shield, Dumbbell, Apple, Camera, Building2 } from "lucide-react";
+import { SportioLogo } from "@/components/shared/sportio-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -15,11 +16,11 @@ const roles = [
   { id: "athlete", label: "Atleta", icon: Trophy, description: "Competir em torneios e ganhar GCoins", primary: true },
   { id: "organizer", label: "Organizador", icon: Briefcase, description: "Criar e gerenciar torneios", primary: true },
   { id: "brand", label: "Marca", icon: Megaphone, description: "Patrocinar e impulsionar sua marca", primary: true },
-  { id: "referee", label: "Arbitro", icon: Shield, description: "Validar partidas e resultados", primary: false },
+  { id: "referee", label: "Árbitro", icon: Shield, description: "Validar partidas e resultados", primary: false },
   { id: "trainer", label: "Treinador", icon: Dumbbell, description: "Treinar e orientar atletas", primary: false },
-  { id: "nutritionist", label: "Nutricionista", icon: Apple, description: "Nutricao esportiva e dietas", primary: false },
-  { id: "photographer", label: "Fotografo", icon: Camera, description: "Registrar momentos esportivos", primary: false },
-  { id: "arena_owner", label: "Dono de Arena", icon: Building2, description: "Gerenciar espacos esportivos", primary: false },
+  { id: "nutritionist", label: "Nutricionista", icon: Apple, description: "Nutrição esportiva e dietas", primary: false },
+  { id: "photographer", label: "Fotógrafo", icon: Camera, description: "Registrar momentos esportivos", primary: false },
+  { id: "arena_owner", label: "Dono de Arena", icon: Building2, description: "Gerenciar espaços esportivos", primary: false },
 ];
 
 type RoleId = "athlete" | "organizer" | "brand" | "referee" | "trainer" | "nutritionist" | "photographer" | "arena_owner";
@@ -68,7 +69,7 @@ export default function RegisterPage() {
         router.push("/login");
       } else {
         toast.success("Conta criada com sucesso!");
-        router.push("/dashboard");
+        router.push("/social");
         router.refresh();
       }
     } catch (error) {
@@ -86,17 +87,13 @@ export default function RegisterPage() {
   return (
     <div>
       {/* Mobile logo */}
-      <div className="lg:hidden flex items-center gap-3 mb-8">
-        <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 via-blue-600 to-blue-800 shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/20">
-          <Coins className="w-6 h-6 text-white drop-shadow-sm" />
-          <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-transparent to-white/10" />
-        </div>
-        <span className="text-2xl font-bold text-slate-900 tracking-tight">Sportio</span>
+      <div className="lg:hidden mb-8">
+        <SportioLogo className="h-10" />
       </div>
 
       <h2 className="text-2xl font-bold text-slate-900 mb-2">Crie sua conta</h2>
       <p className="text-slate-500 mb-8">
-        {step === 1 ? "Preencha seus dados para comecar" : "Escolha seu perfil na plataforma"}
+        {step === 1 ? "Preencha seus dados para começar" : "Escolha seu perfil na plataforma"}
       </p>
 
       {/* Progress steps */}
@@ -169,7 +166,7 @@ export default function RegisterPage() {
               <Input
                 label="Senha"
                 type={showPassword ? "text" : "password"}
-                placeholder="Minimo 8 caracteres"
+                placeholder="Mínimo 8 caracteres"
                 icon={<Lock className="w-4 h-4" />}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -192,7 +189,7 @@ export default function RegisterPage() {
       ) : (
         <form onSubmit={handleSubmit}>
           <p className="text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-2 mb-4 text-center font-medium">
-            Todos os usuarios podem acompanhar torneios, dar palpites e interagir na comunidade automaticamente.
+            Todos os usuários podem acompanhar torneios, dar palpites e interagir na comunidade automaticamente.
           </p>
 
           <p className="text-xs text-slate-500 mb-3 font-semibold uppercase tracking-wider">Perfis principais</p>
@@ -245,7 +242,7 @@ export default function RegisterPage() {
           </div>
 
           <p className="text-xs text-slate-500 mb-4 text-center">
-            Selecione um ou mais perfis. Voce pode alterar depois nas configuracoes.
+            Selecione um ou mais perfis. Você pode alterar depois nas configurações.
           </p>
 
           <div className="flex gap-3">
@@ -265,7 +262,7 @@ export default function RegisterPage() {
       )}
 
       <p className="mt-6 text-center text-sm text-slate-500">
-        Ja tem conta?{" "}
+        Já tem conta?{" "}
         <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
           Fazer login
         </Link>
