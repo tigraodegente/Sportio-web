@@ -30,7 +30,7 @@ function formatNumber(n: number): string {
   return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function formatDate(dateStr: string): { date: string; time: string } {
+function formatDate(dateStr: string | Date): { date: string; time: string } {
   const d = new Date(dateStr);
   const date = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
   const time = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -306,7 +306,7 @@ export default function GCoinsPage() {
                       <div
                         key={tx.id}
                         className={`flex items-center justify-between py-3 px-3 sm:px-4 rounded-xl transition-all duration-200 hover:bg-slate-50/80 group border-l-[3px] ${
-                          tx.amount > 0
+                          Number(tx.amount) > 0
                             ? "border-l-blue-500"
                             : "border-l-red-400"
                         }`}
@@ -314,10 +314,10 @@ export default function GCoinsPage() {
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div
                             className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${
-                              tx.amount > 0 ? "bg-green-100" : "bg-red-100"
+                              Number(tx.amount) > 0 ? "bg-green-100" : "bg-red-100"
                             }`}
                           >
-                            {tx.amount > 0 ? (
+                            {Number(tx.amount) > 0 ? (
                               <ArrowUpRight className="w-5 h-5 text-green-600" />
                             ) : (
                               <ArrowDownRight className="w-5 h-5 text-red-600" />
@@ -326,7 +326,7 @@ export default function GCoinsPage() {
                           <div className="min-w-0">
                             <p className="text-sm font-semibold text-slate-900 truncate">{tx.description}</p>
                             <div className="flex items-center gap-2 mt-0.5">
-                              <Badge variant={tx.amount > 0 ? "primary" : "danger"} className="text-[10px] px-1.5 py-0">
+                              <Badge variant={Number(tx.amount) > 0 ? "primary" : "danger"} className="text-[10px] px-1.5 py-0">
                                 {categoryLabels[tx.category] || tx.category}
                               </Badge>
                               <span className="text-[11px] text-slate-400 font-medium">{date}</span>
@@ -338,10 +338,10 @@ export default function GCoinsPage() {
                         <div className="text-right shrink-0 ml-3">
                           <p
                             className={`text-sm font-bold tracking-tight ${
-                              tx.amount > 0 ? "text-green-600" : "text-red-600"
+                              Number(tx.amount) > 0 ? "text-green-600" : "text-red-600"
                             }`}
                           >
-                            {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()} GC
+                            {Number(tx.amount) > 0 ? "+" : ""}{tx.amount.toLocaleString()} GC
                           </p>
                           <Badge variant={tx.type === "real" ? "primary" : "accent"} className="text-[10px] mt-0.5">
                             {tx.type === "real" ? "Real" : "Game"}

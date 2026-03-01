@@ -70,8 +70,7 @@ function formatDate(date: Date | string | null | undefined): string {
   return d.toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TournamentCard({ tournament }: { tournament: any }) {
+function TournamentCard({ tournament }: { tournament: any }) { // eslint-disable-line
   const enrollmentCount = tournament.enrollments?.length ?? 0;
   const maxParticipants = tournament.maxParticipants ?? 32;
   const fillPercent = Math.round((enrollmentCount / maxParticipants) * 100);
@@ -214,9 +213,8 @@ function TournamentGridSkeleton() {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function TournamentGrid({ tournaments, loadMoreRef, isFetchingNextPage, hasNextPage }: {
-  tournaments: any[];
+  tournaments: any[]; // eslint-disable-line
   loadMoreRef?: React.RefObject<HTMLDivElement | null>;
   isFetchingNextPage?: boolean;
   hasNextPage?: boolean;

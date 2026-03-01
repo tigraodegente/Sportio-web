@@ -94,8 +94,8 @@ export default function ChallengesPage() {
       title: newChallenge.title,
       description: newChallenge.description || undefined,
       reward: newChallenge.reward ? Number(newChallenge.reward) : undefined,
-      rewardType: newChallenge.rewardType || undefined,
-      goal: newChallenge.goal || undefined,
+      rewardType: (newChallenge.rewardType as "real" | "gamification") || undefined,
+      goal: newChallenge.goal ? { description: newChallenge.goal } : undefined,
       maxParticipants: newChallenge.maxParticipants
         ? Number(newChallenge.maxParticipants)
         : undefined,

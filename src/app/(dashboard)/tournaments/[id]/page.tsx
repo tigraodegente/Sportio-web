@@ -155,7 +155,7 @@ export default function TournamentDetailPage() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-2">
               <Badge className="bg-white/20 text-white border-0">
-                {statusMap[tournament.status]?.label ?? tournament.status}
+                {statusMap[tournament.status as string]?.label ?? tournament.status}
               </Badge>
               <Badge className="bg-white/15 text-white border-0 backdrop-blur-sm">
                 <span className="mr-0.5">{sportEmoji}</span> {sportName}
