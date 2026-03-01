@@ -1,11 +1,23 @@
 import { z } from "zod";
-import { eq, desc, and, ilike } from "drizzle-orm";
+import { eq, desc, and, ilike, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { tournaments, enrollments, matches } from "@/server/db/schema";
+import {
+  tournaments,
+  enrollments,
+  matches,
+  tournamentSponsors,
+  tournamentPrizes,
+  users,
+  gcoinTransactions,
+} from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
 import { getRuleTemplate, formatRulesAsText, getAllRuleTemplates } from "@/server/services/rules-engine";
-import { notifyTournamentEnrollment } from "@/server/services/notification-service";
+import {
+  notifyTournamentEnrollment,
+  notifySponsorshipApproved,
+  notifyPrizeAwarded,
+} from "@/server/services/notification-service";
 import {
   generateBracket as generateBracketService,
   advanceWinner as advanceWinnerService,
@@ -39,6 +51,11 @@ export const tournamentRouter = createTRPCRouter({
         with: {
           sport: true,
           organizer: true,
+          sponsors: {
+            where: eq(tournamentSponsors.status, "active"),
+            with: { brandUser: { columns: { id: true, name: true, image: true } } },
+            orderBy: [desc(tournamentSponsors.tier)],
+          },
         },
         orderBy: [desc(tournaments.startDate)],
         limit: input.limit + 1,
@@ -53,7 +70,7 @@ export const tournamentRouter = createTRPCRouter({
       return { items: results, nextCursor };
     }),
 
-  // Get tournament by ID
+  // Get tournament by ID (includes sponsors + prizes)
   getById: publicProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
@@ -63,12 +80,229 @@ export const tournamentRouter = createTRPCRouter({
           sport: true,
           organizer: true,
           enrollments: { with: { user: true } },
-          matches: {
-            orderBy: [desc(matches.round)],
+          matches: { orderBy: [desc(matches.round)] },
+          sponsors: {
+            with: {
+              brandUser: { columns: { id: true, name: true, image: true } },
+              prizes: true,
+            },
+            orderBy: [desc(tournamentSponsors.tier)],
+          },
+          prizes: {
+            with: {
+              sponsor: { with: { brandUser: { columns: { name: true, image: true } } } },
+              awardedTo: { columns: { id: true, name: true, image: true } },
+            },
+            orderBy: [tournamentPrizes.placement],
           },
         },
       });
       return tournament;
+    }),
+
+  // Get sponsors for a tournament (public)
+  sponsors: publicProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.tournamentSponsors.findMany({
+        where: and(
+          eq(tournamentSponsors.tournamentId, input.tournamentId),
+          eq(tournamentSponsors.status, "active")
+        ),
+        with: {
+          brandUser: { columns: { id: true, name: true, image: true } },
+          prizes: true,
+        },
+        orderBy: [desc(tournamentSponsors.tier)],
+      });
+    }),
+
+  // Get prizes for a tournament (public)
+  prizes: publicProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.query.tournamentPrizes.findMany({
+        where: eq(tournamentPrizes.tournamentId, input.tournamentId),
+        with: {
+          sponsor: { with: { brandUser: { columns: { name: true, image: true } } } },
+          awardedTo: { columns: { id: true, name: true, image: true } },
+        },
+        orderBy: [tournamentPrizes.placement],
+      });
+    }),
+
+  // Approve sponsorship (organizer only)
+  approveSponsorship: protectedProcedure
+    .input(z.object({ sponsorshipId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const sponsorship = await ctx.db.query.tournamentSponsors.findFirst({
+        where: eq(tournamentSponsors.id, input.sponsorshipId),
+        with: { tournament: true, brandUser: { columns: { name: true } } },
+      });
+
+      if (!sponsorship) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Patrocinio nao encontrado" });
+      }
+
+      if (sponsorship.tournament?.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode aprovar patrocinios" });
+      }
+
+      const [updated] = await ctx.db
+        .update(tournamentSponsors)
+        .set({ status: "active", updatedAt: new Date() })
+        .where(eq(tournamentSponsors.id, input.sponsorshipId))
+        .returning();
+
+      // Notify brand
+      notifySponsorshipApproved(
+        sponsorship.brandUserId,
+        sponsorship.tournament?.name ?? "",
+        sponsorship.tournamentId
+      ).catch(() => {});
+
+      return updated;
+    }),
+
+  // Reject sponsorship (organizer only, refunds GCoins)
+  rejectSponsorship: protectedProcedure
+    .input(z.object({ sponsorshipId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const sponsorship = await ctx.db.query.tournamentSponsors.findFirst({
+        where: eq(tournamentSponsors.id, input.sponsorshipId),
+        with: { tournament: true },
+      });
+
+      if (!sponsorship) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Patrocinio nao encontrado" });
+      }
+
+      if (sponsorship.tournament?.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode rejeitar patrocinios" });
+      }
+
+      // Refund GCoins
+      const refundAmount = Number(sponsorship.gcoinContribution ?? 0);
+      if (refundAmount > 0) {
+        await ctx.db
+          .update(users)
+          .set({ gcoinsReal: sql`${users.gcoinsReal} + ${refundAmount}` })
+          .where(eq(users.id, sponsorship.brandUserId));
+
+        await ctx.db.insert(gcoinTransactions).values({
+          userId: sponsorship.brandUserId,
+          type: "real",
+          category: "brand_reward",
+          amount: refundAmount.toString(),
+          description: `Patrocinio rejeitado - ${sponsorship.tournament?.name}`,
+        });
+
+        await ctx.db
+          .update(tournaments)
+          .set({ prizePool: sql`GREATEST(${tournaments.prizePool} - ${refundAmount}, 0)` })
+          .where(eq(tournaments.id, sponsorship.tournamentId));
+      }
+
+      await ctx.db.delete(tournamentPrizes).where(eq(tournamentPrizes.sponsorId, input.sponsorshipId));
+
+      const [updated] = await ctx.db
+        .update(tournamentSponsors)
+        .set({ status: "rejected", updatedAt: new Date() })
+        .where(eq(tournamentSponsors.id, input.sponsorshipId))
+        .returning();
+
+      return updated;
+    }),
+
+  // Award prizes to tournament winners (organizer action)
+  awardPrizes: protectedProcedure
+    .input(
+      z.object({
+        tournamentId: z.string().uuid(),
+        awards: z.array(
+          z.object({
+            prizeId: z.string().uuid(),
+            userId: z.string().uuid(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+      });
+
+      if (!tournament) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Torneio nao encontrado" });
+      }
+
+      if (tournament.organizerId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode distribuir premios" });
+      }
+
+      for (const award of input.awards) {
+        const prize = await ctx.db.query.tournamentPrizes.findFirst({
+          where: and(
+            eq(tournamentPrizes.id, award.prizeId),
+            eq(tournamentPrizes.tournamentId, input.tournamentId)
+          ),
+          with: { sponsor: { with: { brandUser: { columns: { name: true } } } } },
+        });
+
+        if (!prize || prize.isAwarded) continue;
+
+        // Award the prize
+        await ctx.db
+          .update(tournamentPrizes)
+          .set({
+            isAwarded: true,
+            awardedToUserId: award.userId,
+            awardedAt: new Date(),
+          })
+          .where(eq(tournamentPrizes.id, award.prizeId));
+
+        // If GCoin prize, credit the winner
+        if (prize.prizeType === "gcoin" && prize.gcoinAmount) {
+          const amount = Number(prize.gcoinAmount);
+          await ctx.db
+            .update(users)
+            .set({ gcoinsReal: sql`${users.gcoinsReal} + ${amount}` })
+            .where(eq(users.id, award.userId));
+
+          await ctx.db.insert(gcoinTransactions).values({
+            userId: award.userId,
+            type: "real",
+            category: "tournament_prize",
+            amount: amount.toString(),
+            description: `Premio ${prize.placement}o lugar - ${tournament.name}${prize.sponsor?.brandUser?.name ? ` (patrocinado por ${prize.sponsor.brandUser.name})` : ""}`,
+            referenceId: tournament.id,
+            referenceType: "tournament_prize",
+          });
+
+          const brandName = prize.sponsor?.brandUser?.name;
+          notifyPrizeAwarded(
+            award.userId,
+            tournament.name,
+            prize.placement,
+            `${amount} GCoins${brandName ? ` (${brandName})` : ""}`,
+            tournament.id
+          ).catch(() => {});
+        }
+
+        // If product prize, notify winner
+        if (prize.prizeType === "product" && prize.productName) {
+          const brandName = prize.sponsor?.brandUser?.name ?? "";
+          notifyPrizeAwarded(
+            award.userId,
+            tournament.name,
+            prize.placement,
+            `${prize.productName}${brandName ? ` (${brandName})` : ""}`,
+            tournament.id
+          ).catch(() => {});
+        }
+      }
+
+      return { success: true, awarded: input.awards.length };
     }),
 
   // Create tournament
@@ -175,7 +409,6 @@ export const tournamentRouter = createTRPCRouter({
         .onConflictDoNothing()
         .returning();
 
-      // Auto-post for enrollment
       const tournament = await ctx.db.query.tournaments.findFirst({
         where: eq(tournaments.id, input.tournamentId),
         columns: { name: true, sportId: true },
@@ -189,18 +422,22 @@ export const tournamentRouter = createTRPCRouter({
           tournamentId: input.tournamentId,
         }).catch(() => {});
 
-        // Notify the user about enrollment confirmation
         notifyTournamentEnrollment(ctx.session.user.id, tournament.name, input.tournamentId).catch(() => {});
       }
 
       return enrollment;
     }),
 
-  // Get my tournaments (as organizer)
+  // Get my tournaments (as organizer) - includes pending sponsorships
   myTournaments: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.tournaments.findMany({
       where: eq(tournaments.organizerId, ctx.session.user.id),
-      with: { sport: true },
+      with: {
+        sport: true,
+        sponsors: {
+          with: { brandUser: { columns: { id: true, name: true, image: true } } },
+        },
+      },
       orderBy: [desc(tournaments.createdAt)],
     });
   }),
@@ -238,23 +475,16 @@ export const tournamentRouter = createTRPCRouter({
   generateBracket: protectedProcedure
     .input(z.object({ tournamentId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      // Verify user is the organizer
       const tournament = await ctx.db.query.tournaments.findFirst({
         where: eq(tournaments.id, input.tournamentId),
       });
 
       if (!tournament) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Torneio nao encontrado.",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Torneio nao encontrado." });
       }
 
       if (tournament.organizerId !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Apenas o organizador pode gerar as chaves.",
-        });
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode gerar as chaves." });
       }
 
       try {
@@ -263,10 +493,7 @@ export const tournamentRouter = createTRPCRouter({
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Erro ao gerar as chaves do torneio.",
+          message: error instanceof Error ? error.message : "Erro ao gerar as chaves do torneio.",
         });
       }
     }),
@@ -275,24 +502,17 @@ export const tournamentRouter = createTRPCRouter({
   advanceWinner: protectedProcedure
     .input(z.object({ matchId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      // Verify the match exists and get the tournament to check organizer
       const match = await ctx.db.query.matches.findFirst({
         where: eq(matches.id, input.matchId),
         with: { tournament: true },
       });
 
       if (!match) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Partida nao encontrada.",
-        });
+        throw new TRPCError({ code: "NOT_FOUND", message: "Partida nao encontrada." });
       }
 
       if (match.tournament?.organizerId !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "Apenas o organizador pode avancar o vencedor.",
-        });
+        throw new TRPCError({ code: "FORBIDDEN", message: "Apenas o organizador pode avancar o vencedor." });
       }
 
       try {
@@ -301,10 +521,7 @@ export const tournamentRouter = createTRPCRouter({
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Erro ao avancar o vencedor.",
+          message: error instanceof Error ? error.message : "Erro ao avancar o vencedor.",
         });
       }
     }),
@@ -318,10 +535,7 @@ export const tournamentRouter = createTRPCRouter({
       } catch (error) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Erro ao buscar classificacao.",
+          message: error instanceof Error ? error.message : "Erro ao buscar classificacao.",
         });
       }
     }),

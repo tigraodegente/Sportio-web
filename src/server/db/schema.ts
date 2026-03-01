@@ -129,6 +129,13 @@ export const enrollmentStatusEnum = pgEnum("enrollment_status", [
   "cancelled",
 ]);
 
+export const sponsorTierEnum = pgEnum("sponsor_tier", [
+  "main",
+  "gold",
+  "silver",
+  "bronze",
+]);
+
 export const notificationTypeEnum = pgEnum("notification_type", [
   "tournament",
   "match",
@@ -779,6 +786,62 @@ export const campaignRedemptions = pgTable(
   ]
 );
 
+// Tournament Sponsors (multiple brands per tournament)
+export const tournamentSponsors = pgTable(
+  "tournament_sponsors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tournamentId: uuid("tournament_id")
+      .notNull()
+      .references(() => tournaments.id, { onDelete: "cascade" }),
+    brandUserId: uuid("brand_user_id")
+      .notNull()
+      .references(() => users.id),
+    campaignId: uuid("campaign_id")
+      .references(() => brandCampaigns.id),
+    tier: sponsorTierEnum("tier").notNull().default("bronze"),
+    gcoinContribution: decimal("gcoin_contribution", { precision: 12, scale: 2 }).default("0"),
+    productPrizes: jsonb("product_prizes"), // [{name, description, image, forPlacement}]
+    logoUrl: text("logo_url"),
+    message: text("message"),
+    status: sponsorshipStatusEnum("status").default("pending"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("tournament_sponsors_tournament_idx").on(table.tournamentId),
+    index("tournament_sponsors_brand_idx").on(table.brandUserId),
+    uniqueIndex("tournament_sponsors_unique_idx").on(table.tournamentId, table.brandUserId),
+  ]
+);
+
+// Tournament Prizes (GCoins or products awarded to placement winners)
+export const tournamentPrizes = pgTable(
+  "tournament_prizes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tournamentId: uuid("tournament_id")
+      .notNull()
+      .references(() => tournaments.id, { onDelete: "cascade" }),
+    sponsorId: uuid("sponsor_id")
+      .references(() => tournamentSponsors.id, { onDelete: "set null" }),
+    placement: integer("placement").notNull(), // 1 = champion, 2 = runner-up, 3 = third, etc.
+    prizeType: varchar("prize_type", { length: 20 }).notNull(), // 'gcoin' or 'product'
+    gcoinAmount: decimal("gcoin_amount", { precision: 12, scale: 2 }),
+    productName: varchar("product_name", { length: 255 }),
+    productDescription: text("product_description"),
+    productImage: text("product_image"),
+    isAwarded: boolean("is_awarded").default(false),
+    awardedToUserId: uuid("awarded_to_user_id").references(() => users.id),
+    awardedAt: timestamp("awarded_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("tournament_prizes_tournament_idx").on(table.tournamentId),
+    index("tournament_prizes_sponsor_idx").on(table.sponsorId),
+  ]
+);
+
 // User Settings (notification + privacy preferences)
 export const userSettings = pgTable("user_settings", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -848,6 +911,8 @@ export const tournamentsRelations = relations(tournaments, ({ one, many }) => ({
   organizer: one(users, { fields: [tournaments.organizerId], references: [users.id] }),
   enrollments: many(enrollments),
   matches: many(matches),
+  sponsors: many(tournamentSponsors),
+  prizes: many(tournamentPrizes),
 }));
 
 export const enrollmentsRelations = relations(enrollments, ({ one }) => ({
@@ -944,6 +1009,19 @@ export const brandCampaignsRelations = relations(brandCampaigns, ({ one, many })
 export const campaignRedemptionsRelations = relations(campaignRedemptions, ({ one }) => ({
   campaign: one(brandCampaigns, { fields: [campaignRedemptions.campaignId], references: [brandCampaigns.id] }),
   user: one(users, { fields: [campaignRedemptions.userId], references: [users.id] }),
+}));
+
+export const tournamentSponsorsRelations = relations(tournamentSponsors, ({ one, many }) => ({
+  tournament: one(tournaments, { fields: [tournamentSponsors.tournamentId], references: [tournaments.id] }),
+  brandUser: one(users, { fields: [tournamentSponsors.brandUserId], references: [users.id] }),
+  campaign: one(brandCampaigns, { fields: [tournamentSponsors.campaignId], references: [brandCampaigns.id] }),
+  prizes: many(tournamentPrizes),
+}));
+
+export const tournamentPrizesRelations = relations(tournamentPrizes, ({ one }) => ({
+  tournament: one(tournaments, { fields: [tournamentPrizes.tournamentId], references: [tournaments.id] }),
+  sponsor: one(tournamentSponsors, { fields: [tournamentPrizes.sponsorId], references: [tournamentSponsors.id] }),
+  awardedTo: one(users, { fields: [tournamentPrizes.awardedToUserId], references: [users.id] }),
 }));
 
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
