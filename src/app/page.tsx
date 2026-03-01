@@ -73,7 +73,7 @@ function SectionContainer({
   narrow?: boolean;
 }) {
   return (
-    <div className={cn("mx-auto w-full px-8 sm:px-10 lg:px-16", narrow ? "max-w-4xl" : "max-w-6xl", className)}>
+    <div className={cn("mx-auto w-full px-5 sm:px-10 lg:px-16", narrow ? "max-w-4xl" : "max-w-6xl", className)}>
       {children}
     </div>
   );
@@ -85,7 +85,7 @@ function SectionContainer({
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-32 sm:pt-40 pb-24 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-28 sm:pt-40 pb-16 sm:pb-32 lg:min-h-screen lg:flex lg:items-center lg:py-0">
       {/* Gradient orbs */}
       <div className="absolute inset-0">
         <div className="absolute top-[-20%] left-[-10%] h-[400px] w-[400px] sm:h-[600px] sm:w-[600px] rounded-full bg-blue-500/20 blur-[120px] animate-float" />
@@ -131,35 +131,35 @@ function HeroSection() {
         <div className="relative grid lg:grid-cols-2 gap-16 items-center">
           {/* Left content */}
           <div>
-            <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-5 py-2.5 backdrop-blur-sm">
+            <div className="mb-5 sm:mb-8 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-3.5 py-2 sm:px-5 sm:py-2.5 backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-400" />
               </span>
-              <span className="text-xs sm:text-sm font-medium text-yellow-200">Plataforma #1 de esportes no Brasil</span>
+              <span className="text-[11px] sm:text-sm font-medium text-yellow-200">Plataforma #1 de esportes no Brasil</span>
             </div>
 
-            <h1 className="text-[2.5rem] sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-8">
+            <h1 className="text-[2rem] sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-5 sm:mb-8">
               Transforme{" "}
               <span className="text-yellow-400">Esporte</span>
               {" "}em Renda Real
             </h1>
 
-            <p className="text-base sm:text-lg lg:text-xl text-blue-200 mb-12 max-w-xl leading-relaxed">
+            <p className="text-[15px] sm:text-lg lg:text-xl text-blue-200 mb-8 sm:mb-12 max-w-xl leading-relaxed">
               Junte-se a <span className="text-white font-semibold">12.500+ atletas</span> que ja transformam paixao em lucro real. Ganhe <span className="text-yellow-400 font-semibold">GCoins</span> competindo no que voce ama.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a
                 href="/register"
-                className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-yellow-400 px-8 py-4 text-base sm:text-lg font-bold text-blue-900 shadow-2xl shadow-yellow-400/30 transition-all duration-300 hover:bg-yellow-300 hover:shadow-yellow-400/50 hover:-translate-y-1 hover:scale-105 min-h-[56px]"
+                className="group relative inline-flex items-center justify-center gap-2 rounded-2xl bg-yellow-400 px-6 py-3.5 sm:px-8 sm:py-4 text-[15px] sm:text-lg font-bold text-blue-900 shadow-2xl shadow-yellow-400/30 transition-all duration-300 hover:bg-yellow-300 hover:shadow-yellow-400/50 hover:-translate-y-1 hover:scale-105 min-h-[48px] sm:min-h-[56px]"
               >
                 Comecar Gratis
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#como-funciona"
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 backdrop-blur-sm px-8 py-4 text-base sm:text-lg font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white/30"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 backdrop-blur-sm px-6 py-3.5 sm:px-8 sm:py-4 text-[15px] sm:text-lg font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white/30"
               >
                 <Play className="h-5 w-5" />
                 Como Funciona
@@ -220,8 +220,8 @@ function HeroSection() {
         </div>
 
         {/* Stats bar */}
-        <div className="mt-16 sm:mt-24 lg:mt-28">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6">
+        <div className="mt-10 sm:mt-24 lg:mt-28">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
             {[
               { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-yellow-400 to-amber-500" },
               { value: "850+", label: "Torneios/mes", icon: Trophy, color: "from-blue-400 to-blue-600" },
@@ -230,13 +230,13 @@ function HeroSection() {
             ].map((stat) => (
               <div
                 key={stat.label}
-                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6 text-center transition-all duration-300 hover:bg-white/10 hover:border-white/20"
               >
-                <div className={cn("mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
+                <div className={cn("mx-auto mb-2.5 sm:mb-3 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-br shadow-lg", stat.color)}>
                   <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-blue-900" />
                 </div>
-                <div className="text-2xl sm:text-3xl font-black text-white">{stat.value}</div>
-                <div className="mt-1.5 text-xs sm:text-sm text-blue-300">{stat.label}</div>
+                <div className="text-xl sm:text-3xl font-black text-white">{stat.value}</div>
+                <div className="mt-1 sm:mt-1.5 text-[11px] sm:text-sm text-blue-300">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -259,16 +259,16 @@ function HowItWorksSection() {
   ];
 
   return (
-    <section id="como-funciona" className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+    <section id="como-funciona" className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-yellow-400 to-blue-600" />
 
       <SectionContainer>
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Rocket className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-700">Simples e rapido</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Como <span className="text-blue-600">Funciona</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
@@ -323,19 +323,19 @@ function HowItWorksSection() {
 
 function GCoinsEconomySection() {
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-yellow-400/10 blur-[120px]" />
       </div>
 
       <SectionContainer className="relative">
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-5 py-2.5 mb-6 sm:mb-8">
             <BadgeDollarSign className="h-4 w-4 text-yellow-400" />
             <span className="text-sm font-semibold text-yellow-300">Economia digital</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
             A Economia do <span className="text-yellow-400">Sportio</span>
           </h2>
           <p className="text-base sm:text-lg text-blue-200 max-w-2xl mx-auto leading-relaxed">
@@ -345,7 +345,7 @@ function GCoinsEconomySection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* GCoins Reais */}
-          <div className="group rounded-3xl border border-yellow-400/20 bg-gradient-to-br from-yellow-400/10 to-yellow-400/5 backdrop-blur-sm p-8 sm:p-10 transition-all duration-500 hover:border-yellow-400/40 hover:shadow-2xl hover:shadow-yellow-400/10">
+          <div className="group rounded-3xl border border-yellow-400/20 bg-gradient-to-br from-yellow-400/10 to-yellow-400/5 backdrop-blur-sm p-6 sm:p-10 transition-all duration-500 hover:border-yellow-400/40 hover:shadow-2xl hover:shadow-yellow-400/10">
             <div className="flex items-center gap-4 mb-8">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg shadow-yellow-400/30">
                 <CircleDollarSign className="h-8 w-8 text-blue-900" />
@@ -374,7 +374,7 @@ function GCoinsEconomySection() {
           </div>
 
           {/* GCoins Gamificacao */}
-          <div className="group rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-400/10 to-blue-400/5 backdrop-blur-sm p-8 sm:p-10 transition-all duration-500 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-400/10">
+          <div className="group rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-400/10 to-blue-400/5 backdrop-blur-sm p-6 sm:p-10 transition-all duration-500 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-400/10">
             <div className="flex items-center gap-4 mb-8">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-400/30">
                 <Gift className="h-8 w-8 text-white" />
@@ -429,14 +429,14 @@ function SportsGridSection() {
   };
 
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white via-blue-50/30 to-white overflow-hidden">
       <SectionContainer>
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Sparkles className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-semibold text-blue-700">13 modalidades</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Encontre Seu <span className="text-blue-600">Esporte</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
@@ -445,16 +445,16 @@ function SportsGridSection() {
         </div>
 
         {/* Mobile: 3-col */}
-        <div className="grid grid-cols-3 gap-4 sm:hidden">
+        <div className="grid grid-cols-3 gap-2.5 sm:hidden">
           {SPORTS.map((sport) => {
             const IconComponent = SPORT_ICON_MAP[sport.icon] || Target;
             const colors = sportColors[sport.color] || sportColors["text-blue-500"];
             return (
-              <div key={sport.id} className={cn("flex flex-col items-center text-center rounded-2xl border bg-white py-6 px-3 shadow-sm", colors.border)}>
-                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl mb-3", colors.bg)}>
-                  <IconComponent className={cn("h-6 w-6", colors.text)} />
+              <div key={sport.id} className={cn("flex flex-col items-center text-center rounded-xl border bg-white py-4 px-2 shadow-sm", colors.border)}>
+                <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg mb-2", colors.bg)}>
+                  <IconComponent className={cn("h-5 w-5", colors.text)} />
                 </div>
-                <h3 className="text-xs font-bold text-gray-900 leading-tight">{sport.name}</h3>
+                <h3 className="text-[10px] font-bold text-gray-900 leading-tight">{sport.name}</h3>
               </div>
             );
           })}
@@ -499,19 +499,19 @@ function UserTypesSection() {
   };
 
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-1/3 left-0 h-72 w-72 rounded-full bg-blue-600/10 blur-[100px]" />
         <div className="absolute bottom-1/3 right-0 h-72 w-72 rounded-full bg-yellow-400/10 blur-[100px]" />
       </div>
 
       <SectionContainer className="relative">
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-400/10 px-5 py-2.5 mb-6 sm:mb-8">
             <Users className="h-4 w-4 text-blue-400" />
             <span className="text-sm font-semibold text-blue-300">Para cada perfil</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
             Ha um Lugar Para <span className="text-yellow-400">Voce</span>
           </h2>
           <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -572,21 +572,21 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
       <SectionContainer>
-        <div className="text-center mb-14 sm:mb-20">
+        <div className="text-center mb-10 sm:mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-yellow-50 px-5 py-2.5 mb-6 sm:mb-8">
             <Star className="h-4 w-4 text-yellow-600" />
             <span className="text-sm font-semibold text-yellow-700">Depoimentos reais</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Quem Ja Esta <span className="text-yellow-500">Ganhando</span>
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t) => (
-            <div key={t.author} className="group relative rounded-3xl border border-gray-100 bg-white p-8 sm:p-10 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
+            <div key={t.author} className="group relative rounded-3xl border border-gray-100 bg-white p-6 sm:p-10 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-2">
               <div className="flex gap-1 mb-6">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
@@ -622,7 +622,7 @@ function TestimonialsSection() {
 
 function CTASection() {
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-yellow-400/10 blur-3xl" />
         <div className="absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-blue-400/10 blur-3xl" />
@@ -633,7 +633,7 @@ function CTASection() {
           <Coins className="h-10 w-10 text-yellow-400" />
         </div>
 
-        <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
+        <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black text-white mb-6 leading-tight">
           Comece a Ganhar com Seu Esporte Hoje
         </h2>
 
@@ -683,10 +683,10 @@ function FAQSection() {
   ];
 
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 bg-gray-50 overflow-hidden">
+    <section className="relative py-16 sm:py-32 lg:py-40 bg-gray-50 overflow-hidden">
       <SectionContainer narrow>
-        <div className="text-center mb-14 sm:mb-20">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+        <div className="text-center mb-10 sm:mb-20">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
             Perguntas <span className="text-blue-600">Frequentes</span>
           </h2>
         </div>

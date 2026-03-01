@@ -35,7 +35,7 @@ export function Header() {
           : "bg-transparent"
       )}
     >
-      <div className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-8 sm:px-10 lg:px-12">
+      <div className="mx-auto flex h-16 sm:h-[72px] max-w-6xl items-center justify-between px-5 sm:px-10 lg:px-12">
         <Link href="/">
           <SportioLogo className="h-9" white={!scrolled} />
         </Link>
