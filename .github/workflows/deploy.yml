@@ -115,7 +115,21 @@ jobs:
       - name: Deploy to Production
         id: deploy-prod
         run: |
-          url=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$url" >> $GITHUB_OUTPUT
-          echo "### Production Deployed" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY
+          for attempt in 1 2 3; do
+            echo "Deploy attempt $attempt..."
+            url=$(vercel deploy --prebuilt --prod --archive=tgz --token=${{ secrets.VERCEL_TOKEN }} 2>&1) && {
+              echo "url=$url" >> $GITHUB_OUTPUT
+              echo "### Production Deployed" >> $GITHUB_STEP_SUMMARY
+              echo "**URL:** $url" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            }
+            echo "Attempt $attempt failed: $url"
+            if echo "$url" | grep -q "Too many requests"; then
+              echo "Rate limited. Waiting before retry..."
+              sleep $((60 * attempt))
+            else
+              sleep $((10 * attempt))
+            fi
+          done
+          echo "All deploy attempts failed"
+          exit 1
