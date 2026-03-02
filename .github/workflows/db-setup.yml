@@ -50,5 +50,8 @@ jobs:
       - name: Success
         run: |
           echo "### Database setup completed" >> $GITHUB_STEP_SUMMARY
-          echo "- Schema pushed" >> $GITHUB_STEP_SUMMARY
-          echo "- Seed data loaded (43 sports)" >> $GITHUB_STEP_SUMMARY
+          echo "- Schema pushed (includes achievements, missions, payments tables)" >> $GITHUB_STEP_SUMMARY
+          echo "- Seed data loaded:" >> $GITHUB_STEP_SUMMARY
+          echo "  - 43 sports" >> $GITHUB_STEP_SUMMARY
+          echo "  - 55+ achievements (all 10 personas)" >> $GITHUB_STEP_SUMMARY
+          echo "  - 16+ missions (daily + weekly)" >> $GITHUB_STEP_SUMMARY
