@@ -112,6 +112,20 @@ export const matchStatusEnum = pgEnum("match_status", [
   "cancelled",
 ]);
 
+export const challengeStatusEnum = pgEnum("challenge_status", [
+  "pending",         // Created, waiting opponent to accept
+  "accepted",        // Opponent accepted, waiting to open bets
+  "betting_open",    // Open for bets
+  "in_progress",     // Challenge happening (bets closed)
+  "completed",       // Result determined
+  "cancelled",       // Cancelled/declined
+]);
+
+export const challengeTypeEnum = pgEnum("challenge_type", [
+  "duel",            // 1v1 challenge between two players
+  "community",       // Community challenge (original type - goal-based)
+]);
+
 export const betTypeEnum = pgEnum("bet_type", [
   "winner",
   "score",
@@ -486,12 +500,9 @@ export const bets = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    matchId: uuid("match_id")
-      .notNull()
-      .references(() => matches.id),
-    tournamentId: uuid("tournament_id")
-      .notNull()
-      .references(() => tournaments.id),
+    matchId: uuid("match_id").references(() => matches.id),
+    tournamentId: uuid("tournament_id").references(() => tournaments.id),
+    challengeId: uuid("challenge_id").references(() => challenges.id),
     betType: betTypeEnum("bet_type").notNull(),
     prediction: jsonb("prediction").notNull(),
     amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
@@ -504,6 +515,7 @@ export const bets = pgTable(
   (table) => [
     index("bets_user_idx").on(table.userId),
     index("bets_match_idx").on(table.matchId),
+    index("bets_challenge_idx").on(table.challengeId),
     index("bets_result_idx").on(table.result),
   ]
 );
@@ -596,20 +608,42 @@ export const challenges = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
+    challengeType: challengeTypeEnum("challenge_type").default("duel").notNull(),
+    status: challengeStatusEnum("status").default("pending").notNull(),
     sportId: uuid("sport_id").references(() => sports.id),
     creatorId: uuid("creator_id")
       .notNull()
       .references(() => users.id),
+    // 1v1 Duel fields
+    opponentId: uuid("opponent_id").references(() => users.id),
+    winnerId: uuid("winner_id").references(() => users.id),
+    score1: integer("score1"),  // creator's score
+    score2: integer("score2"),  // opponent's score
+    // Betting
+    bettingEnabled: boolean("betting_enabled").default(true),
+    bettingDeadline: timestamp("betting_deadline"),
+    // Reward
     reward: decimal("reward", { precision: 10, scale: 2 }).default("0"),
     rewardType: gcoinTypeEnum("reward_type").default("gamification"),
+    wagerAmount: decimal("wager_amount", { precision: 10, scale: 2 }).default("0"), // GCoins each player puts up
+    // Community challenge fields (kept for backward compat)
     goal: jsonb("goal"),
     maxParticipants: integer("max_participants"),
+    // Timing
     startsAt: timestamp("starts_at"),
     endsAt: timestamp("ends_at"),
+    acceptedAt: timestamp("accepted_at"),
+    completedAt: timestamp("completed_at"),
     isActive: boolean("is_active").default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("challenges_sport_idx").on(table.sportId)]
+  (table) => [
+    index("challenges_sport_idx").on(table.sportId),
+    index("challenges_creator_idx").on(table.creatorId),
+    index("challenges_opponent_idx").on(table.opponentId),
+    index("challenges_status_idx").on(table.status),
+    index("challenges_type_idx").on(table.challengeType),
+  ]
 );
 
 // Challenge Participants
@@ -1185,12 +1219,16 @@ export const betsRelations = relations(bets, ({ one }) => ({
   user: one(users, { fields: [bets.userId], references: [users.id] }),
   match: one(matches, { fields: [bets.matchId], references: [matches.id] }),
   tournament: one(tournaments, { fields: [bets.tournamentId], references: [tournaments.id] }),
+  challenge: one(challenges, { fields: [bets.challengeId], references: [challenges.id] }),
 }));
 
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
   sport: one(sports, { fields: [challenges.sportId], references: [sports.id] }),
-  creator: one(users, { fields: [challenges.creatorId], references: [users.id] }),
+  creator: one(users, { fields: [challenges.creatorId], references: [users.id], relationName: "challengeCreator" }),
+  opponent: one(users, { fields: [challenges.opponentId], references: [users.id], relationName: "challengeOpponent" }),
+  winner: one(users, { fields: [challenges.winnerId], references: [users.id], relationName: "challengeWinner" }),
   participants: many(challengeParticipants),
+  bets: many(bets),
 }));
 
 export const challengeParticipantsRelations = relations(challengeParticipants, ({ one }) => ({

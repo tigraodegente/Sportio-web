@@ -136,6 +136,25 @@ export async function notifyChallengeComplete(userId: string, challengeTitle: st
   });
 }
 
+export async function notifyChallengeDuel(userId: string, challengerName: string, challengeTitle: string, challengeId: string, wager?: number) {
+  return createNotification({
+    userId,
+    type: "challenge",
+    title: "Desafio 1v1 recebido!",
+    message: `${challengerName} te desafiou: "${challengeTitle}"${wager ? ` (aposta: ${wager} GCoins)` : ""}`,
+    data: { challengeId, challengerName, wager },
+  });
+}
+
+export async function notifyChallengeBettingOpen(userIds: string[], challengeTitle: string, challengeId: string) {
+  return createBulkNotifications(userIds, {
+    type: "challenge",
+    title: "Apostas abertas!",
+    message: `As apostas estão abertas para o desafio "${challengeTitle}". Faça seu palpite!`,
+    data: { challengeId },
+  });
+}
+
 export async function notifyChatMessage(userId: string, senderName: string, roomId: string) {
   return createNotification({
     userId,

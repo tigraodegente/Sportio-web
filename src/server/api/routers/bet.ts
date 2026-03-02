@@ -2,12 +2,12 @@ import { z } from "zod";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { bets, users, gcoinTransactions } from "@/server/db/schema";
-import { calculateOdds } from "@/server/services/odds-calculator";
+import { bets, users, gcoinTransactions, challenges } from "@/server/db/schema";
+import { calculateOdds, calculateChallengeOdds } from "@/server/services/odds-calculator";
 import { awardXP } from "@/server/services/gamification";
 
 export const betRouter = createTRPCRouter({
-  // Place bet
+  // Apostar em partida de torneio
   place: protectedProcedure
     .input(
       z.object({
@@ -19,7 +19,6 @@ export const betRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      // Check balance
       const user = await ctx.db.query.users.findFirst({
         where: eq(users.id, ctx.session.user.id),
         columns: { gcoinsGamification: true },
@@ -29,11 +28,9 @@ export const betRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Saldo insuficiente de GCoins" });
       }
 
-      // Dynamic odds calculation based on existing bets
       const { odds } = await calculateOdds(ctx.db, input.matchId, input.betType, input.prediction);
       const potentialWin = input.amount * odds;
 
-      // Debit user
       await ctx.db
         .update(users)
         .set({
@@ -41,7 +38,6 @@ export const betRouter = createTRPCRouter({
         })
         .where(eq(users.id, ctx.session.user.id));
 
-      // Create bet
       const [bet] = await ctx.db
         .insert(bets)
         .values({
@@ -56,7 +52,6 @@ export const betRouter = createTRPCRouter({
         })
         .returning();
 
-      // Log transaction
       await ctx.db.insert(gcoinTransactions).values({
         userId: ctx.session.user.id,
         type: "gamification",
@@ -72,7 +67,110 @@ export const betRouter = createTRPCRouter({
       return bet;
     }),
 
-  // My bets
+  // Apostar em desafio 1v1
+  placeChallengeBet: protectedProcedure
+    .input(
+      z.object({
+        challengeId: z.string().uuid(),
+        winnerId: z.string().uuid(),
+        amount: z.number().positive().max(10000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Verificar desafio existe e está aberto para apostas
+      const challenge = await ctx.db.query.challenges.findFirst({
+        where: eq(challenges.id, input.challengeId),
+      });
+
+      if (!challenge) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Desafio não encontrado" });
+      }
+      if (challenge.status !== "betting_open") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Apostas não estão abertas para este desafio" });
+      }
+      if (challenge.bettingDeadline && new Date() > challenge.bettingDeadline) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Prazo de apostas encerrado" });
+      }
+
+      // Não permitir que os participantes apostem no próprio desafio
+      if (userId === challenge.creatorId || userId === challenge.opponentId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Participantes do desafio não podem apostar" });
+      }
+
+      // Verificar que winnerId é um dos participantes
+      if (input.winnerId !== challenge.creatorId && input.winnerId !== challenge.opponentId) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Escolha um dos participantes como vencedor" });
+      }
+
+      // Verificar saldo
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, userId),
+        columns: { gcoinsGamification: true },
+      });
+
+      if (Number(user?.gcoinsGamification ?? 0) < input.amount) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Saldo insuficiente de GCoins" });
+      }
+
+      // Calcular odds
+      const prediction = { winnerId: input.winnerId };
+      const { odds } = await calculateChallengeOdds(ctx.db, input.challengeId, prediction);
+      const potentialWin = input.amount * odds;
+
+      // Debitar
+      await ctx.db
+        .update(users)
+        .set({
+          gcoinsGamification: sql`${users.gcoinsGamification} - ${input.amount}`,
+        })
+        .where(eq(users.id, userId));
+
+      // Criar aposta
+      const [bet] = await ctx.db
+        .insert(bets)
+        .values({
+          userId,
+          challengeId: input.challengeId,
+          betType: "winner",
+          prediction,
+          amount: input.amount.toString(),
+          odds: odds.toString(),
+          potentialWin: potentialWin.toString(),
+        })
+        .returning();
+
+      // Log transação
+      await ctx.db.insert(gcoinTransactions).values({
+        userId,
+        type: "gamification",
+        category: "bet_place",
+        amount: (-input.amount).toString(),
+        description: `Palpite no desafio "${challenge.title}"`,
+        referenceId: bet.id,
+        referenceType: "bet",
+      });
+
+      awardXP(userId, "bet_placed").catch(() => {});
+
+      return bet;
+    }),
+
+  // Odds de desafio
+  getChallengeOdds: publicProcedure
+    .input(
+      z.object({
+        challengeId: z.string().uuid(),
+        winnerId: z.string().uuid(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const prediction = { winnerId: input.winnerId };
+      return calculateChallengeOdds(ctx.db, input.challengeId, prediction);
+    }),
+
+  // Minhas apostas
   myBets: protectedProcedure
     .input(
       z.object({
@@ -89,13 +187,19 @@ export const betRouter = createTRPCRouter({
         with: {
           match: true,
           tournament: true,
+          challenge: {
+            with: {
+              creator: { columns: { id: true, name: true, image: true } },
+              opponent: { columns: { id: true, name: true, image: true } },
+            },
+          },
         },
         orderBy: [desc(bets.createdAt)],
         limit: input.limit,
       });
     }),
 
-  // Get current odds for a match
+  // Odds de partida de torneio
   getOdds: publicProcedure
     .input(
       z.object({
@@ -109,7 +213,7 @@ export const betRouter = createTRPCRouter({
       return result;
     }),
 
-  // Leaderboard
+  // Ranking de apostadores
   leaderboard: publicProcedure
     .input(z.object({ limit: z.number().min(1).max(100).default(50) }))
     .query(async ({ ctx, input }) => {
