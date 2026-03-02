@@ -1,4 +1,5 @@
 // E2E Test Helpers - HTTP client, auth, assertions
+import { execSync } from "child_process";
 import { BASE_URL, TRPC_URL, AUTH_URL } from "./config";
 
 // ============================================================
@@ -27,12 +28,28 @@ interface TestResult {
   duration?: number;
 }
 
+interface CurlResponse {
+  status: number;
+  headers: Record<string, string>;
+  setCookies: string[];
+  body: string;
+}
+
 // ============================================================
 // State - cookies per user session
 // ============================================================
 
 const sessionCookies: Record<string, string> = {};
+const cookieJarFiles: Record<string, string> = {};
 const userIds: Record<string, string> = {};
+let useCurl = false; // Will be set to true if native fetch fails
+
+function getCookieJar(userKey: string): string {
+  if (!cookieJarFiles[userKey]) {
+    cookieJarFiles[userKey] = `/tmp/_e2e_jar_${userKey}_${Date.now()}`;
+  }
+  return cookieJarFiles[userKey];
+}
 
 export function setUserId(userKey: string, id: string) {
   userIds[userKey] = id;
@@ -92,8 +109,234 @@ export function getResults() {
 }
 
 // ============================================================
-// HTTP helpers
+// Network detection - check if native fetch works
 // ============================================================
+
+export async function detectNetwork(): Promise<void> {
+  try {
+    const res = await fetch(BASE_URL, { signal: AbortSignal.timeout(5000) });
+    if (res.ok || res.status < 500) {
+      useCurl = false;
+      console.log("  Usando: Node.js fetch nativo");
+      return;
+    }
+  } catch {
+    // fetch failed, try curl
+  }
+
+  try {
+    execSync(`curl -sf -o /dev/null -w "%{http_code}" "${BASE_URL}"`, { timeout: 10000 });
+    useCurl = true;
+    console.log("  Usando: curl (fallback - DNS bloqueado para Node.js)");
+  } catch {
+    useCurl = false;
+    console.log("  AVISO: Nem fetch nem curl funcionam. Testes podem falhar.");
+  }
+}
+
+// ============================================================
+// curl-based HTTP client
+// ============================================================
+
+function curlRequest(
+  url: string,
+  method: string,
+  headers: Record<string, string>,
+  body?: string,
+): CurlResponse {
+  const args: string[] = [
+    "curl", "-sS",
+    "-X", method,
+    "--max-time", "30",
+    "-D", "-",        // dump headers to stdout
+    "-o", "/dev/stderr", // body to stderr
+  ];
+
+  for (const [k, v] of Object.entries(headers)) {
+    args.push("-H", `${k}: ${v}`);
+  }
+
+  if (body) {
+    args.push("-d", body);
+  }
+
+  // Don't follow redirects (we handle them manually)
+  args.push("-L"); // Actually, DO follow for page checks
+  args.push("--max-redirs", "0");
+  args.push(url);
+
+  try {
+    // Execute curl, capture both stdout (headers) and stderr (body)
+    const headerOutput = execSync(args.join(" "), {
+      timeout: 35000,
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    // Parse status and headers from header output
+    return parseCurlHeaders(headerOutput);
+  } catch (error: any) {
+    // execSync throws on non-zero exit, but curl may return body in stderr
+    if (error.stdout || error.stderr) {
+      const headerStr = typeof error.stdout === "string" ? error.stdout : "";
+      const bodyStr = typeof error.stderr === "string" ? error.stderr : "";
+      const parsed = parseCurlHeaders(headerStr);
+      if (bodyStr) parsed.body = bodyStr;
+      return parsed;
+    }
+    return { status: 0, headers: {}, setCookies: [], body: "" };
+  }
+}
+
+function parseCurlHeaders(raw: string): CurlResponse {
+  const lines = raw.split("\r\n");
+  let status = 0;
+  const headers: Record<string, string> = {};
+  const setCookies: string[] = [];
+
+  for (const line of lines) {
+    if (line.startsWith("HTTP/")) {
+      const parts = line.split(" ");
+      status = parseInt(parts[1] || "0", 10);
+    } else if (line.includes(":")) {
+      const idx = line.indexOf(":");
+      const key = line.substring(0, idx).trim().toLowerCase();
+      const val = line.substring(idx + 1).trim();
+      if (key === "set-cookie") {
+        setCookies.push(val);
+      }
+      headers[key] = val;
+    }
+  }
+
+  return { status, headers, setCookies, body: "" };
+}
+
+// Simpler curl that returns body
+function curlFetch(
+  url: string,
+  method: string,
+  headers: Record<string, string>,
+  body?: string,
+  userKey?: string,
+): { status: number; body: string; setCookies: string[] } {
+  const args: string[] = [
+    "curl", "-sS",
+    "-X", method,
+    "--max-time", "30",
+    "-w", "\\n__CURL_STATUS__%{http_code}__END__",
+    "-D", "/dev/stderr",  // Headers to stderr
+  ];
+
+  // Use cookie jar if userKey provided
+  if (userKey) {
+    const jar = getCookieJar(userKey);
+    args.push("-b", jar, "-c", jar);
+    // Remove Cookie header since jar handles it
+    delete headers["Cookie"];
+  }
+
+  for (const [k, v] of Object.entries(headers)) {
+    args.push("-H", `${k}: ${v}`);
+  }
+
+  if (body) {
+    args.push("-d", body);
+  }
+
+  args.push(url);
+
+  // Build safe command string
+  const cmd = args.map(a => {
+    // Quote args that contain spaces or special chars
+    if (a.includes(" ") || a.includes('"') || a.includes("'") || a.includes("&") || a.includes("?") || a.includes("{")) {
+      return `'${a.replace(/'/g, "'\\''")}'`;
+    }
+    return a;
+  }).join(" ");
+
+  try {
+    // stdout = body + status marker, stderr = headers
+    const output = execSync(`${cmd} 2>/tmp/_curl_headers_$$`, {
+      timeout: 35000,
+      encoding: "utf-8",
+      maxBuffer: 10 * 1024 * 1024,
+    });
+
+    // Read headers from temp file
+    let headerPart = "";
+    try {
+      headerPart = execSync(`cat /tmp/_curl_headers_$$ 2>/dev/null; rm -f /tmp/_curl_headers_$$`, {
+        encoding: "utf-8",
+        timeout: 5000,
+      });
+    } catch {}
+
+    // Extract status from end marker
+    const statusMatch = output.match(/__CURL_STATUS__(\d+)__END__/);
+    const status = statusMatch ? parseInt(statusMatch[1], 10) : 0;
+
+    // Remove the status marker from body
+    const bodyPart = output.replace(/\n?__CURL_STATUS__\d+__END__\s*$/, "").trim();
+
+    // Extract Set-Cookie headers from stderr headers
+    const setCookies: string[] = [];
+    for (const line of headerPart.split(/\r?\n/)) {
+      if (line.toLowerCase().startsWith("set-cookie:")) {
+        setCookies.push(line.substring(11).trim());
+      }
+    }
+
+    return { status, body: bodyPart, setCookies };
+  } catch (error: any) {
+    // execSync throws if curl exits non-zero - extract what we can
+    const stdout = typeof error.stdout === "string" ? error.stdout : "";
+    const stderr = typeof error.stderr === "string" ? error.stderr : "";
+
+    const statusMatch = stdout.match(/__CURL_STATUS__(\d+)__END__/);
+    const status = statusMatch ? parseInt(statusMatch[1], 10) : 0;
+    const bodyPart = stdout.replace(/\n?__CURL_STATUS__\d+__END__\s*$/, "").trim();
+
+    const setCookies: string[] = [];
+    for (const line of stderr.split(/\r?\n/)) {
+      if (line.toLowerCase().startsWith("set-cookie:")) {
+        setCookies.push(line.substring(11).trim());
+      }
+    }
+
+    return { status, body: bodyPart || stderr.substring(0, 500), setCookies };
+  }
+}
+
+// ============================================================
+// Unified HTTP helpers (fetch or curl)
+// ============================================================
+
+function saveCookiesFromArray(cookieHeaders: string[], userKey: string) {
+  if (cookieHeaders.length === 0) return;
+
+  const existing = sessionCookies[userKey] || "";
+  const existingPairs = existing
+    ? existing.split("; ").reduce(
+        (acc, pair) => {
+          const [key] = pair.split("=");
+          if (key) acc[key] = pair;
+          return acc;
+        },
+        {} as Record<string, string>
+      )
+    : {};
+
+  for (const cookie of cookieHeaders) {
+    const mainPart = cookie.split(";")[0];
+    if (mainPart) {
+      const [key] = mainPart.split("=");
+      if (key) existingPairs[key] = mainPart;
+    }
+  }
+
+  sessionCookies[userKey] = Object.values(existingPairs).join("; ");
+}
 
 async function fetchWithCookies(
   url: string,
@@ -114,29 +357,7 @@ async function fetchWithCookies(
 
 function saveCookies(response: Response, userKey: string) {
   const setCookieHeaders = response.headers.getSetCookie?.() || [];
-  if (setCookieHeaders.length > 0) {
-    const existing = sessionCookies[userKey] || "";
-    const existingPairs = existing
-      ? existing.split("; ").reduce(
-          (acc, pair) => {
-            const [key] = pair.split("=");
-            if (key) acc[key] = pair;
-            return acc;
-          },
-          {} as Record<string, string>
-        )
-      : {};
-
-    for (const cookie of setCookieHeaders) {
-      const mainPart = cookie.split(";")[0];
-      if (mainPart) {
-        const [key] = mainPart.split("=");
-        if (key) existingPairs[key] = mainPart;
-      }
-    }
-
-    sessionCookies[userKey] = Object.values(existingPairs).join("; ");
-  }
+  saveCookiesFromArray(setCookieHeaders, userKey);
 }
 
 // ============================================================
@@ -148,6 +369,8 @@ export async function loginUser(
   password: string,
   userKey: string
 ): Promise<boolean> {
+  if (useCurl) return loginUserCurl(email, password, userKey);
+
   try {
     // Step 1: Get CSRF token
     const csrfRes = await fetch(`${AUTH_URL}/csrf`);
@@ -204,6 +427,77 @@ export async function loginUser(
   }
 }
 
+function loginUserCurl(email: string, password: string, userKey: string): boolean {
+  try {
+    const cookieJar = getCookieJar(userKey);
+
+    // Step 1: Get CSRF token (with cookie jar)
+    const csrfBody = execSync(
+      `curl -sS --max-time 15 -c '${cookieJar}' '${AUTH_URL}/csrf'`,
+      { encoding: "utf-8", timeout: 20000 }
+    ).trim();
+
+    let csrfToken = "";
+    try {
+      const csrfData = JSON.parse(csrfBody) as { csrfToken: string };
+      csrfToken = csrfData.csrfToken;
+    } catch {
+      return false;
+    }
+
+    // Step 2: POST credentials (use cookie jar, capture set-cookie headers)
+    const params = new URLSearchParams({
+      email, password, csrfToken,
+      callbackUrl: BASE_URL,
+      json: "true",
+    });
+
+    // Use -b/-c for cookie jar and -D to capture response headers
+    execSync(
+      `curl -sS --max-time 15 -b '${cookieJar}' -c '${cookieJar}' ` +
+      `-X POST -H 'Content-Type: application/x-www-form-urlencoded' ` +
+      `-d '${params.toString()}' ` +
+      `-o /dev/null ` +
+      `'${AUTH_URL}/callback/credentials'`,
+      { encoding: "utf-8", timeout: 20000 }
+    );
+
+    // Step 3: Verify session using cookie jar
+    const sessionBody = execSync(
+      `curl -sS --max-time 15 -b '${cookieJar}' '${AUTH_URL}/session'`,
+      { encoding: "utf-8", timeout: 20000 }
+    ).trim();
+
+    // Read cookie jar and extract cookies for our session state
+    try {
+      const jarContent = execSync(`cat '${cookieJar}' 2>/dev/null`, { encoding: "utf-8" });
+      const cookieParts: string[] = [];
+      for (const line of jarContent.split("\n")) {
+        if (line.startsWith("#") || !line.trim()) continue;
+        const parts = line.split("\t");
+        if (parts.length >= 7) {
+          cookieParts.push(`${parts[5]}=${parts[6]}`);
+        }
+      }
+      if (cookieParts.length > 0) {
+        sessionCookies[userKey] = cookieParts.join("; ");
+      }
+    } catch {}
+
+    try {
+      const session = JSON.parse(sessionBody) as { user?: { id: string; email: string } };
+      if (session?.user?.id) {
+        userIds[userKey] = session.user.id;
+        return true;
+      }
+    } catch {}
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // ============================================================
 // tRPC call helpers
 // ============================================================
@@ -213,28 +507,20 @@ export async function trpcQuery<T = unknown>(
   input?: unknown,
   userKey?: string
 ): Promise<{ data?: T; error?: string }> {
-  try {
-    // tRPC v11 with superjson: wrap input in {json: ...}
-    const url = input !== undefined
-      ? `${TRPC_URL}/${procedure}?input=${encodeURIComponent(JSON.stringify({ json: input }))}`
-      : `${TRPC_URL}/${procedure}`;
+  const url = input !== undefined
+    ? `${TRPC_URL}/${procedure}?input=${encodeURIComponent(JSON.stringify({ json: input }))}`
+    : `${TRPC_URL}/${procedure}`;
 
+  if (useCurl) {
+    return trpcCallCurl<T>(url, "GET", undefined, userKey);
+  }
+
+  try {
     const res = await fetchWithCookies(url, { method: "GET" }, userKey);
     if (userKey) saveCookies(res, userKey);
 
     const raw = await res.text();
-    try {
-      const json = JSON.parse(raw) as TRPCResponse<T>;
-      const err = json.error?.json || json.error;
-      if (err) {
-        return { error: (err as any).message || JSON.stringify(err) };
-      }
-      // superjson wraps in {json: ...}
-      const data = json.result?.data;
-      return { data: (data as any)?.json !== undefined ? (data as any).json : data as T };
-    } catch {
-      return { error: `Parse error: ${raw.substring(0, 200)}` };
-    }
+    return parseTrpcResponse<T>(raw);
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }
@@ -245,32 +531,59 @@ export async function trpcMutation<T = unknown>(
   input: unknown,
   userKey?: string
 ): Promise<{ data?: T; error?: string }> {
+  const url = `${TRPC_URL}/${procedure}`;
+  const body = JSON.stringify({ json: input });
+
+  if (useCurl) {
+    return trpcCallCurl<T>(url, "POST", body, userKey);
+  }
+
   try {
-    // tRPC v11 with superjson: wrap input in {json: ...}
     const res = await fetchWithCookies(
-      `${TRPC_URL}/${procedure}`,
-      {
-        method: "POST",
-        body: JSON.stringify({ json: input }),
-      },
+      url,
+      { method: "POST", body },
       userKey
     );
     if (userKey) saveCookies(res, userKey);
 
     const raw = await res.text();
-    try {
-      const json = JSON.parse(raw) as TRPCResponse<T>;
-      const err = json.error?.json || json.error;
-      if (err) {
-        return { error: (err as any).message || JSON.stringify(err) };
-      }
-      const data = json.result?.data;
-      return { data: (data as any)?.json !== undefined ? (data as any).json : data as T };
-    } catch {
-      return { error: `Parse error: ${raw.substring(0, 200)}` };
-    }
+    return parseTrpcResponse<T>(raw);
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function trpcCallCurl<T>(
+  url: string,
+  method: string,
+  body?: string,
+  userKey?: string
+): { data?: T; error?: string } {
+  try {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    const res = curlFetch(url, method, headers, body, userKey);
+
+    return parseTrpcResponse<T>(res.body);
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function parseTrpcResponse<T>(raw: string): { data?: T; error?: string } {
+  try {
+    const json = JSON.parse(raw) as TRPCResponse<T>;
+    const err = json.error?.json || json.error;
+    if (err) {
+      return { error: (err as any).message || JSON.stringify(err) };
+    }
+    // superjson wraps in {json: ...}
+    const data = json.result?.data;
+    return { data: (data as any)?.json !== undefined ? (data as any).json : data as T };
+  } catch {
+    return { error: `Parse error: ${raw.substring(0, 200)}` };
   }
 }
 
@@ -282,6 +595,16 @@ export async function checkPage(
   path: string,
   userKey?: string
 ): Promise<{ ok: boolean; status: number; error?: string }> {
+  if (useCurl) {
+    try {
+      const res = curlFetch(`${BASE_URL}${path}`, "GET", {}, undefined, userKey ?? "default");
+      const ok = (res.status >= 200 && res.status < 400) || res.status === 302 || res.status === 307;
+      return { ok, status: res.status };
+    } catch (error) {
+      return { ok: false, status: 0, error: error instanceof Error ? error.message : String(error) };
+    }
+  }
+
   try {
     const res = await fetchWithCookies(`${BASE_URL}${path}`, {}, userKey);
     saveCookies(res, userKey ?? "default");
