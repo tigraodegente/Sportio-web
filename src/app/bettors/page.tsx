@@ -144,7 +144,7 @@ export default function BettorsPage() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="#"
+                href="/register"
                 className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Começar a Apostar
@@ -317,7 +317,7 @@ export default function BettorsPage() {
               GCoins. Cadastro gratuito.
             </p>
             <a
-              href="#"
+              href="/register"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Criar Minha Conta Grátis

@@ -137,7 +137,7 @@ export default function RefereesPage() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="#"
+                href="/register?persona=referee"
                 className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Cadastrar como Árbitro
@@ -289,7 +289,7 @@ export default function RefereesPage() {
               para partidas na sua região.
             </p>
             <a
-              href="#"
+              href="/register?persona=referee"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Cadastrar Agora

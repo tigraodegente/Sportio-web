@@ -370,7 +370,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Compita em torneios, ganhe GCoins com vitorias e transforme seu talento esportivo em renda real via PIX.",
     icon: "Users",
-    href: "/register",
+    href: "/athletes",
     color: "text-emerald-500",
   },
   {
@@ -379,7 +379,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Crie torneios, gerencie inscricoes e brackets. Lucre organizando eventos esportivos profissionais.",
     icon: "CalendarDays",
-    href: "/register",
+    href: "/organizers",
     color: "text-blue-500",
   },
   {
@@ -388,7 +388,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Patrocine atletas e torneios, de produtos como premio, compre GCoins e aumente a visibilidade da sua marca.",
     icon: "Building2",
-    href: "/register",
+    href: "/brands",
     color: "text-purple-500",
   },
   {
@@ -397,7 +397,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Conecte-se com atletas, organize treinos e campeonatos. Aumente sua renda e visibilidade como treinador.",
     icon: "ShieldCheck",
-    href: "/register",
+    href: "/register?persona=trainer",
     color: "text-amber-500",
   },
   {
@@ -406,7 +406,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Seja escalado para partidas e torneios, construa sua reputacao e ganhe por arbitrar eventos.",
     icon: "ShieldCheck",
-    href: "/register",
+    href: "/referees",
     color: "text-slate-500",
   },
   {
@@ -415,7 +415,7 @@ export const USER_TYPES: UserType[] = [
     description:
       "Qualquer pessoa pode acompanhar torneios ao vivo, dar palpites com GCoins e interagir com a comunidade. Basta se cadastrar!",
     icon: "Heart",
-    href: "/register",
+    href: "/fans",
     color: "text-red-500",
   },
 ];

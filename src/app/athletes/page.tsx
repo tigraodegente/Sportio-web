@@ -137,7 +137,7 @@ export default function AthletesPage() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="#"
+                href="/register?persona=athlete"
                 className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Começar a Ganhar
@@ -290,7 +290,7 @@ export default function AthletesPage() {
               Cadastro gratuito e sem compromisso.
             </p>
             <a
-              href="#"
+              href="/register?persona=athlete"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Criar Minha Conta Grátis
