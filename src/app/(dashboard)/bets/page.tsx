@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Target, TrendingUp, Trophy, Clock, CheckCircle2, XCircle, Swords, Flame, Zap, Loader2, AlertCircle } from "lucide-react";
+import { Target, TrendingUp, Trophy, Clock, CheckCircle2, XCircle, Swords, Flame, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

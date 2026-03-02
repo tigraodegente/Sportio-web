@@ -47,14 +47,6 @@ const statusMap: Record<string, { label: string; variant: "primary" | "info" | "
   cancelled: { label: "Cancelado", variant: "danger" },
 };
 
-const formatMap: Record<string, string> = {
-  single_elimination: "Eliminacao Simples",
-  double_elimination: "Eliminacao Dupla",
-  round_robin: "Todos contra Todos",
-  swiss: "Suico",
-  league: "Liga",
-};
-
 const sportOptions = [
   { value: "", label: "Todos os esportes" },
   { value: "futebol", label: "Futebol" },
@@ -71,7 +63,7 @@ function formatDate(date: Date | string | null | undefined): string {
   return d.toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function TournamentCard({ tournament }: { tournament: any }) { // eslint-disable-line
+function TournamentCard({ tournament }: { tournament: any }) {
   const enrollmentCount = tournament.enrollments?.length ?? 0;
   const maxParticipants = tournament.maxParticipants ?? 32;
   const fillPercent = Math.round((enrollmentCount / maxParticipants) * 100);
@@ -215,7 +207,7 @@ function TournamentGridSkeleton() {
 }
 
 function TournamentGrid({ tournaments, loadMoreRef, isFetchingNextPage, hasNextPage }: {
-  tournaments: any[]; // eslint-disable-line
+  tournaments: any[];
   loadMoreRef?: React.RefObject<HTMLDivElement | null>;
   isFetchingNextPage?: boolean;
   hasNextPage?: boolean;

@@ -7,14 +7,12 @@ import {
   Trophy,
   Calendar,
   MapPin,
-  Users,
   Building2,
   Check,
   X,
   Clock,
   Loader2,
   UserPlus,
-  Coins,
   PartyPopper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, User, Star, Loader2, AlertCircle, Coins } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, Star, Loader2, AlertCircle, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -100,7 +100,6 @@ export default function GCoinsPage() {
     });
   }
 
-  const isLoading = balance.isLoading || summary.isLoading || history.isLoading;
   const hasError = balance.isError || summary.isError || history.isError;
 
   return (
