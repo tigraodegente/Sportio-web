@@ -10,6 +10,7 @@ import { notificationRouter } from "./routers/notification";
 import { challengeRouter } from "./routers/challenge";
 import { brandRouter } from "./routers/brand";
 import { paymentRouter } from "./routers/payment";
+import { gamificationRouter } from "./routers/gamification";
 
 export const appRouter = createTRPCRouter({
   user: userRouter,
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   challenge: challengeRouter,
   brand: brandRouter,
   payment: paymentRouter,
+  gamification: gamificationRouter,
 });
 
 export type AppRouter = typeof appRouter;

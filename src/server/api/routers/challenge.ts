@@ -3,6 +3,7 @@ import { eq, desc, and } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { challenges, challengeParticipants } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
+import { awardXP } from "@/server/services/gamification";
 
 export const challengeRouter = createTRPCRouter({
   // List active challenges
@@ -51,6 +52,8 @@ export const challengeRouter = createTRPCRouter({
           sportId: challenge.sportId ?? undefined,
         }).catch(() => {});
       }
+
+      awardXP(ctx.session.user.id, "challenge_joined").catch(() => {});
 
       return participant;
     }),

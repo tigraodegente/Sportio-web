@@ -3,6 +3,7 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { bets, users, gcoinTransactions } from "@/server/db/schema";
 import { calculateOdds } from "@/server/services/odds-calculator";
+import { awardXP } from "@/server/services/gamification";
 
 export const betRouter = createTRPCRouter({
   // Place bet
@@ -64,6 +65,8 @@ export const betRouter = createTRPCRouter({
         referenceId: bet.id,
         referenceType: "bet",
       });
+
+      awardXP(ctx.session.user.id, "bet_placed").catch(() => {});
 
       return bet;
     }),

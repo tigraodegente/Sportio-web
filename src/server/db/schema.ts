@@ -974,6 +974,114 @@ export const withdrawalRequests = pgTable(
   ]
 );
 
+// Achievement Definitions (system-defined, not user-created)
+export const achievementTierEnum = pgEnum("achievement_tier", [
+  "bronze",
+  "silver",
+  "gold",
+  "platinum",
+  "diamond",
+]);
+
+export const missionFrequencyEnum = pgEnum("mission_frequency", [
+  "daily",
+  "weekly",
+  "monthly",
+  "one_time",
+]);
+
+export const achievements = pgTable(
+  "achievements",
+  {
+    id: varchar("id", { length: 100 }).primaryKey(), // e.g. "athlete_first_win"
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    icon: varchar("icon", { length: 50 }),
+    tier: achievementTierEnum("tier").notNull(),
+    category: varchar("category", { length: 50 }).notNull(), // e.g. "athlete", "organizer", "brand"
+    targetRole: userRoleEnum("target_role"), // which persona this is for (null = all)
+    requirement: jsonb("requirement").notNull(), // { type: "count", metric: "matches_won", value: 1 }
+    xpReward: integer("xp_reward").default(0),
+    gcoinReward: integer("gcoin_reward").default(0),
+    sortOrder: integer("sort_order").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("achievements_category_idx").on(table.category),
+    index("achievements_role_idx").on(table.targetRole),
+  ]
+);
+
+// User Achievements (earned by users)
+export const userAchievements = pgTable(
+  "user_achievements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    achievementId: varchar("achievement_id", { length: 100 })
+      .notNull()
+      .references(() => achievements.id),
+    progress: integer("progress").default(0), // current progress toward requirement
+    completedAt: timestamp("completed_at"), // null = in progress
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_achievements_unique_idx").on(table.userId, table.achievementId),
+    index("user_achievements_user_idx").on(table.userId),
+    index("user_achievements_completed_idx").on(table.completedAt),
+  ]
+);
+
+// Mission Definitions (daily/weekly rotating quests)
+export const missions = pgTable(
+  "missions",
+  {
+    id: varchar("id", { length: 100 }).primaryKey(), // e.g. "daily_post_1"
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    icon: varchar("icon", { length: 50 }),
+    frequency: missionFrequencyEnum("frequency").notNull(),
+    targetRole: userRoleEnum("target_role"), // null = all
+    requirement: jsonb("requirement").notNull(), // { type: "action", action: "create_post", count: 1 }
+    xpReward: integer("xp_reward").default(0),
+    gcoinReward: integer("gcoin_reward").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("missions_frequency_idx").on(table.frequency),
+    index("missions_role_idx").on(table.targetRole),
+  ]
+);
+
+// User Missions (tracking user progress on missions)
+export const userMissions = pgTable(
+  "user_missions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    missionId: varchar("mission_id", { length: 100 })
+      .notNull()
+      .references(() => missions.id),
+    progress: integer("progress").default(0),
+    completedAt: timestamp("completed_at"),
+    periodStart: timestamp("period_start").notNull(), // start of daily/weekly period
+    periodEnd: timestamp("period_end").notNull(), // end of period
+    rewardClaimed: boolean("reward_claimed").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("user_missions_user_idx").on(table.userId),
+    index("user_missions_period_idx").on(table.periodStart, table.periodEnd),
+    uniqueIndex("user_missions_unique_idx").on(table.userId, table.missionId, table.periodStart),
+  ]
+);
+
 // ==================== RELATIONS ====================
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -1151,4 +1259,22 @@ export const paymentOrdersRelations = relations(paymentOrders, ({ one }) => ({
 export const withdrawalRequestsRelations = relations(withdrawalRequests, ({ one }) => ({
   user: one(users, { fields: [withdrawalRequests.userId], references: [users.id] }),
   reviewer: one(users, { fields: [withdrawalRequests.reviewedBy], references: [users.id] }),
+}));
+
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, { fields: [userAchievements.userId], references: [users.id] }),
+  achievement: one(achievements, { fields: [userAchievements.achievementId], references: [achievements.id] }),
+}));
+
+export const missionsRelations = relations(missions, ({ many }) => ({
+  userMissions: many(userMissions),
+}));
+
+export const userMissionsRelations = relations(userMissions, ({ one }) => ({
+  user: one(users, { fields: [userMissions.userId], references: [users.id] }),
+  mission: one(missions, { fields: [userMissions.missionId], references: [missions.id] }),
 }));

@@ -24,6 +24,7 @@ import {
   notifyInviteAccepted,
   notifyInviteDeclined,
 } from "@/server/services/notification-service";
+import { awardXP } from "@/server/services/gamification";
 import {
   generateBracket as generateBracketService,
   advanceWinner as advanceWinnerService,
@@ -386,6 +387,8 @@ export const tournamentRouter = createTRPCRouter({
           sportId: input.sportId,
           tournamentId: tournament.id,
         }).catch(() => {});
+
+        awardXP(ctx.session.user.id, "tournament_created").catch(() => {});
       }
 
       return tournament;
@@ -440,6 +443,42 @@ export const tournamentRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Torneio lotado" });
       }
 
+      // Entry fee collection
+      const entryFee = Number(tournament.entryFee ?? 0);
+      let paidAmount: string | null = null;
+      if (entryFee > 0) {
+        const user = await ctx.db.query.users.findFirst({
+          where: eq(users.id, ctx.session.user.id),
+          columns: { gcoinsReal: true, gcoinsGamification: true },
+        });
+        const feeField = tournament.entryFeeType === "real" ? "gcoinsReal" : "gcoinsGamification";
+        const balance = Number(feeField === "gcoinsReal" ? user?.gcoinsReal ?? 0 : user?.gcoinsGamification ?? 0);
+        if (balance < entryFee) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Saldo insuficiente para taxa de inscricao. Necessario: ${entryFee} GCoins ${tournament.entryFeeType}. Saldo: ${balance.toFixed(0)}.`,
+          });
+        }
+        // Deduct entry fee
+        await ctx.db.update(users)
+          .set({ [feeField]: sql`${users[feeField]} - ${entryFee}` })
+          .where(eq(users.id, ctx.session.user.id));
+        // Log transaction
+        await ctx.db.insert(gcoinTransactions).values({
+          id: crypto.randomUUID(), userId: ctx.session.user.id,
+          type: tournament.entryFeeType ?? "real", category: "tournament_entry",
+          amount: (-entryFee).toString(), balanceAfter: null,
+          description: `Taxa de inscricao: ${tournament.name}`,
+          referenceId: input.tournamentId, referenceType: "tournament_entry_fee",
+          createdAt: new Date(),
+        });
+        // Add to prize pool
+        await ctx.db.update(tournaments)
+          .set({ prizePool: sql`${tournaments.prizePool} + ${entryFee}` })
+          .where(eq(tournaments.id, input.tournamentId));
+        paidAmount = entryFee.toString();
+      }
+
       const [enrollment] = await ctx.db
         .insert(enrollments)
         .values({
@@ -450,7 +489,7 @@ export const tournamentRouter = createTRPCRouter({
           status: "confirmed",
           seed: null,
           placement: null,
-          paidAmount: null,
+          paidAmount,
           checkedInAt: null,
           createdAt: new Date(),
         })
@@ -499,7 +538,37 @@ export const tournamentRouter = createTRPCRouter({
         notifyTournamentEnrollment(ctx.session.user.id, tournament.name, input.tournamentId).catch(() => {});
       }
 
+      // Award XP for enrollment
+      awardXP(ctx.session.user.id, "tournament_enrolled").catch(() => {});
+
       return enrollment;
+    }),
+
+  // Check-in to a tournament
+  checkIn: protectedProcedure
+    .input(z.object({ tournamentId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const enrollment = await ctx.db.query.enrollments.findFirst({
+        where: and(
+          eq(enrollments.tournamentId, input.tournamentId),
+          eq(enrollments.userId, ctx.session.user.id),
+          eq(enrollments.status, "confirmed")
+        ),
+      });
+      if (!enrollment) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Inscricao nao encontrada ou nao confirmada" });
+      }
+      if (enrollment.checkedInAt) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Check-in ja realizado" });
+      }
+      const [updated] = await ctx.db.update(enrollments)
+        .set({ checkedInAt: new Date(), status: "checked_in" })
+        .where(eq(enrollments.id, enrollment.id))
+        .returning();
+
+      awardXP(ctx.session.user.id, "tournament_checkin").catch(() => {});
+
+      return updated;
     }),
 
   // Get my tournaments (as organizer) - includes pending sponsorships
