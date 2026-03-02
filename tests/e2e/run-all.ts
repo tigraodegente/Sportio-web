@@ -466,14 +466,14 @@ async function phase3_social() {
 
   // Suggested users
   await runTest("SOCIAL", "Sugestões de usuários para seguir", async () => {
-    const result = await trpcQuery<unknown[]>("social.suggestedUsers", undefined, "athlete");
+    const result = await trpcQuery<unknown[]>("social.suggestedUsers", { limit: 5 }, "athlete");
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} sugestões` };
   });
 
   // Trending
   await runTest("SOCIAL", "Posts em alta (trending)", async () => {
-    const result = await trpcQuery<unknown[]>("social.trending");
+    const result = await trpcQuery<unknown[]>("social.trending", { limit: 5 });
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} posts` };
   });
@@ -515,8 +515,8 @@ async function phase4_tournaments() {
       format: "single_elimination" as const,
       maxParticipants: 8,
       minParticipants: 4,
-      entryFee: "10",
-      prizePool: "100",
+      entryFee: 10,
+      prizePool: 100,
       level: "B" as const,
     },
     {
@@ -526,8 +526,8 @@ async function phase4_tournaments() {
       format: "round_robin" as const,
       maxParticipants: 4,
       minParticipants: 3,
-      entryFee: "5",
-      prizePool: "50",
+      entryFee: 5,
+      prizePool: 50,
       level: "C" as const,
     },
   ];
@@ -687,7 +687,7 @@ async function phase4_tournaments() {
 
   // Rules template
   await runTest("TORNEIO", "Buscar template de regras (beach-tennis)", async () => {
-    const result = await trpcQuery("tournament.getRulesTemplate", { slug: "beach-tennis" });
+    const result = await trpcQuery("tournament.getRulesTemplate", { sportSlug: "beach-tennis" });
     if (result.error) return { pass: false, message: result.error };
     return { pass: !!result.data, message: "Template encontrado" };
   });
@@ -700,6 +700,17 @@ async function phase4_tournaments() {
 
   // Generate bracket
   if (tournamentIds["single_elim"]) {
+    // Close registration first
+    await runTest("TORNEIO", "Fechar inscrições (single elimination)", async () => {
+      const result = await trpcMutation(
+        "tournament.update",
+        { id: tournamentIds["single_elim"], status: "registration_closed" },
+        "organizer"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true };
+    });
+
     await runTest("TORNEIO", "Gerar bracket (single elimination)", async () => {
       const result = await trpcMutation(
         "tournament.generateBracket",
@@ -922,7 +933,7 @@ async function phase5_bets() {
 
   // Leaderboard
   await runTest("APOSTAS", "Leaderboard de apostadores", async () => {
-    const result = await trpcQuery<unknown[]>("bet.leaderboard");
+    const result = await trpcQuery<unknown[]>("bet.leaderboard", { limit: 50 });
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} no ranking` };
   });
@@ -1072,7 +1083,7 @@ async function phase7_chat() {
 
     // Get messages
     await runTest("CHAT", "Listar mensagens da conversa", async () => {
-      const result = await trpcMutation<{ items: unknown[] }>(
+      const result = await trpcQuery<{ items: unknown[] }>(
         "chat.messages",
         { roomId: chatRoomId, limit: 50 },
         "athlete"
@@ -1153,7 +1164,7 @@ async function phase8_notifications() {
     await runTest("NOTIF", "Marcar notificação como lida", async () => {
       const result = await trpcMutation(
         "notification.markRead",
-        { notificationId: notifId },
+        { id: notifId },
         "athlete"
       );
       if (result.error) return { pass: false, message: result.error };
@@ -1209,7 +1220,7 @@ async function phase9_brand() {
         imageUrl: "https://example.com/banner.jpg",
         linkUrl: "https://example.com/brandx",
         targetSportId: btSportId || undefined,
-        budget: "500",
+        budget: 500,
       },
       "brand"
     );
@@ -1231,7 +1242,7 @@ async function phase9_brand() {
         productDescription: "Raquete profissional de beach tennis",
         productImage: "https://example.com/raquete.jpg",
         maxRedemptions: 5,
-        budget: "200",
+        budget: 200,
       },
       "brand"
     );
@@ -1248,9 +1259,9 @@ async function phase9_brand() {
         description: "Ganhe GCoins da BrandX",
         type: "gcoin_reward",
         placement: "sidebar",
-        gcoinRewardAmount: "25",
+        gcoinRewardAmount: 25,
         maxRedemptions: 20,
-        budget: "500",
+        budget: 500,
       },
       "brand"
     );
@@ -1303,7 +1314,7 @@ async function phase9_brand() {
     await runTest("BRAND", "Atualizar campanha", async () => {
       const result = await trpcMutation(
         "brand.updateCampaign",
-        { campaignId, description: "Nova descrição atualizada E2E" },
+        { id: campaignId, description: "Nova descrição atualizada E2E" },
         "brand"
       );
       if (result.error) return { pass: false, message: result.error };
@@ -1319,7 +1330,7 @@ async function phase9_brand() {
         {
           tournamentId: tournamentIds["single_elim"],
           tier: "gold",
-          gcoinContribution: "100",
+          gcoinContribution: 100,
           message: "BrandX patrocina o Sportio Open!",
           productPrizes: [
             {
@@ -1376,7 +1387,7 @@ async function phase10_challenges() {
       {
         title: "Desafio 10 partidas E2E",
         description: "Complete 10 partidas de beach tennis em 7 dias",
-        reward: "50",
+        reward: 50,
         rewardType: "gamification",
         goal: { type: "matches", count: 10 },
         maxParticipants: 20,
@@ -1467,7 +1478,7 @@ async function phase11_admin() {
 
   // Betting leaderboard
   await runTest("ADMIN", "Leaderboard de apostas", async () => {
-    const result = await trpcQuery<unknown[]>("bet.leaderboard");
+    const result = await trpcQuery<unknown[]>("bet.leaderboard", { limit: 50 });
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} no ranking` };
   });

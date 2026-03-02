@@ -347,14 +347,34 @@ export const tournamentRouter = createTRPCRouter({
       const [tournament] = await ctx.db
         .insert(tournaments)
         .values({
-          ...input,
+          id: crypto.randomUUID(),
+          name: input.name,
+          description: input.description ?? null,
+          rules: input.rules ?? null,
           slug,
+          sportId: input.sportId,
+          format: input.format,
           organizerId: ctx.session.user.id,
+          maxParticipants: input.maxParticipants,
+          minParticipants: input.minParticipants,
           entryFee: input.entryFee.toString(),
+          entryFeeType: input.entryFeeType,
           prizePool: input.prizePool.toString(),
+          city: input.city ?? null,
+          state: input.state ?? null,
+          address: input.address ?? null,
+          isOnline: input.isOnline,
+          level: input.level ?? null,
+          coverImage: null,
           startDate: input.startDate ? new Date(input.startDate) : null,
           endDate: input.endDate ? new Date(input.endDate) : null,
           registrationDeadline: input.registrationDeadline ? new Date(input.registrationDeadline) : null,
+          status: "registration_open",
+          currentParticipants: 0,
+          prizeDistribution: null,
+          bracketData: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         })
         .returning();
 
@@ -407,10 +427,16 @@ export const tournamentRouter = createTRPCRouter({
       const [enrollment] = await ctx.db
         .insert(enrollments)
         .values({
+          id: crypto.randomUUID(),
           tournamentId: input.tournamentId,
           userId: ctx.session.user.id,
-          teamId: input.teamId,
+          teamId: input.teamId ?? null,
           status: "pending",
+          seed: null,
+          placement: null,
+          paidAmount: null,
+          checkedInAt: null,
+          createdAt: new Date(),
         })
         .onConflictDoNothing()
         .returning();

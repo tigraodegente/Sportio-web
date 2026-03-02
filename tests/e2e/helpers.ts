@@ -6,10 +6,15 @@ import { BASE_URL, TRPC_URL, AUTH_URL } from "./config";
 // ============================================================
 
 interface TRPCResponse<T = unknown> {
-  result?: { data: T };
+  result?: { data: { json: T } };
   error?: {
-    message: string;
-    code: number;
+    json?: {
+      message: string;
+      code: number;
+      data?: { code: string; httpStatus: number; path: string };
+    };
+    message?: string;
+    code?: number;
     data?: { code: string; httpStatus: number; path: string };
   };
 }
@@ -209,20 +214,27 @@ export async function trpcQuery<T = unknown>(
   userKey?: string
 ): Promise<{ data?: T; error?: string }> {
   try {
-    const url = input
-      ? `${TRPC_URL}/${procedure}?input=${encodeURIComponent(JSON.stringify(input))}`
+    // tRPC v11 with superjson: wrap input in {json: ...}
+    const url = input !== undefined
+      ? `${TRPC_URL}/${procedure}?input=${encodeURIComponent(JSON.stringify({ json: input }))}`
       : `${TRPC_URL}/${procedure}`;
 
     const res = await fetchWithCookies(url, { method: "GET" }, userKey);
-    saveCookies(res, userKey);
+    if (userKey) saveCookies(res, userKey);
 
-    const json = (await res.json()) as TRPCResponse<T>;
-
-    if (json.error) {
-      return { error: json.error.message || JSON.stringify(json.error) };
+    const raw = await res.text();
+    try {
+      const json = JSON.parse(raw) as TRPCResponse<T>;
+      const err = json.error?.json || json.error;
+      if (err) {
+        return { error: (err as any).message || JSON.stringify(err) };
+      }
+      // superjson wraps in {json: ...}
+      const data = json.result?.data;
+      return { data: (data as any)?.json !== undefined ? (data as any).json : data as T };
+    } catch {
+      return { error: `Parse error: ${raw.substring(0, 200)}` };
     }
-
-    return { data: json.result?.data };
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }
@@ -234,23 +246,29 @@ export async function trpcMutation<T = unknown>(
   userKey?: string
 ): Promise<{ data?: T; error?: string }> {
   try {
+    // tRPC v11 with superjson: wrap input in {json: ...}
     const res = await fetchWithCookies(
       `${TRPC_URL}/${procedure}`,
       {
         method: "POST",
-        body: JSON.stringify(input),
+        body: JSON.stringify({ json: input }),
       },
       userKey
     );
-    saveCookies(res, userKey);
+    if (userKey) saveCookies(res, userKey);
 
-    const json = (await res.json()) as TRPCResponse<T>;
-
-    if (json.error) {
-      return { error: json.error.message || JSON.stringify(json.error) };
+    const raw = await res.text();
+    try {
+      const json = JSON.parse(raw) as TRPCResponse<T>;
+      const err = json.error?.json || json.error;
+      if (err) {
+        return { error: (err as any).message || JSON.stringify(err) };
+      }
+      const data = json.result?.data;
+      return { data: (data as any)?.json !== undefined ? (data as any).json : data as T };
+    } catch {
+      return { error: `Parse error: ${raw.substring(0, 200)}` };
     }
-
-    return { data: json.result?.data };
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) };
   }

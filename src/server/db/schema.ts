@@ -280,7 +280,7 @@ export const userSports = pgTable(
       .references(() => sports.id, { onDelete: "cascade" }),
     level: levelEnum("level").default("C"),
     position: varchar("position", { length: 50 }),
-    rating: decimal("rating", { precision: 4, scale: 2 }).default("1000"),
+    rating: decimal("rating", { precision: 8, scale: 2 }).default("1000"),
     wins: integer("wins").default(0),
     losses: integer("losses").default(0),
     draws: integer("draws").default(0),

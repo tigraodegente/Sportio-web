@@ -142,10 +142,16 @@ export const userRouter = createTRPCRouter({
       const [userSport] = await ctx.db
         .insert(userSports)
         .values({
+          id: crypto.randomUUID(),
           userId: ctx.session.user.id,
           sportId: input.sportId,
-          level: input.level,
-          position: input.position,
+          level: input.level ?? "C",
+          position: input.position ?? null,
+          rating: "1000",
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          createdAt: new Date(),
         })
         .onConflictDoNothing()
         .returning();
