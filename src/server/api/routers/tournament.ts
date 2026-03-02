@@ -424,6 +424,22 @@ export const tournamentRouter = createTRPCRouter({
   enroll: protectedProcedure
     .input(z.object({ tournamentId: z.string().uuid(), teamId: z.string().uuid().optional() }))
     .mutation(async ({ ctx, input }) => {
+      const tournament = await ctx.db.query.tournaments.findFirst({
+        where: eq(tournaments.id, input.tournamentId),
+      });
+
+      if (!tournament) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Torneio nao encontrado" });
+      }
+
+      if (tournament.status !== "registration_open") {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Inscricoes nao estao abertas" });
+      }
+
+      if (tournament.currentParticipants >= tournament.maxParticipants) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Torneio lotado" });
+      }
+
       const [enrollment] = await ctx.db
         .insert(enrollments)
         .values({
@@ -431,7 +447,7 @@ export const tournamentRouter = createTRPCRouter({
           tournamentId: input.tournamentId,
           userId: ctx.session.user.id,
           teamId: input.teamId ?? null,
-          status: "pending",
+          status: "confirmed",
           seed: null,
           placement: null,
           paidAmount: null,
@@ -441,10 +457,36 @@ export const tournamentRouter = createTRPCRouter({
         .onConflictDoNothing()
         .returning();
 
-      const tournament = await ctx.db.query.tournaments.findFirst({
-        where: eq(tournaments.id, input.tournamentId),
-        columns: { name: true, sportId: true },
-      });
+      // Increment participant count and award gamification GCoins
+      if (enrollment) {
+        await ctx.db
+          .update(tournaments)
+          .set({
+            currentParticipants: sql`${tournaments.currentParticipants} + 1`,
+            updatedAt: new Date(),
+          })
+          .where(eq(tournaments.id, input.tournamentId));
+
+        // Enrollment bonus: 50 gamification GCoins
+        await ctx.db
+          .update(users)
+          .set({ gcoinsGamification: sql`${users.gcoinsGamification} + 50` })
+          .where(eq(users.id, ctx.session.user.id));
+
+        await ctx.db.insert(gcoinTransactions).values({
+          id: crypto.randomUUID(),
+          userId: ctx.session.user.id,
+          type: "gamification",
+          category: "tournament_entry",
+          amount: "50",
+          balanceAfter: null,
+          description: `Bonus por inscricao: ${tournament.name}`,
+          referenceId: input.tournamentId,
+          referenceType: "tournament",
+          createdAt: new Date(),
+        });
+      }
+
       if (tournament) {
         createAutoPost({
           type: "tournament_enrolled",

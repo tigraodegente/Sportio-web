@@ -609,9 +609,9 @@ async function phase4_tournaments() {
     }
   }
 
-  // Round Robin enrollments
+  // Round Robin enrollments (includes trainer so they earn gamification GCoins for bet tests)
   if (tournamentIds["round_robin"]) {
-    for (const userKey of ["athlete", "athlete2", "athlete3"]) {
+    for (const userKey of ["athlete", "athlete2", "athlete3", "trainer"]) {
       await runTest("TORNEIO", `Inscrever ${userKey} no round robin`, async () => {
         const result = await trpcMutation(
           "tournament.enroll",
@@ -721,15 +721,17 @@ async function phase4_tournaments() {
       return { pass: true };
     });
 
-    // List matches
+    // List matches (reverse to get round 1 matches first)
     await runTest("TORNEIO", "Listar partidas do torneio", async () => {
-      const result = await trpcQuery<unknown[]>(
+      const result = await trpcQuery<Array<{ id: string; round: number; player1Id: string | null }>>(
         "match.listByTournament",
         { tournamentId: tournamentIds["single_elim"] }
       );
       if (result.error) return { pass: false, message: result.error };
       if (Array.isArray(result.data)) {
-        matchIds = result.data.map((m: any) => m.id).filter(Boolean);
+        // Reverse so round 1 matches (with players) come first
+        const sorted = [...result.data].reverse();
+        matchIds = sorted.map((m) => m.id).filter(Boolean);
       }
       return { pass: matchIds.length > 0, message: `${matchIds.length} partidas geradas` };
     });
@@ -804,8 +806,9 @@ async function phase5_bets() {
   console.log("\n🎲 FASE 5 — APOSTAS");
   console.log("-".repeat(50));
 
-  // We need a live match to bet on - use second match if available
+  // We need a live match to bet on - use second match (round 1, pos 2)
   const liveMatchId = matchIds.length > 1 ? matchIds[1] : null;
+  const betTournamentId = tournamentIds["single_elim"];
 
   if (!liveMatchId) {
     skipTest("APOSTAS", "Todos os testes de aposta", "Nenhuma partida disponível para apostas");
@@ -847,6 +850,7 @@ async function phase5_bets() {
       "bet.place",
       {
         matchId: liveMatchId,
+        tournamentId: betTournamentId,
         betType: "winner",
         prediction: { winnerId: playerId },
         amount: 10,
@@ -867,6 +871,7 @@ async function phase5_bets() {
       "bet.place",
       {
         matchId: liveMatchId,
+        tournamentId: betTournamentId,
         betType: "winner",
         prediction: { winnerId: playerId },
         amount: 5,
@@ -947,6 +952,29 @@ async function phase6_gcoins() {
   console.log("\n💰 FASE 6 — GCOINS");
   console.log("-".repeat(50));
 
+  // Setup: Brand buys GCoins and transfers to athlete so transfer test works
+  await runTest("GCOINS", "Brand compra GCoins (setup)", async () => {
+    const result = await trpcMutation(
+      "brand.buyGcoins",
+      { amount: 500 },
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "500 GCoins comprados pela brand" };
+  });
+
+  const athleteId = getUserId("athlete");
+  await runTest("GCOINS", "Brand transfere GCoins para atleta (setup)", async () => {
+    if (!athleteId) return { pass: false, message: "Athlete ID não encontrado" };
+    const result = await trpcMutation(
+      "gcoin.transfer",
+      { toUserId: athleteId, amount: 100, type: "real" },
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "100 GCoins transferidos para atleta" };
+  });
+
   // Check balance
   await runTest("GCOINS", "Saldo do atleta", async () => {
     const result = await trpcQuery<{ real: string; gamification: string; total: string }>(
@@ -968,7 +996,7 @@ async function phase6_gcoins() {
 
     const result = await trpcMutation(
       "gcoin.transfer",
-      { toUserId: trainerId, amount: 5, type: "gamification" },
+      { toUserId: trainerId, amount: 5, type: "real" },
       "athlete"
     );
     if (result.error) return { pass: false, message: result.error };
@@ -977,13 +1005,13 @@ async function phase6_gcoins() {
 
   // Check balance after transfer
   await runTest("GCOINS", "Saldo após transferência (treinadora)", async () => {
-    const result = await trpcQuery<{ gamification: string }>(
+    const result = await trpcQuery<{ real: string }>(
       "gcoin.balance",
       undefined,
       "trainer"
     );
     if (result.error) return { pass: false, message: result.error };
-    return { pass: true, message: `Gamif: ${result.data?.gamification}` };
+    return { pass: true, message: `Real: ${result.data?.real}` };
   });
 
   // Transaction history
@@ -998,14 +1026,14 @@ async function phase6_gcoins() {
   });
 
   // Filter by type
-  await runTest("GCOINS", "Histórico filtrado por tipo (gamification)", async () => {
+  await runTest("GCOINS", "Histórico filtrado por tipo (real)", async () => {
     const result = await trpcQuery<{ items: unknown[] }>(
       "gcoin.history",
-      { limit: 50, type: "gamification" },
+      { limit: 50, type: "real" },
       "athlete"
     );
     if (result.error) return { pass: false, message: result.error };
-    return { pass: true, message: `${result.data?.items?.length ?? 0} transações gamification` };
+    return { pass: true, message: `${result.data?.items?.length ?? 0} transações real` };
   });
 
   // Summary
