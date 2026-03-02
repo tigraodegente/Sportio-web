@@ -102,23 +102,70 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
   const isOwner = currentUserId === post.userId;
   const images = (Array.isArray(post.images) ? post.images : []) as string[];
 
-  // Toggle like mutation
+  // Get current user data for optimistic comment display
+  const meQuery = trpc.user.me.useQuery(undefined, { enabled: !!currentUserId });
+
+  // Toggle like mutation with optimistic update
   const toggleLike = trpc.social.toggleLike.useMutation({
     onMutate: () => {
+      // Optimistically toggle like state immediately
       setLocalLiked((prev) => !prev);
       setLocalLikesCount((prev) => (localLiked ? prev - 1 : prev + 1));
     },
     onError: () => {
+      // Roll back on error
       setLocalLiked((prev) => !prev);
       setLocalLikesCount((prev) => (localLiked ? prev + 1 : prev - 1));
     },
+    onSettled: () => {
+      // Sync with server after mutation completes
+      utils.social.feed.invalidate();
+    },
   });
 
-  // Add comment mutation
+  // Add comment mutation with optimistic update
   const addComment = trpc.social.addComment.useMutation({
-    onSuccess: () => {
-      setCommentText("");
+    onMutate: async (newComment) => {
+      // Cancel outgoing refetches
+      await utils.social.getComments.cancel({ postId: post.id });
+
+      // Snapshot previous comments
+      const previousComments = utils.social.getComments.getData({ postId: post.id });
+
+      // Optimistically add the new comment to the list
+      if (previousComments && currentUserId && meQuery.data) {
+        const optimisticComment = {
+          id: `optimistic-${Date.now()}`,
+          content: newComment.content,
+          createdAt: new Date(),
+          postId: post.id,
+          userId: currentUserId,
+          parentId: null,
+          likesCount: 0,
+          updatedAt: new Date(),
+          user: meQuery.data,
+        };
+        utils.social.getComments.setData(
+          { postId: post.id },
+          [...previousComments, optimisticComment as unknown as typeof previousComments[0]]
+        );
+      }
+
+      // Optimistically update comment count
       setLocalCommentsCount((prev) => prev + 1);
+      setCommentText("");
+
+      return { previousComments };
+    },
+    onError: (_err, _variables, context) => {
+      // Roll back on error
+      if (context?.previousComments) {
+        utils.social.getComments.setData({ postId: post.id }, context.previousComments);
+      }
+      setLocalCommentsCount((prev) => Math.max(0, prev - 1));
+    },
+    onSettled: () => {
+      // Sync with server
       utils.social.getComments.invalidate({ postId: post.id });
       utils.social.feed.invalidate();
     },

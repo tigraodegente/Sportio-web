@@ -16,7 +16,6 @@ import {
   notifyBrandReward,
   notifyProductRedeemed,
   notifyNewSponsor,
-  notifySponsorshipApproved,
 } from "@/server/services/notification-service";
 
 // Helper to verify brand role

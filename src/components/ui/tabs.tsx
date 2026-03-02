@@ -12,8 +12,8 @@ interface Tab {
 interface TabsProps {
   tabs: Tab[];
   defaultTab?: string;
-  onChange?: (_id: string) => void;
-  children: (_tab: string) => React.ReactNode;
+  onChange?: (id: string) => void; // eslint-disable-line no-unused-vars
+  children: (tab: string) => React.ReactNode; // eslint-disable-line no-unused-vars
   className?: string;
 }
 

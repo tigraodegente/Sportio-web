@@ -91,8 +91,11 @@ export const matchRouter = createTRPCRouter({
             }).catch(() => {});
           }
 
-          // Settle all bets for this match
-          settleBets(matchId, input.winnerId).catch(() => {});
+          // Settle all bets for this match (pass actual scores for score-type bets)
+          settleBets(matchId, input.winnerId, {
+            score1: input.score1,
+            score2: input.score2,
+          }).catch(() => {});
 
           // Notify winner and loser
           createNotification({
