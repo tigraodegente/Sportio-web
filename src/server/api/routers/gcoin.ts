@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, desc, and, sql } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { gcoinTransactions, users } from "@/server/db/schema";
 import { notifyGcoinReceived } from "@/server/services/notification-service";
 import { claimDailyBonus, getLevelInfo, getRatingTier } from "@/server/services/gamification";
@@ -48,7 +48,7 @@ export const gcoinRouter = createTRPCRouter({
     }),
 
   // Transfer GCoins to another user
-  transfer: protectedProcedure
+  transfer: rateLimitedProcedure({ key: "gcoin.transfer", maxRequests: 5 })
     .input(
       z.object({
         toUserId: z.string().uuid(),

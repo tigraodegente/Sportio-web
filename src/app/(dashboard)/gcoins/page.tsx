@@ -171,7 +171,6 @@ export default function GCoinsPage() {
     });
   }
 
-  const isLoading = balance.isLoading || summary.isLoading || history.isLoading;
   const hasError = balance.isError || summary.isError || history.isError;
 
   return (

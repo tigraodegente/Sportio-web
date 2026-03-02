@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Trophy, Coins, MessageSquare, Target, Users, CheckCheck, Swords, Calendar, PartyPopper, BellRing, Loader2, Heart, ThumbsUp } from "lucide-react";
+import { Bell, Trophy, Coins, MessageSquare, Target, Users, CheckCheck, Swords, Calendar, PartyPopper, BellRing, Loader2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -48,23 +48,108 @@ const timeGroupLabels: Record<string, string> = {
 
 export default function NotificationsPage() {
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const utils = trpc.useUtils();
 
-  const notifications = trpc.notification.list.useQuery({
-    unreadOnly: showUnreadOnly,
-    limit: 50,
+  const notifications = trpc.notification.list.useQuery(
+    {
+      unreadOnly: showUnreadOnly,
+      limit: 50,
+    },
+    {
+      refetchOnWindowFocus: true,
+    }
+  );
+  const unreadCount = trpc.notification.unreadCount.useQuery(undefined, {
+    refetchOnWindowFocus: true,
   });
-  const unreadCount = trpc.notification.unreadCount.useQuery();
 
   const markRead = trpc.notification.markRead.useMutation({
-    onSuccess: () => {
-      notifications.refetch();
-      unreadCount.refetch();
+    // Optimistic update: immediately mark the notification as read in the UI
+    onMutate: async ({ id }) => {
+      await utils.notification.list.cancel({ unreadOnly: showUnreadOnly, limit: 50 });
+      await utils.notification.unreadCount.cancel();
+
+      const previousNotifications = utils.notification.list.getData({
+        unreadOnly: showUnreadOnly,
+        limit: 50,
+      });
+      const previousUnreadCount = utils.notification.unreadCount.getData();
+
+      // Optimistically update the notification to be read
+      if (previousNotifications) {
+        utils.notification.list.setData(
+          { unreadOnly: showUnreadOnly, limit: 50 },
+          previousNotifications.map((notif) =>
+            notif.id === id ? { ...notif, isRead: true } : notif
+          )
+        );
+      }
+
+      // Optimistically decrement the unread count
+      if (previousUnreadCount !== undefined && previousUnreadCount > 0) {
+        utils.notification.unreadCount.setData(undefined, previousUnreadCount - 1);
+      }
+
+      return { previousNotifications, previousUnreadCount };
+    },
+    onError: (_err, _variables, context) => {
+      // Roll back on error
+      if (context?.previousNotifications) {
+        utils.notification.list.setData(
+          { unreadOnly: showUnreadOnly, limit: 50 },
+          context.previousNotifications
+        );
+      }
+      if (context?.previousUnreadCount !== undefined) {
+        utils.notification.unreadCount.setData(undefined, context.previousUnreadCount);
+      }
+    },
+    onSettled: () => {
+      utils.notification.list.invalidate();
+      utils.notification.unreadCount.invalidate();
     },
   });
+
   const markAllRead = trpc.notification.markAllRead.useMutation({
-    onSuccess: () => {
-      notifications.refetch();
-      unreadCount.refetch();
+    // Optimistic update: immediately mark all notifications as read in the UI
+    onMutate: async () => {
+      await utils.notification.list.cancel({ unreadOnly: showUnreadOnly, limit: 50 });
+      await utils.notification.unreadCount.cancel();
+
+      const previousNotifications = utils.notification.list.getData({
+        unreadOnly: showUnreadOnly,
+        limit: 50,
+      });
+      const previousUnreadCount = utils.notification.unreadCount.getData();
+
+      // Optimistically mark all as read
+      if (previousNotifications) {
+        utils.notification.list.setData(
+          { unreadOnly: showUnreadOnly, limit: 50 },
+          previousNotifications.map((notif) => ({ ...notif, isRead: true }))
+        );
+      }
+
+      // Optimistically set unread count to 0
+      utils.notification.unreadCount.setData(undefined, 0);
+
+      return { previousNotifications, previousUnreadCount };
+    },
+    onError: (_err, _variables, context) => {
+      // Roll back on error
+      if (context?.previousNotifications) {
+        utils.notification.list.setData(
+          { unreadOnly: showUnreadOnly, limit: 50 },
+          context.previousNotifications
+        );
+      }
+      if (context?.previousUnreadCount !== undefined) {
+        utils.notification.unreadCount.setData(undefined, context.previousUnreadCount);
+      }
+    },
+    onSettled: () => {
+      utils.notification.list.invalidate();
+      utils.notification.unreadCount.invalidate();
     },
   });
 

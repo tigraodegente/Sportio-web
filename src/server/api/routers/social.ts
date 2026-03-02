@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, desc, and, sql, lt } from "drizzle-orm";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { posts, comments, likes, users, sports, followers } from "@/server/db/schema";
 import { notifyComment, notifyLike } from "@/server/services/notification-service";
 import { awardXP } from "@/server/services/gamification";
@@ -81,7 +81,7 @@ export const socialRouter = createTRPCRouter({
     }),
 
   // Create post
-  createPost: protectedProcedure
+  createPost: rateLimitedProcedure({ key: "social.createPost", maxRequests: 10 })
     .input(
       z.object({
         content: z.string().min(1).max(2000),
@@ -133,7 +133,7 @@ export const socialRouter = createTRPCRouter({
     }),
 
   // Add comment
-  addComment: protectedProcedure
+  addComment: rateLimitedProcedure({ key: "social.addComment", maxRequests: 20 })
     .input(
       z.object({
         postId: z.string().uuid(),
@@ -199,7 +199,7 @@ export const socialRouter = createTRPCRouter({
     }),
 
   // Toggle like
-  toggleLike: protectedProcedure
+  toggleLike: rateLimitedProcedure({ key: "social.toggleLike", maxRequests: 30 })
     .input(
       z.object({
         postId: z.string().uuid().optional(),

@@ -155,6 +155,41 @@ export async function notifyChallengeBettingOpen(userIds: string[], challengeTit
   });
 }
 
+export async function notifyChallengeWinner(
+  userId: string,
+  challengeTitle: string,
+  placement: number,
+  reward: number,
+  challengeId: string
+) {
+  const placementLabels: Record<number, string> = {
+    1: "1º lugar",
+    2: "2º lugar",
+    3: "3º lugar",
+  };
+  const label = placementLabels[placement] ?? `${placement}º lugar`;
+  return createNotification({
+    userId,
+    type: "challenge",
+    title: `${label} no desafio!`,
+    message: `Parabéns! Você ficou em ${label} no desafio "${challengeTitle}" e ganhou ${reward} GCoins`,
+    data: { challengeId, challengeTitle, placement, reward },
+  });
+}
+
+export async function notifyChallengeEnded(
+  userIds: string[],
+  challengeTitle: string,
+  challengeId: string
+) {
+  return createBulkNotifications(userIds, {
+    type: "challenge",
+    title: "Desafio encerrado",
+    message: `O desafio "${challengeTitle}" foi encerrado. Confira os resultados!`,
+    data: { challengeId, challengeTitle },
+  });
+}
+
 export async function notifyChatMessage(userId: string, senderName: string, roomId: string) {
   return createNotification({
     userId,

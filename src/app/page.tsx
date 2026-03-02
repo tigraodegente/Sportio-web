@@ -34,7 +34,6 @@ import {
   Crown,
   Rocket,
   Lock,
-  Shield,
   Spade,
   LayoutGrid,
   Dices,

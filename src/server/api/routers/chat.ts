@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, desc } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { chatRooms, chatMembers, chatMessages, users } from "@/server/db/schema";
 import { notifyChatMessage } from "@/server/services/notification-service";
 import { awardXP } from "@/server/services/gamification";
@@ -52,7 +52,7 @@ export const chatRouter = createTRPCRouter({
     }),
 
   // Send message
-  sendMessage: protectedProcedure
+  sendMessage: rateLimitedProcedure({ key: "chat.sendMessage", maxRequests: 60 })
     .input(
       z.object({
         roomId: z.string().uuid(),

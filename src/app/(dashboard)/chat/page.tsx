@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Search,
   Send,
@@ -79,24 +79,90 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [isWindowFocused, setIsWindowFocused] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  const utils = trpc.useUtils();
   const me = trpc.user.me.useQuery();
   const currentUserId = me.data?.id;
 
+  // Track window focus state for adaptive polling
+  useEffect(() => {
+    const onFocus = () => setIsWindowFocused(true);
+    const onBlur = () => setIsWindowFocused(false);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
   const rooms = trpc.chat.myRooms.useQuery(undefined, {
-    refetchInterval: 5000,
+    refetchInterval: isWindowFocused ? 3000 : 10000,
+    refetchOnWindowFocus: true,
   });
 
   const messages = trpc.chat.messages.useQuery(
     { roomId: selectedChat!, limit: 50 },
-    { enabled: !!selectedChat, refetchInterval: 3000 }
+    {
+      enabled: !!selectedChat,
+      refetchInterval: isWindowFocused ? 2000 : 8000,
+      refetchOnWindowFocus: true,
+    }
   );
 
   const sendMessage = trpc.chat.sendMessage.useMutation({
-    onSuccess: () => {
-      messages.refetch();
-      rooms.refetch();
+    // Optimistic update: immediately show the message in the UI
+    onMutate: async (newMessage) => {
+      // Cancel outgoing refetches so they don't overwrite our optimistic update
+      await utils.chat.messages.cancel({ roomId: newMessage.roomId, limit: 50 });
+
+      // Snapshot previous value
+      const previousMessages = utils.chat.messages.getData({
+        roomId: newMessage.roomId,
+        limit: 50,
+      });
+
+      // Optimistically add the new message
+      if (previousMessages && currentUserId && me.data) {
+        const optimisticMessage = {
+          id: `optimistic-${Date.now()}`,
+          roomId: newMessage.roomId,
+          senderId: currentUserId,
+          content: newMessage.content,
+          images: newMessage.images ?? null,
+          isEdited: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          sender: me.data,
+        };
+
+        utils.chat.messages.setData(
+          { roomId: newMessage.roomId, limit: 50 },
+          {
+            ...previousMessages,
+            items: [...(previousMessages.items ?? []), optimisticMessage as unknown as typeof previousMessages.items[0]],
+          }
+        );
+      }
+
+      return { previousMessages };
+    },
+    onError: (_err, newMessage, context) => {
+      // Roll back to the previous value on error
+      if (context?.previousMessages) {
+        utils.chat.messages.setData(
+          { roomId: newMessage.roomId, limit: 50 },
+          context.previousMessages
+        );
+      }
+    },
+    onSettled: (_data, _err, variables) => {
+      // Refetch to sync with server
+      utils.chat.messages.invalidate({ roomId: variables.roomId, limit: 50 });
+      utils.chat.myRooms.invalidate();
     },
   });
 
@@ -114,10 +180,25 @@ export default function ChatPage() {
     },
   });
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
+  }, []);
+
+  // Check if user is near the bottom of the messages container
+  const isNearBottom = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return true;
+    const threshold = 150;
+    return container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+  }, []);
+
+  // Auto-scroll when messages change, but only if user is near the bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.data?.items]);
+    if (isNearBottom()) {
+      scrollToBottom();
+    }
+  }, [messages.data?.items, scrollToBottom, isNearBottom]);
 
   const filteredRooms = (rooms.data ?? []).filter((room) => {
     if (!searchQuery.trim()) return true;
@@ -324,7 +405,7 @@ export default function ChatPage() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
             {messages.isLoading ? (
               <div className="flex flex-col items-center justify-center h-full gap-3">
                 <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />

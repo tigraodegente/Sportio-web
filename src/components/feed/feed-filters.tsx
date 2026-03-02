@@ -5,7 +5,7 @@ import { trpc } from "@/lib/trpc";
 
 interface FeedFiltersProps {
   selectedSportId?: string;
-  onSportChange: (sportId: string | undefined) => void;
+  onSportChange: (id: string | undefined) => void; // eslint-disable-line no-unused-vars
 }
 
 export function FeedFilters({ selectedSportId, onSportChange }: FeedFiltersProps) {

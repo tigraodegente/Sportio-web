@@ -12,15 +12,12 @@ import {
   Play,
   Trash2,
   ImageIcon,
-  ExternalLink,
   Megaphone,
   Trophy,
   Crown,
   X,
-  Check,
-  Ban,
 } from "lucide-react";
-import { Card, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatsCard } from "@/components/ui/stats-card";
@@ -197,7 +194,7 @@ export default function BrandDashboardPage() {
     });
   };
 
-  const handleImageUpload = (setter: (url: string) => void) => {
+  const handleImageUpload = (setter: (_url: string) => void) => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/jpeg,image/png,image/webp";

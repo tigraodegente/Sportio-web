@@ -33,20 +33,6 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { trpc } from "@/lib/trpc";
 
-const roleLabels: Record<string, string> = {
-  athlete: "Atleta",
-  organizer: "Organizador",
-  brand: "Marca",
-  fan: "Fa",
-  bettor: "Palpiteiro",
-  referee: "Arbitro",
-  trainer: "Treinador",
-  nutritionist: "Nutricionista",
-  photographer: "Fotografo",
-  arena_owner: "Arena",
-  admin: "Admin",
-};
-
 const tournamentStatusLabels: Record<string, string> = {
   draft: "Rascunho",
   registration_open: "Inscricoes Abertas",

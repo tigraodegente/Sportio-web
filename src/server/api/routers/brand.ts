@@ -16,7 +16,6 @@ import {
   notifyBrandReward,
   notifyProductRedeemed,
   notifyNewSponsor,
-  notifySponsorshipApproved,
 } from "@/server/services/notification-service";
 import { awardXP } from "@/server/services/gamification";
 
