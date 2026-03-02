@@ -137,7 +137,7 @@ export default function BrandsPage() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
-                href="#"
+                href="/register?persona=brand"
                 className="inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
               >
                 Falar com Comercial
@@ -298,7 +298,7 @@ export default function BrandsPage() {
               crescer com o esporte.
             </p>
             <a
-              href="#"
+              href="/register?persona=brand"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-yellow-400 px-8 py-4 text-base font-semibold text-blue-900 shadow-lg transition-all hover:bg-yellow-300 hover:shadow-xl"
             >
               Agendar Demonstração

@@ -3,6 +3,7 @@ import { eq, desc, and, sql, lt } from "drizzle-orm";
 import { createTRPCRouter, publicProcedure, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { posts, comments, likes, users, sports, followers } from "@/server/db/schema";
 import { notifyComment, notifyLike } from "@/server/services/notification-service";
+import { awardXP } from "@/server/services/gamification";
 
 export const socialRouter = createTRPCRouter({
   // Feed with cursor-based pagination
@@ -100,6 +101,7 @@ export const socialRouter = createTRPCRouter({
           tournamentId: input.tournamentId,
         })
         .returning();
+      awardXP(ctx.session.user.id, "post_created").catch(() => {});
       return post;
     }),
 
@@ -175,6 +177,8 @@ export const socialRouter = createTRPCRouter({
         notifyComment(post.userId, commenter?.name ?? "Alguem", input.postId).catch(() => {});
       }
 
+      awardXP(ctx.session.user.id, "comment_created").catch(() => {});
+
       return commentWithUser;
     }),
 
@@ -245,6 +249,7 @@ export const socialRouter = createTRPCRouter({
           notifyLike(post.userId, liker?.name ?? "Alguem", input.postId).catch(() => {});
         }
       }
+      awardXP(ctx.session.user.id, "like_given").catch(() => {});
       return { liked: true };
     }),
 

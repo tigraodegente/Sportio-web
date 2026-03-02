@@ -9,6 +9,8 @@ type FeedEventType =
   | "tournament_won"
   | "challenge_joined"
   | "challenge_completed"
+  | "challenge_created"
+  | "challenge_won"
   | "bet_won"
   | "bet_lost"
   | "level_up"
@@ -38,7 +40,11 @@ const templates: Record<FeedEventType, (data: Record<string, unknown>) => string
   challenge_joined: (d) =>
     `Aceitou o desafio "${d.challengeTitle}". Bora!`,
   challenge_completed: (d) =>
-    `Completou o desafio "${d.challengeTitle}". Recompensa conquistada!`,
+    `Completou o desafio "${d.challengeTitle}"${d.opponentName ? ` contra ${d.opponentName}` : ""}${d.score ? ` (${d.score})` : ""}. Recompensa conquistada!`,
+  challenge_created: (d) =>
+    `Desafiou ${d.opponentName} para um duelo: "${d.challengeTitle}"!`,
+  challenge_won: (d) =>
+    `Venceu o desafio "${d.challengeTitle}" contra ${d.opponentName}${d.score ? ` por ${d.score}` : ""}!`,
   bet_won: (d) =>
     `Acertou o palpite e ganhou ${d.amount} GCoins!`,
   bet_lost: () =>

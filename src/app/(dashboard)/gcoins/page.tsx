@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, Star, Loader2, AlertCircle, Coins } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Send, CreditCard, TrendingUp, History, Plus, Search, User, Star, Loader2, AlertCircle, Coins, Banknote, QrCode, CheckCircle2, Clock, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,17 +40,27 @@ function formatDate(dateStr: string | Date): { date: string; time: string } {
 export default function GCoinsPage() {
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
+  const [customAmount, setCustomAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "credit_card">("pix");
+  const [buyStep, setBuyStep] = useState<"select" | "processing" | "success">("select");
+  const [buyError, setBuyError] = useState("");
   const [transferSearch, setTransferSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email: string; avatar: string } | null>(null);
   const [transferAmount, setTransferAmount] = useState("");
   const [transferType, setTransferType] = useState<"real" | "gamification">("real");
   const [transferError, setTransferError] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawError, setWithdrawError] = useState("");
+  const [withdrawSuccess, setWithdrawSuccess] = useState(false);
 
   // tRPC queries
   const balance = trpc.gcoin.balance.useQuery();
   const summary = trpc.gcoin.summary.useQuery();
   const history = trpc.gcoin.history.useQuery({ limit: 20 });
+  const myWithdrawals = trpc.payment.myWithdrawals.useQuery({ limit: 5 });
+  const myOrders = trpc.payment.myOrders.useQuery({ limit: 5 });
 
   // User search for transfer
   const userSearchResults = trpc.user.search.useQuery(
@@ -72,7 +82,68 @@ export default function GCoinsPage() {
     },
   });
 
+  const quickBuy = trpc.payment.quickBuy.useMutation({
+    onSuccess: () => {
+      setBuyStep("success");
+      balance.refetch();
+      history.refetch();
+      summary.refetch();
+      myOrders.refetch();
+    },
+    onError: (error) => {
+      setBuyError(error.message);
+      setBuyStep("select");
+    },
+  });
+
+  const requestWithdrawal = trpc.payment.requestWithdrawal.useMutation({
+    onSuccess: () => {
+      setWithdrawSuccess(true);
+      balance.refetch();
+      history.refetch();
+      summary.refetch();
+      myWithdrawals.refetch();
+      setTimeout(() => {
+        setShowWithdrawModal(false);
+        setWithdrawSuccess(false);
+        setWithdrawAmount("");
+      }, 3000);
+    },
+    onError: (error) => {
+      setWithdrawError(error.message);
+    },
+  });
+
   const buyAmounts = [100, 250, 500, 1000, 2500, 5000];
+
+  function handleBuy() {
+    const amount = selectedAmount ?? Number(customAmount);
+    if (!amount || amount < 50) {
+      setBuyError("Valor minimo: 50 GCoins");
+      return;
+    }
+    setBuyError("");
+    setBuyStep("processing");
+    quickBuy.mutate({ gcoinAmount: amount, method: paymentMethod });
+  }
+
+  function resetBuyModal() {
+    setSelectedAmount(null);
+    setCustomAmount("");
+    setPaymentMethod("pix");
+    setBuyStep("select");
+    setBuyError("");
+  }
+
+  function handleWithdraw() {
+    const amount = Number(withdrawAmount);
+    if (!amount || amount < 100) {
+      setWithdrawError("Valor minimo: 100 GCoins");
+      return;
+    }
+    setWithdrawError("");
+    requestWithdrawal.mutate({ gcoinAmount: amount });
+  }
 
   function resetTransferForm() {
     setTransferSearch("");
@@ -196,14 +267,18 @@ export default function GCoinsPage() {
                 {formatNumber(balance.data?.total ?? 0)}
               </p>
             )}
-            <div className="flex gap-2 mt-3">
-              <Button size="sm" onClick={() => setShowBuyModal(true)}>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <Button size="sm" onClick={() => { resetBuyModal(); setShowBuyModal(true); }}>
                 <Plus className="w-4 h-4" />
                 Comprar
               </Button>
               <Button size="sm" variant="outline" onClick={() => { resetTransferForm(); setShowTransferModal(true); }}>
                 <Send className="w-4 h-4" />
                 Transferir
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => { setWithdrawAmount(""); setWithdrawError(""); setWithdrawSuccess(false); setShowWithdrawModal(true); }}>
+                <Banknote className="w-4 h-4" />
+                Sacar
               </Button>
             </div>
           </div>
@@ -363,68 +438,233 @@ export default function GCoinsPage() {
       </Card>
 
       {/* Buy Modal */}
-      <Modal isOpen={showBuyModal} onClose={() => setShowBuyModal(false)} title="Comprar GCoins">
-        <div className="space-y-5">
-          <p className="text-sm text-slate-500">Selecione o valor que deseja comprar:</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {buyAmounts.map((amount) => (
-              <button
-                key={amount}
-                onClick={() => setSelectedAmount(amount)}
-                className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-center group ${
-                  selectedAmount === amount
-                    ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20"
-                    : "border-slate-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-500/5"
-                }`}
-              >
-                {amount === 500 && (
-                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-gradient-to-r from-amber-500 to-amber-400 text-white text-[10px] font-bold rounded-full shadow-sm shadow-amber-500/30 flex items-center gap-1">
-                    <Star className="w-2.5 h-2.5 fill-current" />
-                    Popular
-                  </span>
-                )}
-                <p className={`text-xl font-bold transition-colors ${
-                  selectedAmount === amount ? "text-blue-700" : "text-slate-900 group-hover:text-blue-700"
-                }`}>
-                  {amount.toLocaleString()}
-                </p>
-                <p className="text-xs text-slate-500 mt-0.5">R$ {(amount * 0.1).toFixed(2)}</p>
-                {selectedAmount === amount && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+      <Modal isOpen={showBuyModal} onClose={() => { setShowBuyModal(false); resetBuyModal(); }} title="Comprar GCoins">
+        {buyStep === "success" ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">Compra Realizada!</h3>
+            <p className="text-sm text-slate-500 text-center">
+              {selectedAmount ?? customAmount} GCoins foram adicionados ao seu saldo.
+            </p>
+            <Button onClick={() => { setShowBuyModal(false); resetBuyModal(); }}>
+              Fechar
+            </Button>
+          </div>
+        ) : buyStep === "processing" ? (
+          <div className="flex flex-col items-center justify-center py-12 space-y-4">
+            <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+            <p className="text-sm text-slate-500">Processando pagamento...</p>
+            <p className="text-xs text-slate-400">
+              {paymentMethod === "pix" ? "Simulando PIX..." : "Simulando cartao..."}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-5">
+            <p className="text-sm text-slate-500">Selecione o valor que deseja comprar:</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {buyAmounts.map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => { setSelectedAmount(amount); setCustomAmount(""); }}
+                  className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-center group ${
+                    selectedAmount === amount
+                      ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20"
+                      : "border-slate-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-500/5"
+                  }`}
+                >
+                  {amount === 500 && (
+                    <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-gradient-to-r from-amber-500 to-amber-400 text-white text-[10px] font-bold rounded-full shadow-sm shadow-amber-500/30 flex items-center gap-1">
+                      <Star className="w-2.5 h-2.5 fill-current" />
+                      Popular
+                    </span>
+                  )}
+                  <p className={`text-xl font-bold transition-colors ${
+                    selectedAmount === amount ? "text-blue-700" : "text-slate-900 group-hover:text-blue-700"
+                  }`}>
+                    {amount.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">R$ {(amount * 0.1).toFixed(2)}</p>
+                  {selectedAmount === amount && (
+                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-white px-3 text-slate-400 font-medium">ou</span>
+              </div>
+            </div>
+
+            <Input
+              label="Valor personalizado (min. 50)"
+              type="number"
+              placeholder="Quantidade de GCoins"
+              value={customAmount}
+              onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
+            />
+
+            {/* Payment Method Selector */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Forma de Pagamento</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setPaymentMethod("pix")}
+                  className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                    paymentMethod === "pix"
+                      ? "border-green-500 bg-green-50 ring-2 ring-green-500/20"
+                      : "border-slate-200 hover:border-green-400"
+                  }`}
+                >
+                  <QrCode className={`w-5 h-5 ${paymentMethod === "pix" ? "text-green-600" : "text-slate-400"}`} />
+                  <div className="text-left">
+                    <p className={`text-sm font-semibold ${paymentMethod === "pix" ? "text-green-700" : "text-slate-700"}`}>PIX</p>
+                    <p className="text-[10px] text-slate-400">Instantaneo</p>
                   </div>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
+                </button>
+                <button
+                  onClick={() => setPaymentMethod("credit_card")}
+                  className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                    paymentMethod === "credit_card"
+                      ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500/20"
+                      : "border-slate-200 hover:border-blue-400"
+                  }`}
+                >
+                  <CreditCard className={`w-5 h-5 ${paymentMethod === "credit_card" ? "text-blue-600" : "text-slate-400"}`} />
+                  <div className="text-left">
+                    <p className={`text-sm font-semibold ${paymentMethod === "credit_card" ? "text-blue-700" : "text-slate-700"}`}>Cartao</p>
+                    <p className="text-[10px] text-slate-400">Credito/Debito</p>
+                  </div>
+                </button>
+              </div>
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-slate-400 font-medium">ou</span>
+
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-600">GCoins:</span>
+                <span className="font-bold text-slate-900">
+                  {(selectedAmount ?? (Number(customAmount) || 0)).toLocaleString()} GC
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-600">Total a pagar:</span>
+                <span className="font-bold text-blue-700">
+                  R$ {((selectedAmount ?? (Number(customAmount) || 0)) * 0.1).toFixed(2)}
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-400 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Pagamento simulado — credito instantaneo
+              </p>
             </div>
+
+            {buyError && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <p className="text-sm">{buyError}</p>
+              </div>
+            )}
+
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={handleBuy}
+              disabled={quickBuy.isPending || (!(selectedAmount) && !(Number(customAmount) >= 50))}
+            >
+              {paymentMethod === "pix" ? <QrCode className="w-5 h-5" /> : <CreditCard className="w-5 h-5" />}
+              {paymentMethod === "pix" ? "Pagar com PIX" : "Pagar com Cartao"}
+            </Button>
           </div>
+        )}
+      </Modal>
 
-          <Input label="Digite um valor personalizado" type="number" placeholder="Quantidade de GCoins" />
-
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50">
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total a pagar:</span>
-              <span className="font-bold text-blue-700">
-                R$ {selectedAmount ? (selectedAmount * 0.1).toFixed(2) : "0,00"}
-              </span>
+      {/* Withdraw Modal */}
+      <Modal
+        isOpen={showWithdrawModal}
+        onClose={() => { setShowWithdrawModal(false); setWithdrawSuccess(false); }}
+        title="Solicitar Saque"
+      >
+        {withdrawSuccess ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
+            <h3 className="text-lg font-bold text-slate-900">Saque Solicitado!</h3>
+            <p className="text-sm text-slate-500 text-center">
+              Sua solicitacao foi enviada e sera processada em breve.
+            </p>
           </div>
+        ) : (
+          <div className="space-y-5">
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200/50">
+              <div className="flex items-center gap-2 mb-1">
+                <Wallet className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-semibold text-blue-900">Saldo disponivel para saque</span>
+              </div>
+              <p className="text-2xl font-bold text-blue-700">
+                {formatNumber(balance.data?.real ?? 0)} GCoins Reais
+              </p>
+            </div>
 
-          <Button size="lg" className="w-full">
-            <CreditCard className="w-5 h-5" />
-            Comprar com PIX
-          </Button>
-        </div>
+            <Input
+              label="Quantidade de GCoins para sacar (min. 100)"
+              type="number"
+              placeholder="Ex: 500"
+              value={withdrawAmount}
+              onChange={(e) => { setWithdrawAmount(e.target.value); setWithdrawError(""); }}
+            />
+
+            {Number(withdrawAmount) >= 100 && (
+              <div className="bg-gradient-to-r from-amber-50 to-amber-100/50 rounded-xl p-4 border border-amber-200/50 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600">Valor solicitado:</span>
+                  <span className="font-bold text-slate-900">{Number(withdrawAmount).toLocaleString()} GC</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-600">Taxa (5%):</span>
+                  <span className="text-red-600">-{Math.ceil(Number(withdrawAmount) * 0.05)} GC</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-amber-300/50 pt-2">
+                  <span className="text-slate-600">Voce recebe via PIX:</span>
+                  <span className="font-bold text-green-700">
+                    R$ {((Number(withdrawAmount) - Math.ceil(Number(withdrawAmount) * 0.05)) * 0.1).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {withdrawError && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <p className="text-sm">{withdrawError}</p>
+              </div>
+            )}
+
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={handleWithdraw}
+              disabled={requestWithdrawal.isPending || Number(withdrawAmount) < 100}
+            >
+              {requestWithdrawal.isPending ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Banknote className="w-5 h-5" />
+              )}
+              {requestWithdrawal.isPending ? "Processando..." : "Solicitar Saque via PIX"}
+            </Button>
+          </div>
+        )}
       </Modal>
 
       {/* Transfer Modal */}

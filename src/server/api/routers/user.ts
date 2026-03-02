@@ -5,6 +5,7 @@ import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { users, userRoles, userSports, followers, userSettings } from "@/server/db/schema";
 import bcrypt from "bcryptjs";
 import { notifyNewFollower } from "@/server/services/notification-service";
+import { awardXP } from "@/server/services/gamification";
 
 export const userRouter = createTRPCRouter({
   // Register new user
@@ -142,10 +143,16 @@ export const userRouter = createTRPCRouter({
       const [userSport] = await ctx.db
         .insert(userSports)
         .values({
+          id: crypto.randomUUID(),
           userId: ctx.session.user.id,
           sportId: input.sportId,
-          level: input.level,
-          position: input.position,
+          level: input.level ?? "C",
+          position: input.position ?? null,
+          rating: "1000",
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          createdAt: new Date(),
         })
         .onConflictDoNothing()
         .returning();
@@ -192,6 +199,9 @@ export const userRouter = createTRPCRouter({
         columns: { name: true },
       });
       notifyNewFollower(input.userId, follower?.name ?? "Alguem", ctx.session.user.id).catch(() => {});
+
+      awardXP(ctx.session.user.id, "follow_given").catch(() => {});
+      awardXP(input.userId, "follow_received").catch(() => {});
 
       return { success: true };
     }),

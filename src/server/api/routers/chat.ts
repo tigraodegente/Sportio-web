@@ -3,6 +3,7 @@ import { eq, desc } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { chatRooms, chatMembers, chatMessages, users } from "@/server/db/schema";
 import { notifyChatMessage } from "@/server/services/notification-service";
+import { awardXP } from "@/server/services/gamification";
 
 export const chatRouter = createTRPCRouter({
   // My rooms
@@ -83,6 +84,8 @@ export const chatRouter = createTRPCRouter({
           notifyChatMessage(member.userId, sender?.name ?? "Alguem", input.roomId).catch(() => {});
         }
       }
+
+      awardXP(ctx.session.user.id, "chat_message_sent").catch(() => {});
 
       return message;
     }),

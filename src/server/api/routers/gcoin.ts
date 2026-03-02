@@ -3,6 +3,7 @@ import { eq, desc, and, sql } from "drizzle-orm";
 import { createTRPCRouter, protectedProcedure, rateLimitedProcedure } from "../trpc";
 import { gcoinTransactions, users } from "@/server/db/schema";
 import { notifyGcoinReceived } from "@/server/services/notification-service";
+import { claimDailyBonus, getLevelInfo, getRatingTier } from "@/server/services/gamification";
 
 export const gcoinRouter = createTRPCRouter({
   // Get balance
@@ -133,5 +134,19 @@ export const gcoinRouter = createTRPCRouter({
     }
 
     return { totalEarned, totalSpent, transactionCount: txs.length };
+  }),
+
+  // Claim daily login bonus
+  claimDailyBonus: protectedProcedure.mutation(async ({ ctx }) => {
+    return claimDailyBonus(ctx.session.user.id);
+  }),
+
+  // Get XP/Level progression info
+  levelInfo: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+      columns: { xp: true, level: true },
+    });
+    return getLevelInfo(user?.xp ?? 0);
   }),
 });

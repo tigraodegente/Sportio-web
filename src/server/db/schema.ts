@@ -16,6 +16,30 @@ import { relations } from "drizzle-orm";
 
 // ==================== ENUMS ====================
 
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "processing",
+  "completed",
+  "failed",
+  "refunded",
+  "expired",
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "pix",
+  "credit_card",
+  "debit_card",
+  "boleto",
+]);
+
+export const withdrawalStatusEnum = pgEnum("withdrawal_status", [
+  "pending",
+  "approved",
+  "processing",
+  "completed",
+  "rejected",
+]);
+
 export const userRoleEnum = pgEnum("user_role", [
   "athlete",
   "organizer",
@@ -86,6 +110,20 @@ export const matchStatusEnum = pgEnum("match_status", [
   "live",
   "completed",
   "cancelled",
+]);
+
+export const challengeStatusEnum = pgEnum("challenge_status", [
+  "pending",         // Created, waiting opponent to accept
+  "accepted",        // Opponent accepted, waiting to open bets
+  "betting_open",    // Open for bets
+  "in_progress",     // Challenge happening (bets closed)
+  "completed",       // Result determined
+  "cancelled",       // Cancelled/declined
+]);
+
+export const challengeTypeEnum = pgEnum("challenge_type", [
+  "duel",            // 1v1 challenge between two players
+  "community",       // Community challenge (original type - goal-based)
 ]);
 
 export const betTypeEnum = pgEnum("bet_type", [
@@ -280,7 +318,7 @@ export const userSports = pgTable(
       .references(() => sports.id, { onDelete: "cascade" }),
     level: levelEnum("level").default("C"),
     position: varchar("position", { length: 50 }),
-    rating: decimal("rating", { precision: 4, scale: 2 }).default("1000"),
+    rating: decimal("rating", { precision: 8, scale: 2 }).default("1000"),
     wins: integer("wins").default(0),
     losses: integer("losses").default(0),
     draws: integer("draws").default(0),
@@ -312,6 +350,7 @@ export const tournaments = pgTable(
     format: tournamentFormatEnum("format").default("single_elimination"),
     status: tournamentStatusEnum("status").default("draft"),
     maxParticipants: integer("max_participants").default(32),
+    currentParticipants: integer("current_participants").default(0),
     minParticipants: integer("min_participants").default(4),
     entryFee: decimal("entry_fee", { precision: 10, scale: 2 }).default("0"),
     entryFeeType: gcoinTypeEnum("entry_fee_type").default("real"),
@@ -461,12 +500,9 @@ export const bets = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    matchId: uuid("match_id")
-      .notNull()
-      .references(() => matches.id),
-    tournamentId: uuid("tournament_id")
-      .notNull()
-      .references(() => tournaments.id),
+    matchId: uuid("match_id").references(() => matches.id),
+    tournamentId: uuid("tournament_id").references(() => tournaments.id),
+    challengeId: uuid("challenge_id").references(() => challenges.id),
     betType: betTypeEnum("bet_type").notNull(),
     prediction: jsonb("prediction").notNull(),
     amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
@@ -479,6 +515,7 @@ export const bets = pgTable(
   (table) => [
     index("bets_user_idx").on(table.userId),
     index("bets_match_idx").on(table.matchId),
+    index("bets_challenge_idx").on(table.challengeId),
     index("bets_result_idx").on(table.result),
   ]
 );
@@ -571,20 +608,42 @@ export const challenges = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
+    challengeType: challengeTypeEnum("challenge_type").default("duel").notNull(),
+    status: challengeStatusEnum("status").default("pending").notNull(),
     sportId: uuid("sport_id").references(() => sports.id),
     creatorId: uuid("creator_id")
       .notNull()
       .references(() => users.id),
+    // 1v1 Duel fields
+    opponentId: uuid("opponent_id").references(() => users.id),
+    winnerId: uuid("winner_id").references(() => users.id),
+    score1: integer("score1"),  // creator's score
+    score2: integer("score2"),  // opponent's score
+    // Betting
+    bettingEnabled: boolean("betting_enabled").default(true),
+    bettingDeadline: timestamp("betting_deadline"),
+    // Reward
     reward: decimal("reward", { precision: 10, scale: 2 }).default("0"),
     rewardType: gcoinTypeEnum("reward_type").default("gamification"),
+    wagerAmount: decimal("wager_amount", { precision: 10, scale: 2 }).default("0"), // GCoins each player puts up
+    // Community challenge fields (kept for backward compat)
     goal: jsonb("goal"),
     maxParticipants: integer("max_participants"),
+    // Timing
     startsAt: timestamp("starts_at"),
     endsAt: timestamp("ends_at"),
+    acceptedAt: timestamp("accepted_at"),
+    completedAt: timestamp("completed_at"),
     isActive: boolean("is_active").default(true),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("challenges_sport_idx").on(table.sportId)]
+  (table) => [
+    index("challenges_sport_idx").on(table.sportId),
+    index("challenges_creator_idx").on(table.creatorId),
+    index("challenges_opponent_idx").on(table.opponentId),
+    index("challenges_status_idx").on(table.status),
+    index("challenges_type_idx").on(table.challengeType),
+  ]
 );
 
 // Challenge Participants
@@ -899,6 +958,164 @@ export const userSettings = pgTable("user_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Payment Orders (GCoin purchases)
+export const paymentOrders = pgTable(
+  "payment_orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    gcoinAmount: decimal("gcoin_amount", { precision: 12, scale: 2 }).notNull(),
+    brlAmount: decimal("brl_amount", { precision: 12, scale: 2 }).notNull(),
+    method: paymentMethodEnum("method").notNull(),
+    status: paymentStatusEnum("status").default("pending"),
+    gatewayId: varchar("gateway_id", { length: 255 }), // simulated gateway transaction ID
+    gatewayData: jsonb("gateway_data"), // PIX code, card last4, etc.
+    paidAt: timestamp("paid_at"),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("payment_orders_user_idx").on(table.userId),
+    index("payment_orders_status_idx").on(table.status),
+    index("payment_orders_created_idx").on(table.createdAt),
+  ]
+);
+
+// Withdrawal Requests (GCoin → BRL via PIX)
+export const withdrawalRequests = pgTable(
+  "withdrawal_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    gcoinAmount: decimal("gcoin_amount", { precision: 12, scale: 2 }).notNull(),
+    brlAmount: decimal("brl_amount", { precision: 12, scale: 2 }).notNull(),
+    pixKey: varchar("pix_key", { length: 255 }).notNull(),
+    status: withdrawalStatusEnum("status").default("pending"),
+    reviewedBy: uuid("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    rejectionReason: text("rejection_reason"),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("withdrawal_requests_user_idx").on(table.userId),
+    index("withdrawal_requests_status_idx").on(table.status),
+  ]
+);
+
+// Achievement Definitions (system-defined, not user-created)
+export const achievementTierEnum = pgEnum("achievement_tier", [
+  "bronze",
+  "silver",
+  "gold",
+  "platinum",
+  "diamond",
+]);
+
+export const missionFrequencyEnum = pgEnum("mission_frequency", [
+  "daily",
+  "weekly",
+  "monthly",
+  "one_time",
+]);
+
+export const achievements = pgTable(
+  "achievements",
+  {
+    id: varchar("id", { length: 100 }).primaryKey(), // e.g. "athlete_first_win"
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    icon: varchar("icon", { length: 50 }),
+    tier: achievementTierEnum("tier").notNull(),
+    category: varchar("category", { length: 50 }).notNull(), // e.g. "athlete", "organizer", "brand"
+    targetRole: userRoleEnum("target_role"), // which persona this is for (null = all)
+    requirement: jsonb("requirement").notNull(), // { type: "count", metric: "matches_won", value: 1 }
+    xpReward: integer("xp_reward").default(0),
+    gcoinReward: integer("gcoin_reward").default(0),
+    sortOrder: integer("sort_order").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("achievements_category_idx").on(table.category),
+    index("achievements_role_idx").on(table.targetRole),
+  ]
+);
+
+// User Achievements (earned by users)
+export const userAchievements = pgTable(
+  "user_achievements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    achievementId: varchar("achievement_id", { length: 100 })
+      .notNull()
+      .references(() => achievements.id),
+    progress: integer("progress").default(0), // current progress toward requirement
+    completedAt: timestamp("completed_at"), // null = in progress
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_achievements_unique_idx").on(table.userId, table.achievementId),
+    index("user_achievements_user_idx").on(table.userId),
+    index("user_achievements_completed_idx").on(table.completedAt),
+  ]
+);
+
+// Mission Definitions (daily/weekly rotating quests)
+export const missions = pgTable(
+  "missions",
+  {
+    id: varchar("id", { length: 100 }).primaryKey(), // e.g. "daily_post_1"
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    icon: varchar("icon", { length: 50 }),
+    frequency: missionFrequencyEnum("frequency").notNull(),
+    targetRole: userRoleEnum("target_role"), // null = all
+    requirement: jsonb("requirement").notNull(), // { type: "action", action: "create_post", count: 1 }
+    xpReward: integer("xp_reward").default(0),
+    gcoinReward: integer("gcoin_reward").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("missions_frequency_idx").on(table.frequency),
+    index("missions_role_idx").on(table.targetRole),
+  ]
+);
+
+// User Missions (tracking user progress on missions)
+export const userMissions = pgTable(
+  "user_missions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    missionId: varchar("mission_id", { length: 100 })
+      .notNull()
+      .references(() => missions.id),
+    progress: integer("progress").default(0),
+    completedAt: timestamp("completed_at"),
+    periodStart: timestamp("period_start").notNull(), // start of daily/weekly period
+    periodEnd: timestamp("period_end").notNull(), // end of period
+    rewardClaimed: boolean("reward_claimed").default(false),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("user_missions_user_idx").on(table.userId),
+    index("user_missions_period_idx").on(table.periodStart, table.periodEnd),
+    uniqueIndex("user_missions_unique_idx").on(table.userId, table.missionId, table.periodStart),
+  ]
+);
+
 // ==================== RELATIONS ====================
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -1002,12 +1219,16 @@ export const betsRelations = relations(bets, ({ one }) => ({
   user: one(users, { fields: [bets.userId], references: [users.id] }),
   match: one(matches, { fields: [bets.matchId], references: [matches.id] }),
   tournament: one(tournaments, { fields: [bets.tournamentId], references: [tournaments.id] }),
+  challenge: one(challenges, { fields: [bets.challengeId], references: [challenges.id] }),
 }));
 
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
   sport: one(sports, { fields: [challenges.sportId], references: [sports.id] }),
-  creator: one(users, { fields: [challenges.creatorId], references: [users.id] }),
+  creator: one(users, { fields: [challenges.creatorId], references: [users.id], relationName: "challengeCreator" }),
+  opponent: one(users, { fields: [challenges.opponentId], references: [users.id], relationName: "challengeOpponent" }),
+  winner: one(users, { fields: [challenges.winnerId], references: [users.id], relationName: "challengeWinner" }),
   participants: many(challengeParticipants),
+  bets: many(bets),
 }));
 
 export const challengeParticipantsRelations = relations(challengeParticipants, ({ one }) => ({
@@ -1067,4 +1288,31 @@ export const tournamentInvitesRelations = relations(tournamentInvites, ({ one })
 
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
   user: one(users, { fields: [userSettings.userId], references: [users.id] }),
+}));
+
+export const paymentOrdersRelations = relations(paymentOrders, ({ one }) => ({
+  user: one(users, { fields: [paymentOrders.userId], references: [users.id] }),
+}));
+
+export const withdrawalRequestsRelations = relations(withdrawalRequests, ({ one }) => ({
+  user: one(users, { fields: [withdrawalRequests.userId], references: [users.id] }),
+  reviewer: one(users, { fields: [withdrawalRequests.reviewedBy], references: [users.id] }),
+}));
+
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, { fields: [userAchievements.userId], references: [users.id] }),
+  achievement: one(achievements, { fields: [userAchievements.achievementId], references: [achievements.id] }),
+}));
+
+export const missionsRelations = relations(missions, ({ many }) => ({
+  userMissions: many(userMissions),
+}));
+
+export const userMissionsRelations = relations(userMissions, ({ one }) => ({
+  user: one(users, { fields: [userMissions.userId], references: [users.id] }),
+  mission: one(missions, { fields: [userMissions.missionId], references: [missions.id] }),
 }));

@@ -17,6 +17,7 @@ import {
   notifyProductRedeemed,
   notifyNewSponsor,
 } from "@/server/services/notification-service";
+import { awardXP } from "@/server/services/gamification";
 
 // Helper to verify brand role
 async function verifyBrandRole(db: any, userId: string) {
@@ -266,6 +267,8 @@ export const brandRouter = createTRPCRouter({
         })
         .returning();
 
+      awardXP(ctx.session.user.id, "campaign_created").catch(() => {});
+
       return campaign;
     }),
 
@@ -351,6 +354,8 @@ export const brandRouter = createTRPCRouter({
         amount: input.amount.toString(),
         description: `Compra de ${input.amount} GCoins (Marca)`,
       });
+
+      awardXP(ctx.session.user.id, "gcoins_purchased").catch(() => {});
 
       return { success: true, amount: input.amount };
     }),
@@ -509,6 +514,8 @@ export const brandRouter = createTRPCRouter({
         input.tier,
         tournament.id
       ).catch(() => {});
+
+      awardXP(ctx.session.user.id, "tournament_sponsored").catch(() => {});
 
       return sponsor;
     }),

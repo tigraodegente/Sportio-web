@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Calendar, Star, Coins, Edit3, Instagram, Twitter, Trophy, Zap, TrendingUp, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import { MapPin, Calendar, Star, Coins, Edit3, Instagram, Twitter, Trophy, Zap, TrendingUp, ChevronRight, Loader2, AlertCircle, CheckCircle, Lock, Target, Medal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +47,8 @@ export default function ProfilePage() {
     { userId: user.data?.id ?? "" },
     { enabled: !!user.data?.id }
   );
+  const achievementsQuery = trpc.gamification.achievements.useQuery({});
+  const missionsQuery = trpc.gamification.myMissions.useQuery();
 
   if (user.isLoading) {
     return (
@@ -273,6 +275,8 @@ export default function ProfilePage() {
       <Tabs
         tabs={[
           { id: "sports", label: "Esportes" },
+          { id: "achievements", label: "Conquistas" },
+          { id: "missions", label: "Missoes" },
         ]}
       >
         {(tab) => (
@@ -346,6 +350,109 @@ export default function ProfilePage() {
                     </Card>
                   );
                 })}
+              </div>
+            )}
+
+            {tab === "achievements" && (
+              <div className="space-y-4">
+                {achievementsQuery.isLoading ? (
+                  <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-blue-500" /></div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-slate-500">
+                        {(achievementsQuery.data ?? []).filter(a => a.completed).length} de {(achievementsQuery.data ?? []).length} desbloqueadas
+                      </p>
+                      <Link href="/achievements">
+                        <Button variant="outline" size="sm">
+                          Ver todas <ChevronRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {(achievementsQuery.data ?? []).filter(a => a.completed).slice(0, 6).map(a => (
+                        <Card key={a.id} className="flex items-center gap-3 py-3 border-green-200 bg-green-50/50">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-green-100 flex-shrink-0">
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm text-slate-900 truncate">{a.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{a.description}</p>
+                          </div>
+                        </Card>
+                      ))}
+                      {(achievementsQuery.data ?? []).filter(a => !a.completed).slice(0, 3).map(a => (
+                        <Card key={a.id} className="flex items-center gap-3 py-3 opacity-60">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 flex-shrink-0">
+                            <Lock className="w-5 h-5 text-slate-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm text-slate-900 truncate">{a.name}</p>
+                            <p className="text-xs text-slate-500">{a.progress}/{a.target}</p>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                    {(achievementsQuery.data ?? []).length === 0 && (
+                      <div className="text-center py-8 text-slate-400">
+                        <Medal className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                        <p className="font-medium">Nenhuma conquista disponivel</p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+
+            {tab === "missions" && (
+              <div className="space-y-4">
+                {missionsQuery.isLoading ? (
+                  <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-blue-500" /></div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm text-slate-500">
+                        {(missionsQuery.data ?? []).filter(m => m.completedAt).length} de {(missionsQuery.data ?? []).length} concluidas
+                      </p>
+                      <Link href="/missions">
+                        <Button variant="outline" size="sm">
+                          Ver todas <ChevronRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                    <div className="space-y-3">
+                      {(missionsQuery.data ?? []).slice(0, 5).map(um => {
+                        const mission = um.mission;
+                        if (!mission) return null;
+                        const req = mission.requirement as { count: number };
+                        const pct = Math.min(((um.progress ?? 0) / (req?.count ?? 1)) * 100, 100);
+                        return (
+                          <Card key={um.id} className={`flex items-center gap-3 py-3 ${um.completedAt ? "border-green-200 bg-green-50/50" : ""}`}>
+                            <div className={`flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 ${um.completedAt ? "bg-green-100" : "bg-blue-100"}`}>
+                              {um.completedAt ? <CheckCircle className="w-5 h-5 text-green-600" /> : <Target className="w-5 h-5 text-blue-600" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-sm text-slate-900">{mission.name}</p>
+                              <div className="w-full bg-slate-200 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                                <div
+                                  className={`h-1.5 rounded-full ${um.completedAt ? "bg-green-500" : "bg-blue-500"}`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                            <span className="text-xs text-slate-500 flex-shrink-0">{um.progress ?? 0}/{req?.count ?? 1}</span>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                    {(missionsQuery.data ?? []).length === 0 && (
+                      <div className="text-center py-8 text-slate-400">
+                        <Target className="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                        <p className="font-medium">Nenhuma missao ativa</p>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
           </>

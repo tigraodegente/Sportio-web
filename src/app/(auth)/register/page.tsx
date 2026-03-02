@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Mail, Lock, User, Eye, EyeOff, Trophy, Briefcase, Megaphone, Shield, Dumbbell, Apple, Camera, Building2 } from "lucide-react";
@@ -26,11 +26,24 @@ const roles = [
 type RoleId = "athlete" | "organizer" | "brand" | "referee" | "trainer" | "nutritionist" | "photographer" | "arena_owner";
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const personaParam = searchParams.get("persona");
+  const validRoleIds = roles.map((r) => r.id);
+  const initialRoles = personaParam && validRoleIds.includes(personaParam) ? [personaParam] : [];
+
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>(initialRoles);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
   const registerMutation = trpc.user.register.useMutation();
