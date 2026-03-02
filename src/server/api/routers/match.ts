@@ -5,6 +5,7 @@ import { matches } from "@/server/db/schema";
 import { createAutoPost } from "@/server/services/auto-feed";
 import { settleBets, cancelMatchBets } from "@/server/services/bet-settlement";
 import { createNotification } from "@/server/services/notification-service";
+import { updateRatingsAfterMatch } from "@/server/services/gamification";
 
 export const matchRouter = createTRPCRouter({
   // Get match by ID
@@ -93,6 +94,16 @@ export const matchRouter = createTRPCRouter({
 
           // Settle all bets for this match
           settleBets(matchId, input.winnerId).catch(() => {});
+
+          // Update ELO ratings and award XP
+          if (match.player1Id && match.player2Id && match.tournament?.sportId) {
+            updateRatingsAfterMatch(
+              match.player1Id,
+              match.player2Id,
+              input.winnerId,
+              match.tournament.sportId
+            ).catch(() => {});
+          }
 
           // Notify winner and loser
           createNotification({

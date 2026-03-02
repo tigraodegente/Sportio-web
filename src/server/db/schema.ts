@@ -16,6 +16,30 @@ import { relations } from "drizzle-orm";
 
 // ==================== ENUMS ====================
 
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "processing",
+  "completed",
+  "failed",
+  "refunded",
+  "expired",
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", [
+  "pix",
+  "credit_card",
+  "debit_card",
+  "boleto",
+]);
+
+export const withdrawalStatusEnum = pgEnum("withdrawal_status", [
+  "pending",
+  "approved",
+  "processing",
+  "completed",
+  "rejected",
+]);
+
 export const userRoleEnum = pgEnum("user_role", [
   "athlete",
   "organizer",
@@ -312,6 +336,7 @@ export const tournaments = pgTable(
     format: tournamentFormatEnum("format").default("single_elimination"),
     status: tournamentStatusEnum("status").default("draft"),
     maxParticipants: integer("max_participants").default(32),
+    currentParticipants: integer("current_participants").default(0),
     minParticipants: integer("min_participants").default(4),
     entryFee: decimal("entry_fee", { precision: 10, scale: 2 }).default("0"),
     entryFeeType: gcoinTypeEnum("entry_fee_type").default("real"),
@@ -899,6 +924,56 @@ export const userSettings = pgTable("user_settings", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Payment Orders (GCoin purchases)
+export const paymentOrders = pgTable(
+  "payment_orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    gcoinAmount: decimal("gcoin_amount", { precision: 12, scale: 2 }).notNull(),
+    brlAmount: decimal("brl_amount", { precision: 12, scale: 2 }).notNull(),
+    method: paymentMethodEnum("method").notNull(),
+    status: paymentStatusEnum("status").default("pending"),
+    gatewayId: varchar("gateway_id", { length: 255 }), // simulated gateway transaction ID
+    gatewayData: jsonb("gateway_data"), // PIX code, card last4, etc.
+    paidAt: timestamp("paid_at"),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("payment_orders_user_idx").on(table.userId),
+    index("payment_orders_status_idx").on(table.status),
+    index("payment_orders_created_idx").on(table.createdAt),
+  ]
+);
+
+// Withdrawal Requests (GCoin → BRL via PIX)
+export const withdrawalRequests = pgTable(
+  "withdrawal_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    gcoinAmount: decimal("gcoin_amount", { precision: 12, scale: 2 }).notNull(),
+    brlAmount: decimal("brl_amount", { precision: 12, scale: 2 }).notNull(),
+    pixKey: varchar("pix_key", { length: 255 }).notNull(),
+    status: withdrawalStatusEnum("status").default("pending"),
+    reviewedBy: uuid("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    rejectionReason: text("rejection_reason"),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("withdrawal_requests_user_idx").on(table.userId),
+    index("withdrawal_requests_status_idx").on(table.status),
+  ]
+);
+
 // ==================== RELATIONS ====================
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -1067,4 +1142,13 @@ export const tournamentInvitesRelations = relations(tournamentInvites, ({ one })
 
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
   user: one(users, { fields: [userSettings.userId], references: [users.id] }),
+}));
+
+export const paymentOrdersRelations = relations(paymentOrders, ({ one }) => ({
+  user: one(users, { fields: [paymentOrders.userId], references: [users.id] }),
+}));
+
+export const withdrawalRequestsRelations = relations(withdrawalRequests, ({ one }) => ({
+  user: one(users, { fields: [withdrawalRequests.userId], references: [users.id] }),
+  reviewer: one(users, { fields: [withdrawalRequests.reviewedBy], references: [users.id] }),
 }));

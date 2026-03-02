@@ -436,7 +436,7 @@ export const tournamentRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Inscricoes nao estao abertas" });
       }
 
-      if (tournament.currentParticipants >= tournament.maxParticipants) {
+      if ((tournament.currentParticipants ?? 0) >= (tournament.maxParticipants ?? 32)) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Torneio lotado" });
       }
 

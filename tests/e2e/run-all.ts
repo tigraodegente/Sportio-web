@@ -151,7 +151,7 @@ async function phase2_profile() {
     if (user.bio) updates.bio = user.bio;
     if (user.city) updates.city = user.city;
     if (user.state) updates.state = user.state;
-    if (user.phone) updates.phone = user.phone;
+    if ("phone" in user) updates.phone = (user as Record<string, unknown>).phone;
     if ("instagram" in user) updates.instagram = (user as Record<string, unknown>).instagram;
     if ("twitter" in user) updates.twitter = (user as Record<string, unknown>).twitter;
     if ("youtube" in user) updates.youtube = (user as Record<string, unknown>).youtube;

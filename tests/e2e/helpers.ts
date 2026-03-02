@@ -284,7 +284,7 @@ export async function checkPage(
 ): Promise<{ ok: boolean; status: number; error?: string }> {
   try {
     const res = await fetchWithCookies(`${BASE_URL}${path}`, {}, userKey);
-    saveCookies(res, userKey);
+    saveCookies(res, userKey ?? "default");
     return { ok: res.ok || res.status === 302 || res.status === 307, status: res.status };
   } catch (error) {
     return { ok: false, status: 0, error: error instanceof Error ? error.message : String(error) };
