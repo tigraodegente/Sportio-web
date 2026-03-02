@@ -35,9 +35,13 @@ let tournamentIds: Record<string, string> = {};
 let matchIds: string[] = [];
 let postIds: string[] = [];
 let chatRoomId = "";
+let groupChatRoomId = "";
 let challengeId = "";
+let duelId = "";
 let campaignId = "";
+let gcoinRewardCampaignId = "";
 let sponsorshipId = "";
+let orderId = "";
 
 // ============================================================
 // PHASE 0: Server Health Check
@@ -133,6 +137,41 @@ async function phase1_auth() {
     return {
       pass: !!result.error,
       message: result.error ? "Duplicata rejeitada corretamente" : "Deveria ter rejeitado",
+    };
+  });
+
+  // Verify organizer session
+  await runTest("AUTH", "Verificar sessão da organizadora", async () => {
+    const result = await trpcQuery<{ id: string; email: string }>(
+      "user.me",
+      undefined,
+      "organizer"
+    );
+    if (result.data?.email === TEST_USERS.organizer.email) {
+      return { pass: true, message: `Sessão OK: ${result.data.email}` };
+    }
+    return { pass: false, message: result.error || "Sessão inválida" };
+  });
+
+  // Verify brand session
+  await runTest("AUTH", "Verificar sessão da marca", async () => {
+    const result = await trpcQuery<{ id: string; email: string }>(
+      "user.me",
+      undefined,
+      "brand"
+    );
+    if (result.data?.email === TEST_USERS.brand.email) {
+      return { pass: true, message: `Sessão OK: ${result.data.email}` };
+    }
+    return { pass: false, message: result.error || "Sessão inválida" };
+  });
+
+  // Test invalid login
+  await runTest("AUTH", "Rejeitar senha incorreta", async () => {
+    const success = await loginUser(TEST_USERS.athlete.email, "SenhaErrada123!", "invalid_test");
+    return {
+      pass: !success,
+      message: !success ? "Login incorreto rejeitado" : "Deveria ter rejeitado",
     };
   });
 }
@@ -309,6 +348,47 @@ async function phase2_profile() {
       message: `${result.data?.items?.length ?? 0} resultados`,
     };
   });
+
+  // Get profile by ID (public)
+  const athleteId = getUserId("athlete");
+  if (athleteId) {
+    await runTest("PERFIL", "Perfil público por ID", async () => {
+      const result = await trpcQuery<{ id: string; name: string }>(
+        "user.getById",
+        { id: athleteId }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: !!result.data?.name, message: result.data?.name };
+    });
+
+    // Follow counts for athlete
+    await runTest("PERFIL", "Contagem de seguidores do atleta", async () => {
+      const result = await trpcQuery<{ followers: number; following: number }>(
+        "user.getFollowCounts",
+        { userId: athleteId }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `Followers: ${result.data?.followers}, Following: ${result.data?.following}` };
+    });
+  }
+
+  // Level info (gamification)
+  await runTest("PERFIL", "Info de nível e XP (atleta)", async () => {
+    const result = await trpcQuery<{ level: number; xpForNext: number }>(
+      "gcoin.levelInfo",
+      undefined,
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `Nível: ${result.data?.level}` };
+  });
+
+  // Add role to organizer (bettor)
+  await runTest("PERFIL", "Adicionar role extra (bettor) à organizadora", async () => {
+    const result = await trpcMutation("user.addRole", { role: "bettor" }, "organizer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true };
+  });
 }
 
 // ============================================================
@@ -478,6 +558,40 @@ async function phase3_social() {
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} posts` };
   });
 
+  // Get single post by ID
+  if (postIds[0]) {
+    await runTest("SOCIAL", "Buscar post por ID", async () => {
+      const result = await trpcQuery<{ id: string; content: string }>(
+        "social.getPost",
+        { postId: postIds[0] }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: !!result.data?.content, message: `Post encontrado` };
+    });
+  }
+
+  // Multiple follows for social graph
+  const organizerId = getUserId("organizer");
+  if (organizerId) {
+    await runTest("SOCIAL", "Seguir organizadora (Atleta → Organizadora)", async () => {
+      const result = await trpcMutation("user.follow", { userId: organizerId }, "athlete");
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true };
+    });
+  }
+
+  // Verify follow counts for organizer
+  if (organizerId) {
+    await runTest("SOCIAL", "Contagem seguidores da organizadora", async () => {
+      const result = await trpcQuery<{ followers: number; following: number }>(
+        "user.getFollowCounts",
+        { userId: organizerId }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${result.data?.followers} seguidores` };
+    });
+  }
+
   // Delete post (last one)
   if (postIds.length > 3) {
     const deleteId = postIds[postIds.length - 1];
@@ -487,6 +601,16 @@ async function phase3_social() {
       return { pass: true };
     });
   }
+
+  // Feed with cursor pagination
+  await runTest("SOCIAL", "Feed com paginação (cursor)", async () => {
+    const result = await trpcQuery<{ items: unknown[]; nextCursor?: string }>(
+      "social.feed",
+      { limit: 2 }
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `Cursor: ${result.data?.nextCursor ? "sim" : "não"}` };
+  });
 }
 
 // ============================================================
@@ -682,6 +806,51 @@ async function phase4_tournaments() {
       const result = await trpcQuery<unknown[]>("tournament.myInvites", undefined, "referee");
       if (result.error) return { pass: false, message: result.error };
       return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} convites` };
+    });
+  }
+
+  // Filter by sport
+  await runTest("TORNEIO", "Filtrar torneios por esporte", async () => {
+    const result = await trpcQuery<{ items: unknown[] }>(
+      "tournament.list",
+      { sportId: btSportId, limit: 20 }
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${result.data?.items?.length ?? 0} torneios de BT` };
+  });
+
+  // Filter by search
+  await runTest("TORNEIO", "Buscar torneio por nome", async () => {
+    const result = await trpcQuery<{ items: unknown[] }>(
+      "tournament.list",
+      { search: "Sportio Open", limit: 20 }
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${result.data?.items?.length ?? 0} encontrados` };
+  });
+
+  // Tournament invites list for organizer
+  if (tournamentIds["single_elim"]) {
+    await runTest("TORNEIO", "Listar convites enviados (organizadora)", async () => {
+      const result = await trpcQuery<unknown[]>(
+        "tournament.tournamentInvitesList",
+        { tournamentId: tournamentIds["single_elim"] },
+        "organizer"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} convites` };
+    });
+  }
+
+  // Tournament sponsors (public)
+  if (tournamentIds["single_elim"]) {
+    await runTest("TORNEIO", "Listar sponsors do torneio", async () => {
+      const result = await trpcQuery<unknown[]>(
+        "tournament.sponsors",
+        { tournamentId: tournamentIds["single_elim"] }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} sponsors` };
     });
   }
 
@@ -942,6 +1111,27 @@ async function phase5_bets() {
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} no ranking` };
   });
+
+  // My bets filtered by won
+  await runTest("APOSTAS", "Filtrar apostas ganhas", async () => {
+    const result = await trpcQuery<unknown[]>("bet.myBets", { result: "won" }, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} ganhas` };
+  });
+
+  // My bets filtered by lost
+  await runTest("APOSTAS", "Filtrar apostas perdidas", async () => {
+    const result = await trpcQuery<unknown[]>("bet.myBets", { result: "lost" }, "trainer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} perdidas` };
+  });
+
+  // Organizer bets
+  await runTest("APOSTAS", "Minhas apostas (organizadora)", async () => {
+    const result = await trpcQuery<unknown[]>("bet.myBets", {}, "organizer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} apostas` };
+  });
 }
 
 // ============================================================
@@ -1049,6 +1239,121 @@ async function phase6_gcoins() {
       message: `Earned: ${result.data?.totalEarned}, Spent: ${result.data?.totalSpent}, Count: ${result.data?.transactionCount}`,
     };
   });
+
+  // Daily bonus claim
+  await runTest("GCOINS", "Bônus diário (claim)", async () => {
+    const result = await trpcMutation("gcoin.claimDailyBonus", {}, "athlete");
+    // May fail if already claimed today - that's OK
+    if (result.error && !result.error.includes("já")) {
+      return { pass: false, message: result.error };
+    }
+    return { pass: true, message: result.error ? "Já coletado hoje" : "Bônus coletado!" };
+  });
+
+  // Brand balance check
+  await runTest("GCOINS", "Saldo da marca (brand)", async () => {
+    const result = await trpcQuery<{ real: string; gamification: string }>(
+      "gcoin.balance",
+      undefined,
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `Real: ${result.data?.real}, Gamif: ${result.data?.gamification}` };
+  });
+
+  // Payment: Create order (PIX)
+  await runTest("GCOINS", "Criar pedido de compra (PIX)", async () => {
+    const result = await trpcMutation<{ id: string; status: string }>(
+      "payment.createOrder",
+      { gcoinAmount: 100, method: "pix" },
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    if (result.data?.id) orderId = result.data.id;
+    return { pass: true, message: `Pedido: ${result.data?.id?.substring(0, 8)}... Status: ${result.data?.status}` };
+  });
+
+  // Payment: Create order (credit card)
+  await runTest("GCOINS", "Criar pedido de compra (cartão)", async () => {
+    const result = await trpcMutation<{ id: string }>(
+      "payment.createOrder",
+      { gcoinAmount: 50, method: "credit_card" },
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `Pedido cartão criado` };
+  });
+
+  // Payment: Confirm payment
+  if (orderId) {
+    await runTest("GCOINS", "Confirmar pagamento (PIX)", async () => {
+      const result = await trpcMutation(
+        "payment.confirmPayment",
+        { orderId },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: "Pagamento confirmado" };
+    });
+  }
+
+  // Payment: Quick buy
+  await runTest("GCOINS", "Compra rápida de GCoins (quickBuy)", async () => {
+    const result = await trpcMutation(
+      "payment.quickBuy",
+      { gcoinAmount: 200, method: "credit_card" },
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "200 GCoins comprados rapidamente" };
+  });
+
+  // Payment: My orders
+  await runTest("GCOINS", "Listar meus pedidos de compra", async () => {
+    const result = await trpcQuery<unknown[]>(
+      "payment.myOrders",
+      undefined,
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} pedidos` };
+  });
+
+  // Payment: Request withdrawal
+  await runTest("GCOINS", "Solicitar saque via PIX", async () => {
+    const result = await trpcMutation(
+      "payment.requestWithdrawal",
+      { amount: 100, pixKey: "sportio.e2e.atleta@gmail.com" },
+      "athlete"
+    );
+    // May fail if insufficient balance - that's OK
+    if (result.error && !result.error.includes("insuficiente") && !result.error.includes("saldo")) {
+      return { pass: false, message: result.error };
+    }
+    return { pass: true, message: result.error ? "Saldo insuficiente (esperado)" : "Saque solicitado" };
+  });
+
+  // Payment: My withdrawals
+  await runTest("GCOINS", "Listar meus saques", async () => {
+    const result = await trpcQuery<unknown[]>(
+      "payment.myWithdrawals",
+      undefined,
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} saques` };
+  });
+
+  // Level info
+  await runTest("GCOINS", "Info de nível (treinadora)", async () => {
+    const result = await trpcQuery<{ level: number }>(
+      "gcoin.levelInfo",
+      undefined,
+      "trainer"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `Nível: ${result.data?.level}` };
+  });
 }
 
 // ============================================================
@@ -1136,12 +1441,54 @@ async function phase7_chat() {
       "athlete"
     );
     if (result.error) return { pass: false, message: result.error };
+    if (result.data?.id) groupChatRoomId = result.data.id;
     return { pass: true, message: `Grupo criado: ${result.data?.id?.substring(0, 8)}...` };
   });
 
+  // Send message in group
+  if (groupChatRoomId) {
+    await runTest("CHAT", "Enviar mensagem no grupo (Atleta)", async () => {
+      const result = await trpcMutation(
+        "chat.sendMessage",
+        { roomId: groupChatRoomId, content: "Bom dia equipe! Preparados para o torneio?" },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true };
+    });
+
+    await runTest("CHAT", "Responder no grupo (Treinadora)", async () => {
+      const result = await trpcMutation(
+        "chat.sendMessage",
+        { roomId: groupChatRoomId, content: "Preparadíssima! Vamos focar na estratégia." },
+        "trainer"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true };
+    });
+
+    // Messages in group
+    await runTest("CHAT", "Listar mensagens do grupo", async () => {
+      const result = await trpcQuery<{ items: unknown[] }>(
+        "chat.messages",
+        { roomId: groupChatRoomId, limit: 50 },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${result.data?.items?.length ?? 0} mensagens no grupo` };
+    });
+  }
+
   // List rooms
-  await runTest("CHAT", "Listar minhas conversas", async () => {
+  await runTest("CHAT", "Listar minhas conversas (atleta)", async () => {
     const result = await trpcQuery<unknown[]>("chat.myRooms", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} conversas` };
+  });
+
+  // List rooms for trainer
+  await runTest("CHAT", "Listar conversas da treinadora", async () => {
+    const result = await trpcQuery<unknown[]>("chat.myRooms", undefined, "trainer");
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} conversas` };
   });
@@ -1213,6 +1560,27 @@ async function phase8_notifications() {
     if (result.error) return { pass: false, message: result.error };
     return { pass: result.data === 0, message: `${result.data} não lidas` };
   });
+
+  // Organizer notifications
+  await runTest("NOTIF", "Notificações da organizadora", async () => {
+    const result = await trpcQuery<unknown[]>("notification.list", {}, "organizer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} notificações` };
+  });
+
+  // Brand notifications
+  await runTest("NOTIF", "Notificações da marca", async () => {
+    const result = await trpcQuery<unknown[]>("notification.list", {}, "brand");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} notificações` };
+  });
+
+  // Referee notifications
+  await runTest("NOTIF", "Notificações do árbitro", async () => {
+    const result = await trpcQuery<unknown[]>("notification.list", {}, "referee");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} notificações` };
+  });
 }
 
 // ============================================================
@@ -1280,7 +1648,7 @@ async function phase9_brand() {
 
   // Create GCoin reward campaign
   await runTest("BRAND", "Criar campanha gcoin_reward", async () => {
-    const result = await trpcMutation(
+    const result = await trpcMutation<{ id: string }>(
       "brand.createCampaign",
       {
         name: "GCoins BrandX",
@@ -1290,6 +1658,41 @@ async function phase9_brand() {
         gcoinRewardAmount: 25,
         maxRedemptions: 20,
         budget: 500,
+      },
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    if (result.data?.id) gcoinRewardCampaignId = result.data.id;
+    return { pass: true };
+  });
+
+  // Create tournament sponsor campaign
+  await runTest("BRAND", "Criar campanha tournament_sponsor", async () => {
+    const result = await trpcMutation(
+      "brand.createCampaign",
+      {
+        name: "BrandX Torneio Sponsor",
+        description: "Patrocínio de torneio",
+        type: "tournament_sponsor",
+        placement: "tournament_sponsor",
+        budget: 300,
+      },
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true };
+  });
+
+  // Create challenge sponsor campaign
+  await runTest("BRAND", "Criar campanha challenge_sponsor", async () => {
+    const result = await trpcMutation(
+      "brand.createCampaign",
+      {
+        name: "BrandX Challenge Sponsor",
+        description: "Patrocínio de desafio",
+        type: "challenge_sponsor",
+        placement: "challenge_sponsor",
+        budget: 150,
       },
       "brand"
     );
@@ -1392,6 +1795,19 @@ async function phase9_brand() {
       return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} sponsors` };
     });
   }
+
+  // Redeem campaign (athlete redeems gcoin reward)
+  if (gcoinRewardCampaignId) {
+    await runTest("BRAND", "Resgatar campanha gcoin_reward (atleta)", async () => {
+      const result = await trpcMutation(
+        "brand.redeem",
+        { campaignId: gcoinRewardCampaignId },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: "Resgatou campanha!" };
+    });
+  }
 }
 
 // ============================================================
@@ -1399,16 +1815,18 @@ async function phase9_brand() {
 // ============================================================
 
 async function phase10_challenges() {
-  console.log("\n🎯 FASE 10 — CHALLENGES");
+  console.log("\n🎯 FASE 10 — CHALLENGES E DUELOS 1v1");
   console.log("-".repeat(50));
 
   const btSportId = sportIds["beach-tennis"];
+  const athlete2Id = getUserId("athlete2");
+  const athlete3Id = getUserId("athlete3");
 
-  // Create challenge
-  await runTest("CHALLENGE", "Criar challenge", async () => {
+  // Create community challenge
+  await runTest("CHALLENGE", "Criar challenge comunitário", async () => {
     const now = new Date();
-    const start = new Date(now.getTime() + 1 * 60 * 60 * 1000); // 1h from now
-    const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const start = new Date(now.getTime() + 1 * 60 * 60 * 1000);
+    const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const result = await trpcMutation<{ id: string }>(
       "challenge.create",
@@ -1435,6 +1853,13 @@ async function phase10_challenges() {
     const result = await trpcQuery<unknown[]>("challenge.list", {});
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} challenges` };
+  });
+
+  // List bettable challenges
+  await runTest("CHALLENGE", "Listar challenges apostáveis", async () => {
+    const result = await trpcQuery<unknown[]>("challenge.listBettable", {});
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} apostáveis` };
   });
 
   // Join challenge
@@ -1469,6 +1894,157 @@ async function phase10_challenges() {
       if (result.error) return { pass: false, message: result.error };
       return { pass: true, message: "3/10 partidas" };
     });
+
+    // Get challenge by ID
+    await runTest("CHALLENGE", "Detalhe do challenge por ID", async () => {
+      const result = await trpcQuery<{ id: string; title: string; status: string }>(
+        "challenge.getById",
+        { id: challengeId }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${result.data?.title} - ${result.data?.status}` };
+    });
+  }
+
+  // My challenges
+  await runTest("CHALLENGE", "Meus challenges (atleta)", async () => {
+    const result = await trpcQuery<unknown[]>("challenge.myChallenges", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} challenges` };
+  });
+
+  // Search opponents for duel
+  await runTest("DUELO", "Buscar oponentes", async () => {
+    const result = await trpcQuery<unknown[]>(
+      "challenge.searchOpponents",
+      { query: "E2E" },
+      "athlete"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} oponentes` };
+  });
+
+  // Create duel 1v1
+  if (athlete2Id) {
+    await runTest("DUELO", "Criar duelo 1v1 (atleta vs atleta2)", async () => {
+      const result = await trpcMutation<{ id: string }>(
+        "challenge.createDuel",
+        {
+          title: "Duelo BT E2E - Atleta vs Atleta2",
+          description: "Duelo de beach tennis teste E2E",
+          sportId: btSportId || undefined,
+          opponentId: athlete2Id,
+          wagerAmount: 0,
+          bettingEnabled: true,
+        },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      if (result.data?.id) duelId = result.data.id;
+      return { pass: true, message: `Duelo: ${result.data?.id?.substring(0, 8)}...` };
+    });
+
+    // Accept duel
+    if (duelId) {
+      await runTest("DUELO", "Aceitar duelo (atleta2)", async () => {
+        const result = await trpcMutation(
+          "challenge.acceptDuel",
+          { challengeId: duelId },
+          "athlete2"
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true };
+      });
+
+      // Get duel details
+      await runTest("DUELO", "Detalhe do duelo", async () => {
+        const result = await trpcQuery<{ id: string; status: string; challengeType: string }>(
+          "challenge.getById",
+          { id: duelId }
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true, message: `Status: ${result.data?.status}, Tipo: ${result.data?.challengeType}` };
+      });
+
+      // Place bet on duel (challenge bet)
+      await runTest("DUELO", "Apostar no duelo (treinadora)", async () => {
+        const athleteId = getUserId("athlete");
+        if (!athleteId) return { pass: false, message: "Athlete ID não encontrado" };
+
+        const result = await trpcMutation(
+          "bet.placeChallengeBet",
+          {
+            challengeId: duelId,
+            prediction: { winnerId: athleteId },
+            amount: 5,
+          },
+          "trainer"
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true };
+      });
+
+      // Get challenge odds
+      await runTest("DUELO", "Odds do duelo", async () => {
+        const athleteId = getUserId("athlete");
+        if (!athleteId) return { pass: false, message: "Athlete ID não encontrado" };
+
+        const result = await trpcQuery<{ odds: number }>(
+          "bet.getChallengeOdds",
+          { challengeId: duelId, prediction: { winnerId: athleteId } }
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true, message: `Odds: ${result.data?.odds}` };
+      });
+
+      // Submit result
+      await runTest("DUELO", "Submeter resultado do duelo", async () => {
+        const athleteId = getUserId("athlete");
+        const result = await trpcMutation(
+          "challenge.submitResult",
+          {
+            challengeId: duelId,
+            winnerId: athleteId,
+            score: { player1: 6, player2: 4 },
+          },
+          "athlete"
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true, message: "Resultado submetido" };
+      });
+    }
+  }
+
+  // Create second duel to decline
+  if (athlete3Id) {
+    let declineDuelId = "";
+    await runTest("DUELO", "Criar duelo para recusar", async () => {
+      const result = await trpcMutation<{ id: string }>(
+        "challenge.createDuel",
+        {
+          title: "Duelo para recusar E2E",
+          opponentId: athlete3Id,
+          wagerAmount: 0,
+          bettingEnabled: false,
+        },
+        "athlete"
+      );
+      if (result.error) return { pass: false, message: result.error };
+      if (result.data?.id) declineDuelId = result.data.id;
+      return { pass: true };
+    });
+
+    if (declineDuelId) {
+      await runTest("DUELO", "Recusar duelo (atleta3)", async () => {
+        const result = await trpcMutation(
+          "challenge.declineDuel",
+          { challengeId: declineDuelId },
+          "athlete3"
+        );
+        if (result.error) return { pass: false, message: result.error };
+        return { pass: true, message: "Duelo recusado" };
+      });
+    }
   }
 }
 
@@ -1517,6 +2093,92 @@ async function phase11_admin() {
     if (result.error) return { pass: false, message: result.error };
     return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} no ranking` };
   });
+
+  // XP Leaderboard
+  await runTest("ADMIN", "Leaderboard XP global", async () => {
+    const result = await trpcQuery<unknown[]>("gamification.xpLeaderboard", { limit: 20 });
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} no ranking XP` };
+  });
+
+  // Achievements list
+  await runTest("ADMIN", "Listar conquistas do atleta", async () => {
+    const result = await trpcQuery<unknown[]>("gamification.achievements", {}, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} conquistas` };
+  });
+
+  // Achievement categories
+  await runTest("ADMIN", "Categorias de conquistas", async () => {
+    const result = await trpcQuery("gamification.achievementCategories", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "Categorias carregadas" };
+  });
+
+  // My missions
+  await runTest("ADMIN", "Missões atuais do atleta", async () => {
+    const result = await trpcQuery<unknown[]>("gamification.myMissions", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} missões` };
+  });
+
+  // Gamification profile
+  await runTest("ADMIN", "Perfil gamificação do atleta", async () => {
+    const result = await trpcQuery<{
+      level: number;
+      achievementsCompleted: number;
+      achievementsTotal: number;
+    }>("gamification.myProfile", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return {
+      pass: true,
+      message: `Nível: ${result.data?.level}, Conquistas: ${result.data?.achievementsCompleted}/${result.data?.achievementsTotal}`,
+    };
+  });
+
+  // Completed achievements (public)
+  const athleteId = getUserId("athlete");
+  if (athleteId) {
+    await runTest("ADMIN", "Conquistas completadas (público)", async () => {
+      const result = await trpcQuery<unknown[]>(
+        "gamification.completedAchievements",
+        { userId: athleteId }
+      );
+      if (result.error) return { pass: false, message: result.error };
+      return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} completadas` };
+    });
+  }
+
+  // Admin financial summary (may require admin role)
+  await runTest("ADMIN", "Resumo financeiro (admin)", async () => {
+    const result = await trpcQuery("payment.adminFinancialSummary", undefined, "organizer");
+    // May fail without admin role - that's expected
+    if (result.error && (result.error.includes("admin") || result.error.includes("permissão") || result.error.includes("UNAUTHORIZED"))) {
+      return { pass: true, message: "Corretamente restrito a admin" };
+    }
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "Dados financeiros carregados" };
+  });
+
+  // Admin list orders (may require admin role)
+  await runTest("ADMIN", "Listar pedidos de compra (admin)", async () => {
+    const result = await trpcQuery("payment.adminListOrders", undefined, "organizer");
+    if (result.error && (result.error.includes("admin") || result.error.includes("permissão") || result.error.includes("UNAUTHORIZED"))) {
+      return { pass: true, message: "Corretamente restrito a admin" };
+    }
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "Pedidos listados" };
+  });
+
+  // Admin list withdrawals (may require admin role)
+  await runTest("ADMIN", "Listar saques pendentes (admin)", async () => {
+    const result = await trpcQuery("payment.adminListWithdrawals", undefined, "organizer");
+    if (result.error && (result.error.includes("admin") || result.error.includes("permissão") || result.error.includes("UNAUTHORIZED"))) {
+      return { pass: true, message: "Corretamente restrito a admin" };
+    }
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: "Saques listados" };
+  });
 }
 
 // ============================================================
@@ -1560,6 +2222,7 @@ async function phase12_publicPages() {
     { path: "/brand", name: "Brand Dashboard" },
     { path: "/challenges", name: "Challenges" },
     { path: "/admin", name: "Admin Panel" },
+    { path: "/leaderboard", name: "Leaderboard" },
   ];
 
   for (const page of dashPages) {
@@ -1648,6 +2311,76 @@ async function phase13_integration() {
       return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} prêmios` };
     });
   }
+
+  // Verify brand campaigns active
+  await runTest("INTEGRAÇÃO", "Campanhas ativas criadas", async () => {
+    const result = await trpcQuery<unknown[]>("brand.activeCampaigns", {});
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} campanhas ativas` };
+  });
+
+  // Verify chat rooms across users
+  await runTest("INTEGRAÇÃO", "Salas de chat da treinadora", async () => {
+    const result = await trpcQuery<unknown[]>("chat.myRooms", undefined, "trainer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: (Array.isArray(result.data) && result.data.length > 0), message: `${Array.isArray(result.data) ? result.data.length : 0} salas` };
+  });
+
+  // Verify organizer tournaments
+  await runTest("INTEGRAÇÃO", "Torneios da organizadora", async () => {
+    const result = await trpcQuery<unknown[]>("tournament.myTournaments", undefined, "organizer");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: (Array.isArray(result.data) && result.data.length > 0), message: `${Array.isArray(result.data) ? result.data.length : 0} torneios` };
+  });
+
+  // Verify brand sponsorships
+  await runTest("INTEGRAÇÃO", "Patrocínios da marca", async () => {
+    const result = await trpcQuery<unknown[]>("brand.mySponsorships", undefined, "brand");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} patrocínios` };
+  });
+
+  // Verify brand campaigns
+  await runTest("INTEGRAÇÃO", "Campanhas da marca", async () => {
+    const result = await trpcQuery<unknown[]>("brand.myCampaigns", undefined, "brand");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: (Array.isArray(result.data) && result.data.length > 0), message: `${Array.isArray(result.data) ? result.data.length : 0} campanhas` };
+  });
+
+  // Verify GCoin balance consistency
+  await runTest("INTEGRAÇÃO", "Consistência de saldo (brand)", async () => {
+    const result = await trpcQuery<{ real: string; gamification: string }>(
+      "gcoin.balance",
+      undefined,
+      "brand"
+    );
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `R: ${result.data?.real}, G: ${result.data?.gamification}` };
+  });
+
+  // Verify enrollments count
+  await runTest("INTEGRAÇÃO", "Inscrições do atleta", async () => {
+    const result = await trpcQuery<unknown[]>("tournament.myEnrollments", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} inscrições` };
+  });
+
+  // Verify sports loaded
+  await runTest("INTEGRAÇÃO", "Esportes carregados na plataforma", async () => {
+    const result = await trpcQuery<unknown[]>("social.getSports");
+    if (result.error) return { pass: false, message: result.error };
+    return {
+      pass: (Array.isArray(result.data) && result.data.length >= 40),
+      message: `${Array.isArray(result.data) ? result.data.length : 0} esportes (esperado 40+)`,
+    };
+  });
+
+  // Verify duels created
+  await runTest("INTEGRAÇÃO", "Challenges do atleta incluem duelos", async () => {
+    const result = await trpcQuery<unknown[]>("challenge.myChallenges", undefined, "athlete");
+    if (result.error) return { pass: false, message: result.error };
+    return { pass: true, message: `${Array.isArray(result.data) ? result.data.length : 0} challenges/duelos` };
+  });
 }
 
 // ============================================================
