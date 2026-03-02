@@ -15,6 +15,8 @@ import {
   Zap,
   Megaphone,
   Mail,
+  Medal,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
@@ -27,6 +29,9 @@ const navItems = [
   { href: "/tournaments/invites", label: "Convites", icon: Mail, badgeKey: "invites" as const },
   { href: "/gcoins", label: "GCoins", icon: Coins },
   { href: "/bets", label: "Palpites", icon: Target },
+  { href: "/achievements", label: "Conquistas", icon: Medal },
+  { href: "/missions", label: "Missões", icon: Target },
+  { href: "/leaderboard", label: "Ranking", icon: TrendingUp },
   { href: "/chat", label: "Chat", icon: MessageSquare },
   { href: "/notifications", label: "Notificações", icon: Bell },
   { href: "/brand", label: "Marca", icon: Megaphone },

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { eq, desc, and, sql } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { bets, users, gcoinTransactions } from "@/server/db/schema";
 import { calculateOdds } from "@/server/services/odds-calculator";
@@ -25,7 +26,7 @@ export const betRouter = createTRPCRouter({
       });
 
       if (Number(user?.gcoinsGamification ?? 0) < input.amount) {
-        throw new Error("Saldo insuficiente de GCoins");
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Saldo insuficiente de GCoins" });
       }
 
       // Dynamic odds calculation based on existing bets
