@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SITE_URL } from "@/lib/constants";
 import { getBlogPost, getBlogPosts, blogPosts } from "@/lib/blog-data";
 
 // ── Static params ──
@@ -157,7 +158,7 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const shareUrl = `https://sportio.com/blog/${post.slug}`;
+  const shareUrl = `${SITE_URL}/blog/${post.slug}`;
   const shareText = encodeURIComponent(post.title);
 
   // Related posts: same sport first, then same tags, exclude current

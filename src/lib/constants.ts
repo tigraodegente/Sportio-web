@@ -4,7 +4,9 @@
 
 export const SITE_NAME = "Sportio";
 
-export const SITE_URL = "https://sportio.com";
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
 export const SITE_DESCRIPTION =
   "A plataforma completa para o universo esportivo. Conecte-se com atletas, organize torneios, conquiste GCoins e viva o esporte como nunca antes.";
