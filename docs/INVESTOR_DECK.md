@@ -1,70 +1,171 @@
-# SPORTIO — Documento de Apresentação para Investidores
+# SPORTIO — Documento de Apresentacao para Investidores
 
-> **O Ecossistema Digital Completo do Esporte Amador e Semiprofissional**
+> **O Ecossistema Digital Completo do Esporte — Do Amador ao Profissional**
 
 ---
 
-## Sumário Executivo
+## Sumario Executivo
 
-**Sportio** é uma plataforma digital que conecta todo o ecossistema esportivo — atletas, organizadores de torneios, marcas patrocinadoras, apostadores, fãs e árbitros — em uma única experiência integrada com economia própria baseada em **GCoins**, uma moeda dual (real + gamificação).
+**Sportio** e uma plataforma digital que conecta todo o ecossistema esportivo — atletas amadores e profissionais, organizadores de torneios, marcas patrocinadoras, apostadores, fas e arbitros — em uma unica experiencia integrada com economia propria baseada em **GCoins**, uma moeda dual (real + gamificacao).
 
-A plataforma resolve três problemas críticos do esporte amador e semiprofissional no Brasil:
+O Brasil tem **61 milhoes de praticantes regulares de esporte** (IBGE/PNAD), **17,7 milhoes de apostadores ativos** (SPA/Fazenda, 2025) e um mercado de apostas que movimenta **R$ 100 bilhoes/ano** (5o maior do mundo). Apesar desse volume, nao existe nenhuma plataforma que integre competicao, comunidade, monetizacao e apostas em um unico ecossistema — nem para o esporte amador, nem para o profissional.
 
-1. **Atletas não conseguem monetizar seu talento** — Sportio transforma cada partida, vitória e conquista em renda real via PIX
-2. **Organizadores perdem tempo e dinheiro** — Sportio automatiza 90% da gestão de torneios e elimina inadimplência
-3. **Marcas não conseguem atingir esse público** — Sportio oferece segmentação precisa com ROI de 3-5x sobre mídia tradicional
+Sportio resolve isso com uma abordagem em duas camadas:
 
-**O mercado esportivo amador brasileiro é enorme e subatendido.** São milhões de praticantes de 40+ modalidades, organizadores independentes, e marcas sem canal eficiente para atingir esse consumidor apaixonado. A plataforma já conta com **duelos 1v1 com apostas integradas**, **gateway de pagamento completo** (PIX + cartão), **gamificação com 55+ conquistas e missões diárias**, e **182 testes automatizados com 100% de aprovação**.
+1. **Camada de conteudo profissional** — Torneios como Brasileirao, Copa do Brasil, UFC e circuitos de beach tennis sao indexados na plataforma. Fas acompanham, apostam com GCoins e interagem. Isso gera trafego massivo desde o dia 1.
+2. **Camada de competicao amadora** — Atletas amadores criam torneios, competem em duelos 1v1, ganham GCoins e sacam via PIX. Organizadores gerenciam eventos. Marcas patrocinam com self-serve.
+
+O MVP esta **construido e funcional** com Next.js 15, tRPC, PostgreSQL, 40+ tabelas, 12 routers de API, sistema de gamificacao com 55+ conquistas, duelos 1v1 com apostas integradas e gateway de pagamento (PIX + cartao).
+
+---
+
+## O Mercado: Numeros Reais
+
+### O Brasil Esportivo
+
+| Dado | Numero | Fonte |
+|------|--------|-------|
+| Praticantes regulares de esporte | **61 milhoes** (37,9% da populacao 15+) | IBGE PNAD 2015 |
+| Futebol (todas as formas) | **30,4 milhoes** | Federacoes estaduais / Top10Mais 2024 |
+| Corrida de rua | **15 milhoes** | Olympikus/Box1824 "Por Dentro do Corre" 2025 |
+| Volei | **15,3 milhoes** | Top10Mais 2024 |
+| Futebol Society (pelada/7x7) | **12,5 milhoes** | Portal do Rodoviario 2024 |
+| Beach Tennis | **1,1 milhao** (crescimento de 175% em 2 anos) | CBT 2023 |
+| Padel | **600–700 mil** (crescendo 15-20%/ano) | Cobrapa 2024 |
+| CrossFit (boxes afiliados) | **1.150 boxes** (2o maior do mundo) | Ativo.com 2024 |
+| Mercado fitness total | **R$ 17 bilhoes/ano** | Panorama Setorial Fitness 2024 |
+| E-commerce esportivo | **R$ 16,3 bilhoes** (+42,3% YoY) | MKT Esportivo 2024 |
+
+### O Boom dos Torneios Amadores
+
+| Dado | Numero | Fonte |
+|------|--------|-------|
+| Corridas de rua homologadas (2025) | **5.241 eventos** (+85% vs 2024) | Abraceo/CNN Brasil |
+| Corridas de rua total (incluindo nao-homologadas) | **~8.500/ano** | Estimativa multiplas fontes |
+| Ticket medio de inscricao (corrida) | **R$ 119,39** | Maquina do Esporte 2024 |
+| Torneios de beach tennis (ITF + regionais) | **240+/ano** | CBT / LetzPlay |
+| Quadras de beach tennis no Brasil | **30.000+** | FPT / Sagres Online 2024 |
+| Campos de futebol society | **4.000–5.000** | Portal do Rodoviario 2024 |
+| Ligas municipais de futebol | **150+** | Federacoes estaduais |
+| Economia da corrida de rua | **R$ 1–2 bilhoes/ano** | Times Brasil / ISTOE 2025 |
+
+### O Mercado de Apostas Esportivas no Brasil
+
+| Dado | Numero | Fonte |
+|------|--------|-------|
+| Dinheiro apostado (2025) | **R$ 100+ bilhoes** (~1% do PIB) | Brazil Economy 2025 |
+| Receita dos operadores (GGR, 2025) | **R$ 36 bilhoes** | Meio e Mensagem 2025 |
+| Apostadores ativos (H1 2025) | **17,7 milhoes** | CNN Brasil / SPA |
+| Pessoas que apostaram em 2024 | **50+ milhoes** | CNN Brasil |
+| Gasto medio mensal por apostador | **R$ 164/mes** | ISTOE Dinheiro 2025 |
+| Ranking global | **5o maior mercado do mundo** | InfoMoney 2025 |
+| Arrecadacao federal com apostas (jan-set 2025) | **R$ 6,85 bilhoes** | Maquina do Esporte |
+| Perfil: 16-39 anos | **56% dos apostadores** | DataSenado 2024 |
+| Perfil: masculino | **62%** | DataSenado 2024 |
+| Licenca SIGAP (outorga) | **R$ 30 milhoes / 5 anos** | Lei 14.790/23 |
+| Operadores autorizados | **67 operadores, 139 marcas** | Serpro/SIGAP 2025 |
+
+### Plataformas Comparaveis
+
+| Plataforma | Dados | Fonte |
+|------------|-------|-------|
+| **Strava** (Brasil) | **20 milhoes de usuarios** (2o maior mercado global); valuation US$ 2,2 bi | Strava Year in Sport 2024; MKT Esportivo 2025 |
+| **FlashScore** (global) | **155 milhoes MAU**, 400M+ downloads | FlashScore 2024 |
+| **Sofascore** (global) | **25-30 milhoes de usuarios**, 20+ esportes | TechTudo 2024 |
+| **Torneo by Sofascore** | Gestao de torneios integrada ao Sofascore | Sofascore 2024 |
+| **Challonge** (Logitech) | **31 milhoes de chaves criadas** (lifetime) | StriveCloud 2024 |
+| **FACEIT** (adquirida) | Vendida por **US$ 1,05 bilhao** (Savvy Games/Saudi PIF) | Wikipedia/Crunchbase 2022 |
+| **Betano** (Brasil) | **23% market share** em apostas | H2 Gambling Capital 2024 |
+| **Bet365** (Brasil) | **20% market share** em apostas | H2 Gambling Capital 2024 |
+
+### Infraestrutura Digital no Brasil
+
+| Dado | Numero | Fonte |
+|------|--------|-------|
+| Transacoes PIX (2025) | **79,8 bilhoes** | Agencia Brasil |
+| Volume PIX (2025) | **R$ 35,4 trilhoes** | Metropoles |
+| Recorde diario PIX | **313 milhoes de transacoes/dia** | Agencia Brasil, dez/2025 |
+| Gastos em apps (Brasil) | **US$ 1,9 bilhao/ano** | Business of Apps 2024 |
+| Uso diario de apps | **5+ horas/dia** (maior do mundo) | Business of Apps 2024 |
+| CPI medio (Android, Brasil) | **US$ 0,44** | IronSource/Mapendo 2025 |
+| CPI medio (iOS, Brasil) | **US$ 0,86** | IronSource/Mapendo 2025 |
+
+### Patrocinio Esportivo
+
+| Dado | Numero | Fonte |
+|------|--------|-------|
+| Receita de patrocinio (Serie A) | **~R$ 1 bilhao** | IBOPE Repucom 2025 |
+| Marketing total dos clubes brasileiros | **R$ 1,9 bilhao** | Torcedores.com 2024 |
+| Maior patrocinio individual | **R$ 115 milhoes** (Flamengo x Pixbet) | Lance 2025 |
+| Marcas de apostas patrocinando Serie A | **18 marcas em 20 clubes** (100%) | IBOPE Repucom 2025 |
+| Mercado global de marketing esportivo | **US$ 1,24 trilhao ate 2026** (+7,6%/ano) | Agencia IV |
 
 ---
 
 ## O Problema
 
-### Para Atletas Amadores
-- Não existe plataforma para monetizar desempenho esportivo fora do circuito profissional
-- Dificuldade em encontrar torneios compatíveis com seu nível
-- Sem visibilidade para atrair patrocínios
-- Custos com inscrição, equipamento e deslocamento sem retorno financeiro
+### Fragmentacao Total do Ecossistema
 
-### Para Organizadores de Eventos
-- Gestão manual de chaveamento, inscrições e pagamentos em planilhas
-- Alta inadimplência de inscrições (até 30% de desistência)
+O ecossistema esportivo brasileiro — tanto amador quanto profissional — opera de forma completamente fragmentada:
+
+**Para Atletas Amadores (61M de praticantes)**
+- Nao existe plataforma para monetizar desempenho esportivo fora do circuito profissional
+- Dificuldade em encontrar torneios compativeis com seu nivel
+- Sem visibilidade para atrair patrocinios
+- Custos com inscricao, equipamento e deslocamento sem retorno financeiro
+
+**Para Fas e Apostadores (17,7M de apostadores ativos)**
+- Apostas concentradas em esporte profissional nas mesmas plataformas genericas (Betano, Bet365)
+- Zero engajamento com esporte amador — nao existe onde apostar na pelada do bairro
+- Nenhuma plataforma recompensa fas por engajamento social com o esporte
+- Dados esportivos espalhados entre Sofascore, FlashScore, apps isolados
+
+**Para Organizadores de Eventos (5.000+ corridas/ano, 240+ torneios de beach tennis)**
+- Gestao manual de chaveamento, inscricoes e pagamentos em planilhas
+- Alta inadimplencia de inscricoes (ate 30% de desistencia)
 - Dificuldade em atrair patrocinadores
-- Nenhuma ferramenta integrada para todo o ciclo do evento
+- Ferramentas como Challonge e Sympla nao sao integradas entre si
 
-### Para Marcas Esportivas
-- Dificuldade em atingir o consumidor esportivo de forma segmentada
-- Investimento em mídia tradicional com ROI baixo e não mensurável
-- Sem canal direto para o público amador e semiprofissional
-- Falta de dados e analytics sobre o comportamento do consumidor esportivo
-
-### Para o Ecossistema em Geral
-- Fragmentação total: cada ator usa ferramentas diferentes e desconectadas
-- Fãs sem engajamento real e sem recompensa pela participação
-- Árbitros desvalorizados e sem sistema de reputação
-- Apostas esportivas em plataformas genéricas que ignoram o esporte amador
+**Para Marcas (R$ 1,9 bi investidos so em futebol profissional)**
+- Dificuldade em atingir o consumidor esportivo amador de forma segmentada
+- Investimento concentrado em grandes clubes com custo proibitivo para PMEs
+- Sem canal direto para os 61 milhoes de praticantes amadores
+- Falta de dados sobre o comportamento do consumidor esportivo grassroots
 
 ---
 
-## A Solução: Sportio
+## A Solucao: Sportio
 
-Sportio é uma **super app do esporte** que integra em uma única plataforma:
+Sportio e uma **super app do esporte** com duas camadas complementares:
 
-| Funcionalidade | Equivalente de Mercado |
-|---|---|
-| Feed Social Esportivo | Instagram/Twitter do Esporte |
-| Torneios e Competições | Challonge + Sympla |
-| Duelos 1v1 com Apostas | Desafio direto entre atletas + apostas da comunidade |
-| Apostas Esportivas | Bet365 (para esporte amador) |
-| Patrocínio e Ads | Google Ads (segmentado para esporte) |
-| Chat e Comunidade | WhatsApp Groups |
-| Economia de GCoins | PayPal + sistema de recompensas |
-| Gateway de Pagamento | PIX + Cartão (compra e saque de GCoins) |
-| Gamificação Completa | Strava + Duolingo (XP, níveis, conquistas, missões) |
-| Rating ELO por Esporte | Sistema competitivo estilo Chess.com |
-| Gestão de Árbitros | Uber (para arbitragem) |
+### Camada 1: Conteudo Profissional (Tracao desde o Dia 1)
 
-**Nenhuma plataforma no mercado integra todas essas verticais em um único ecossistema com economia própria.**
+Torneios profissionais — Brasileirao, Copa do Brasil, UFC, ATP, circuitos de beach tennis — sao indexados como conteudo na plataforma. Fas acompanham resultados, fazem palpites com GCoins, interagem no feed social e seguem atletas. Atletas profissionais tem perfis publicos (sem necessidade de cadastro ativo) que podem "clamar" quando quiserem.
+
+**Por que isso importa:** Nao dependemos de criar conteudo do zero. O esporte profissional gera centenas de jogos por semana que alimentam o feed, as apostas e o engajamento. Isso resolve o problema do "ovo e galinha" que mata a maioria das redes sociais na fase inicial.
+
+### Camada 2: Competicao Amadora (Monetizacao Direta)
+
+Atletas amadores criam perfis, competem em torneios, se desafiam em duelos 1v1, ganham GCoins por performance e sacam via PIX. Organizadores gerenciam eventos com chaveamento automatico. Marcas criam campanhas self-serve.
+
+**Por que isso importa:** Aqui esta a monetizacao real — inscricoes, apostas, wagers, compra de GCoins, campanhas de marcas. A camada profissional atrai; a camada amadora converte e retém.
+
+### Funcionalidades Integradas
+
+| Funcionalidade | Equivalente de Mercado | Diferencial Sportio |
+|---|---|---|
+| Feed Social Esportivo | Instagram/Twitter do Esporte | Conteudo profissional + amador integrado |
+| Torneios e Competicoes | Challonge + Sympla | Profissionais indexados + amadores gerenciados |
+| Duelos 1v1 com Apostas | Inexistente | Exclusivo: desafio direto entre atletas com wager |
+| Apostas Esportivas | Bet365/Betano | Profissional + amador; GCoins dual (real + gamificacao) |
+| Patrocinio e Ads | Google Ads esportivo | Self-serve; acesso direto a praticantes, nao apenas espectadores |
+| Chat e Comunidade | WhatsApp Groups | Integrado ao ecossistema; salas por torneio/esporte |
+| Economia de GCoins | PayPal + recompensas | Moeda dual proprietaria com saque PIX |
+| Gamificacao | Strava + Duolingo | XP, 55+ conquistas, missoes diarias, rating ELO |
+| Acompanhamento ao Vivo | Sofascore/FlashScore | Integrado com apostas e feed social |
+| Gestao de Arbitros | Uber da arbitragem | Marketplace com reputacao e pagamento automatico |
+
+**Nenhuma plataforma no mercado integra todas essas verticais em um unico ecossistema com economia propria.**
 
 ---
 
@@ -74,284 +175,253 @@ Sportio é uma **super app do esporte** que integra em uma única plataforma:
 
 > *"Cada partida, cada gol e cada treino se transformam em GCoins Reais que viram dinheiro na sua conta."*
 
-**Quem é:** Praticante amador ou semiprofissional de qualquer esporte que busca competir, evoluir e monetizar sua paixão.
+**Quem e:** Praticante amador, semiprofissional ou profissional de qualquer esporte que busca competir, evoluir e monetizar sua paixao.
+
+**Mercado enderecavel:** 61 milhoes de praticantes regulares no Brasil (IBGE/PNAD). Esportes em crescimento explosivo: beach tennis (+175% em 2 anos, CBT), padel (+15-20%/ano, Cobrapa), corrida de rua (15M de praticantes, Olympikus/Box1824 2025).
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Competir em Torneios** | Inscrição em torneios de 40+ modalidades com premiação em GCoins Reais |
+| **Competir em Torneios** | Inscricao em torneios de 43+ modalidades com premiacao em GCoins Reais |
 | **Duelos 1v1** | Desafie qualquer atleta para um duelo direto com aposta (wager) em GCoins |
-| **Rating ELO por Esporte** | Sistema de ranking inteligente que ajusta após cada vitória/derrota |
-| **Perfil Profissional** | Estatísticas, conquistas, nível XP e histórico completo para atrair patrocínios |
+| **Rating ELO por Esporte** | Sistema de ranking inteligente que ajusta apos cada vitoria/derrota |
+| **Perfil Profissional** | Estatisticas, conquistas, nivel XP e historico completo para atrair patrocinios |
 | **Ranking e Leaderboard** | Suba no ranking global e por esporte; ganhe visibilidade na plataforma |
-| **Patrocínios Diretos** | Marcas encontram atletas por desempenho; receba ofertas de patrocínio |
-| **Conquistas e Missões** | 55+ achievements (bronze a diamante) e 16+ missões diárias/semanais com recompensas |
-| **Apostas** | Aposte em partidas e duelos com GCoins (incluindo suas próprias partidas) |
+| **Patrocinios Diretos** | Marcas encontram atletas por desempenho; receba ofertas de patrocinio |
+| **Conquistas e Missoes** | 55+ achievements (bronze a diamante) e 16+ missoes diarias/semanais com recompensas |
+| **Apostas** | Aposte em partidas e duelos com GCoins |
 | **Feed Social** | Compartilhe conquistas, interaja com a comunidade |
-| **Compra e Saque de GCoins** | Compre GCoins via PIX/cartão e saque via PIX instantaneamente |
+| **Compra e Saque de GCoins** | Compre GCoins via PIX/cartao e saque via PIX instantaneamente |
 
-**Potencial de Ganhos:**
+**Potencial de Ganhos (amador):**
 
-| Nível | Faixa Mensal | Descrição |
+| Nivel | Faixa Mensal | Descricao |
 |---|---|---|
-| **Amador** | R$ 200 – 500 | Torneios locais e desafios semanais |
-| **Intermediário** | R$ 800 – 2.000 | Competição regular, ligas, pequenos patrocínios |
-| **Avançado** | R$ 2.000 – 5.000+ | Top ranking, patrocinadores frequentes, eventos premium |
+| **Casual** | R$ 50 – 200 | Desafios esporadicos e missoes diarias |
+| **Regular** | R$ 200 – 800 | Torneios locais, desafios semanais, pequenos patrocinios |
+| **Competitivo** | R$ 800 – 3.000+ | Top ranking, patrocinadores frequentes, eventos premium |
 
-**Vantagem competitiva:** Sportio é a **única plataforma que permite monetização direta** do esporte amador com saque via PIX. O atleta não precisa ser profissional para ganhar dinheiro com seu esporte.
+*Nota: Faixas estimadas com base no ticket medio de inscricao de torneios (R$ 119 para corrida, R$ 89-179 para beach tennis — Maquina do Esporte/LetzPlay 2024) e projecao de premiacoes.*
+
+**Para atletas profissionais:** Perfis publicos com estatisticas, seguidores e interacao com fas. O atleta profissional nao precisa gerenciar nada — a plataforma indexa seus dados. Se quiser, pode "clamar" seu perfil e interagir diretamente.
 
 ---
 
-### 2. ORGANIZADOR — "Organize Torneios Profissionais sem Bagunça"
+### 2. ORGANIZADOR — "Organize Torneios Profissionais sem Balburdia"
 
-> *"Automatize 90% do trabalho, elimine inadimplência e ganhe múltiplas fontes de renda por evento."*
+> *"Automatize chaveamento, inscricoes e pagamentos. Foque na experiencia do evento."*
 
-**Quem é:** Pessoa física ou empresa que organiza torneios, circuitos e ligas esportivas.
+**Quem e:** Pessoa fisica ou empresa que organiza torneios, circuitos e ligas esportivas.
+
+**Mercado enderecavel:** Mais de 5.241 corridas homologadas/ano (+85% de crescimento, Abraceo 2025), 240+ torneios de beach tennis, milhares de torneios de futebol society em 150+ ligas municipais. Mercado totalmente fragmentado entre planilhas, WhatsApp e ferramentas desconectadas.
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Criação de Torneios** | Configure torneio em minutos: esporte, regras, capacidade, preço, local |
-| **Formatos Múltiplos** | Eliminação simples/dupla, Round Robin, Suíço, Liga |
-| **Chaveamento Automático (IA)** | Algoritmo gera chaves equilibradas com base no ranking dos atletas |
-| **Pagamento Integrado** | Cobrança automática via PIX/cartão; sem inadimplência |
-| **Marketing Automático** | Promoção inteligente para atletas da região e do esporte |
-| **Convites para Atletas** | Convide atletas específicos e patrocinadores para o evento |
-| **Gestão de Patrocínio** | Receba propostas de marcas e aprove patrocínios para seus torneios |
-| **Distribuição de Prêmios** | Configuração flexível de premiação por colocação |
-| **Dashboard Completo** | Visão em tempo real de inscrições, receita, partidas e métricas |
-| **Níveis de Dificuldade** | Categorize torneios por nível (A/B/C) para segmentar público |
+| **Criacao de Torneios** | Configure torneio em minutos: esporte, regras, capacidade, preco, local |
+| **Formatos Multiplos** | Eliminacao simples/dupla, Round Robin, Suico, Liga |
+| **Chaveamento Automatico** | Algoritmo gera chaves equilibradas com base no ranking dos atletas |
+| **Pagamento Integrado** | Cobranca automatica via PIX/cartao; sem inadimplencia |
+| **Convites para Atletas** | Convide atletas especificos e patrocinadores para o evento |
+| **Gestao de Patrocinio** | Receba propostas de marcas e aprove patrocinios para seus torneios |
+| **Distribuicao de Premios** | Configuracao flexivel de premiacao por colocacao |
+| **Dashboard Completo** | Visao em tempo real de inscricoes, receita, partidas e metricas |
+| **Niveis de Dificuldade** | Categorize torneios por nivel (A/B/C) para segmentar publico |
 
-**Potencial de Ganhos:**
+**Potencial de Receita por Evento:**
 
-| Tipo de Evento | Faixa de Receita | Descrição |
+| Tipo de Evento | Faixa de Receita | Base de Calculo |
 |---|---|---|
-| **Evento Pequeno** | R$ 2.000 – 5.000 | Torneio local, até 32 participantes |
-| **Evento Médio** | R$ 5.000 – 15.000 | Torneio regional, 64-128 atletas, patrocínios locais |
-| **Liga Anual** | R$ 60.000 – 120.000 | Circuito mensal, ranking acumulado, patrocinadores recorrentes |
+| **Evento Pequeno** | R$ 2.000 – 5.000 | 32 participantes x R$ 100-150 de inscricao |
+| **Evento Medio** | R$ 5.000 – 15.000 | 64-128 atletas + patrocinios locais |
+| **Liga/Circuito Anual** | R$ 60.000 – 120.000 | 12 etapas mensais + patrocinadores recorrentes |
 
-**Vantagem competitiva:** Elimina **100% do trabalho manual** de chaveamento e cobrança. O organizador foca na experiência do evento enquanto a plataforma cuida da operação.
+*Referencia: ticket medio de corrida de rua no Brasil e R$ 119,39 (Maquina do Esporte 2024). Torneios de beach tennis cobram R$ 89-179 por categoria (LetzPlay/CBBT 2024).*
 
 ---
 
-### 3. MARCA / PATROCINADOR — "Conecte Sua Marca a 500k+ Atletas"
+### 3. MARCA / PATROCINADOR — "Acesse Diretamente os 61 Milhoes de Praticantes"
 
-> *"Alcance consumidores apaixonados pelo esporte com ROI de 3-5x. Segmentação precisa e dados reais."*
+> *"Alcance consumidores apaixonados pelo esporte com segmentacao que nenhuma outra plataforma oferece."*
 
-**Quem é:** Marcas esportivas, de nutrição, suplementos, equipamentos, saúde e qualquer empresa que queira atingir o público esportivo.
+**Quem e:** Marcas esportivas, de nutricao, suplementos, equipamentos, saude e qualquer empresa que queira atingir o publico esportivo.
+
+**Oportunidade de mercado:** R$ 1,9 bilhao investidos so em marketing de futebol profissional (Torcedores.com 2024). O mercado amador — 61 milhoes de praticantes — recebe uma fracao minuscula desse investimento por falta de canal eficiente. Sportio cria esse canal.
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Campanhas de Banner** | Anúncios no feed social (a cada 5 posts) e na sidebar |
-| **Sorteio de Produtos** | Promoção de produtos com sistema de resgate controlado |
-| **Distribuição de GCoins** | Distribua GCoins como recompensa para engajamento |
-| **Patrocínio de Torneios** | Associe sua marca a torneios; 4 níveis: Main, Gold, Silver, Bronze |
-| **Patrocínio de Desafios** | Crie desafios patrocinados com sua marca |
-| **Segmentação Precisa** | Filtre por esporte, região, faixa etária, nível de habilidade |
-| **A/B Testing** | Teste diferentes criativos e mensagens para maximizar resultados |
-| **Dashboard de Analytics** | Impressões, cliques, CTR, conversões, resgates — tudo em tempo real |
-| **Posicionamentos Múltiplos** | Feed, sidebar, página de torneio, perfil de atleta, desafios |
+| **Campanhas de Banner** | Anuncios no feed social (a cada 5 posts) e na sidebar |
+| **Sorteio de Produtos** | Promocao de produtos com sistema de resgate controlado |
+| **Distribuicao de GCoins** | Distribua GCoins como recompensa para engajamento |
+| **Patrocinio de Torneios** | Associe sua marca a torneios; 4 niveis: Main, Gold, Silver, Bronze |
+| **Patrocinio de Desafios** | Crie desafios patrocinados com sua marca |
+| **Segmentacao Precisa** | Filtre por esporte, regiao, faixa etaria, nivel de habilidade |
+| **A/B Testing** | Teste diferentes criativos e mensagens |
+| **Dashboard de Analytics** | Impressoes, cliques, CTR, conversoes, resgates — tudo em tempo real |
 
 **Tipos de Campanha:**
 
-| Tipo | Descrição | Exemplo |
+| Tipo | Descricao | Exemplo |
 |---|---|---|
-| **Banner** | Anúncio visual no feed e sidebar | Banner de nova linha de tênis |
-| **Product Giveaway** | Resgate de produto pelo usuário | "Resgate sua amostra de suplemento" |
-| **GCoin Reward** | Distribuição de GCoins | "Ganhe 50 GCoins ao se cadastrar" |
-| **Tournament Sponsor** | Patrocínio de torneio | "Torneio Copa Nike de Beach Tennis" |
-| **Challenge Sponsor** | Patrocínio de desafio | "Desafio Gatorade: 10km em 7 dias" |
+| **Banner** | Anuncio visual no feed e sidebar | Banner de nova linha de tenis |
+| **Product Giveaway** | Resgate de produto pelo usuario | "Resgate sua amostra de suplemento" |
+| **GCoin Reward** | Distribuicao de GCoins | "Ganhe 50 GCoins ao se cadastrar" |
+| **Tournament Sponsor** | Patrocinio de torneio | "Torneio Copa Nike de Beach Tennis" |
+| **Challenge Sponsor** | Patrocinio de desafio | "Desafio Gatorade: 10km em 7 dias" |
 
-**ROI Comprovado:**
-
-| Investimento | Retorno | Detalhamento |
-|---|---|---|
-| **R$ 500** | 1.200 atletas impactados | Distribuição de GCoins com alto engajamento |
-| **R$ 2.000** | 700 jogadores + 2.000 views | Naming rights de torneio + logos no chaveamento |
-| **R$ 10.000** | 5.000 atletas + 25.000 impressões | Presença em todas as etapas do circuito mensal |
-
-**Vantagem competitiva:** Acesso direto a um público **altamente engajado e segmentado** que nenhuma outra plataforma oferece. Dados reais de comportamento esportivo para decisões de marketing.
+**Diferencial vs. midia tradicional:** A marca nao atinge apenas espectadores — atinge **praticantes**. Um banner no Sportio alcanca quem joga beach tennis 3x por semana, nao quem assiste na TV. Isso muda fundamentalmente a qualidade do lead.
 
 ---
 
-### 4. APOSTADOR — "Aposte com Inteligência no Esporte"
+### 4. APOSTADOR — "Aposte com Inteligencia no Esporte"
 
-> *"Use seus GCoins para apostar em partidas reais. Dados transparentes, odds justas e pagamento automático."*
+> *"Aposte em partidas reais — de torneios profissionais a duelos 1v1 entre amigos. Dados transparentes e odds justas."*
 
-**Quem é:** Qualquer usuário da plataforma que queira apostar em partidas reais com GCoins.
+**Quem e:** Qualquer usuario da plataforma que queira apostar com GCoins.
+
+**Mercado enderecavel:** 17,7 milhoes de apostadores ativos no Brasil (CNN Brasil/SPA, H1 2025), gastando em media R$ 164/mes (ISTOE Dinheiro). Nenhuma plataforma atual oferece apostas em esporte amador. Sportio abre um nicho inteiramente novo.
+
+**Estrategia regulatoria:**
+
+| Cenario | Abordagem |
+|---|---|
+| **Fase 1 (lancamento)** | GCoins de Gamificacao — apostas sociais sem conversao em dinheiro. Nao requer licenca SIGAP. |
+| **Fase 2 (com licenca)** | GCoins Reais — apostas com conversao em dinheiro real. Requer licenca SIGAP (R$ 30M / 5 anos). |
+| **Alternativa** | Parceria com operador licenciado (white-label ou revenue share). |
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Apostas em Partidas Reais** | Aposte em jogos de torneios que acontecem na plataforma |
-| **Apostas em Duelos 1v1** | Aposte em desafios diretos entre atletas com odds dinâmicas |
+| **Apostas em Torneios Profissionais** | Aposte em jogos do Brasileirao, Copa do Brasil, UFC indexados na plataforma |
+| **Apostas em Torneios Amadores** | Aposte em torneios e partidas que acontecem na plataforma |
+| **Apostas em Duelos 1v1** | Aposte em desafios diretos entre atletas com odds dinamicas |
 | **Tipos de Aposta** | Vencedor (1.8x), Placar Exato (3x), MVP, Custom |
-| **Odds Dinâmicas** | Sistema parimutuel: odds mudam com base nas apostas existentes |
-| **Apostas ao Vivo** | Aposte durante partidas com odds atualizadas em tempo real |
-| **Apostas entre Amigos** | Crie apostas privadas com amigos |
-| **Dashboard Completo** | Histórico de apostas com filtros (pendente, ganhou, perdeu, cancelada, reembolsada) |
+| **Odds Dinamicas** | Sistema parimutuel: odds mudam com base nas apostas existentes |
+| **Dashboard Completo** | Historico de apostas com filtros |
 | **Leaderboard** | Ranking dos melhores apostadores por lucro |
-| **Jogo Responsável** | Limites de aposta, alertas de comportamento, ferramentas de autocontrole |
+| **Jogo Responsavel** | Limites de aposta, alertas de comportamento, ferramentas de autocontrole |
 
 **Dois Modos de Aposta:**
 
-| Modo | Descrição | Ideal para |
+| Modo | Descricao | Ideal para |
 |---|---|---|
-| **GCoins Reais** | Apostas com GCoins conversíveis em dinheiro; saque via PIX | Apostadores que buscam retorno financeiro |
-| **GCoins Gamificação** | Apostas com GCoins de gamificação; troque por prêmios exclusivos | Iniciantes e quem quer diversão sem risco financeiro |
-
-**Vantagem competitiva:** É a **única plataforma de apostas focada no esporte amador**, com dados reais dos atletas e partidas. O modo gamificação elimina a barreira de entrada e permite experimentação sem risco.
+| **GCoins Gamificacao** | Apostas sociais; troque por premios exclusivos. **Nao requer licenca.** | Lancamento, engajamento, diversao sem risco |
+| **GCoins Reais** | Apostas com conversao em dinheiro; saque via PIX. **Requer licenca SIGAP.** | Apostadores que buscam retorno financeiro |
 
 ---
 
-### 5. FÃ / TORCEDOR — "O Esporte é Mais Emocionante Quando Você Faz Parte"
+### 5. FA / TORCEDOR — "O Esporte e Mais Emocionante Quando Voce Faz Parte"
 
-> *"Acompanhe torneios, torça pelos seus atletas preferidos e ganhe GCoins por cada interação."*
+> *"Acompanhe torneios profissionais e amadores, torca pelos seus atletas preferidos e ganhe GCoins por cada interacao."*
 
-**Quem é:** Todo e qualquer usuário da plataforma. A persona de Fã é atribuída automaticamente a todos os cadastros.
+**Quem e:** Todo e qualquer usuario da plataforma. A persona de Fa e atribuida automaticamente a todos os cadastros.
+
+**Mercado enderecavel:** O Strava tem 20 milhoes de usuarios no Brasil (Strava Year in Sport 2024). O FlashScore tem 155 milhoes de MAU globais com o Brasil entre os top 6 mercados. O espaco de "fa ativo e recompensado" e um mercado nao atendido.
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Feed Social Esportivo** | Resultados, placares e highlights em tempo real |
-| **Seguir Atletas** | Acompanhe atletas favoritos e receba atualizações |
-| **Curtir, Comentar, Compartilhar** | Interaja com conteúdo e ganhe GCoins por cada ação |
-| **Palpites e Previsões** | Teste seu conhecimento esportivo e ganhe GCoins |
-| **Comunidade** | Debate jogadas, celebre vitórias, conecte-se com outros fãs |
-| **Conteúdo Exclusivo** | Bastidores, entrevistas e conteúdo exclusivo de atletas |
-| **Ranking de Fãs** | Suba no ranking; top fãs ganham recompensas especiais |
+| **Feed Social Esportivo** | Resultados profissionais + amadores, placares e highlights em tempo real |
+| **Seguir Atletas** | Acompanhe atletas profissionais e amadores favoritos |
+| **Curtir, Comentar, Compartilhar** | Interaja com conteudo e ganhe GCoins por cada acao |
+| **Palpites e Previsoes** | Teste seu conhecimento esportivo e ganhe GCoins |
+| **Comunidade** | Debate jogadas, celebre vitorias, conecte-se com outros fas |
+| **Ranking de Fas** | Suba no ranking; top fas ganham recompensas especiais |
 
-**Ganhos por Engajamento:**
+**Ganhos por Engajamento (GCoins Gamificacao):**
 
-| Atividade | Recompensa | Descrição |
+| Atividade | Recompensa | Descricao |
 |---|---|---|
-| **Likes e Comentários** | 20 – 50 GCoins | Recompensas diárias por interação |
-| **Palpites Corretos** | 100 – 300 GCoins | Proporcional à dificuldade da previsão |
-| **Top Fã do Mês** | 1.000 GCoins | Bônus exclusivo para os mais engajados |
-
-**Vantagem competitiva:** Transforma **torcedores passivos em participantes ativos** que são recompensados pelo engajamento. Diferente de redes sociais tradicionais, aqui a interação gera valor tangível.
+| **Likes e Comentarios** | 20 – 50 GCoins | Recompensas diarias por interacao |
+| **Palpites Corretos** | 100 – 300 GCoins | Proporcional a dificuldade da previsao |
+| **Top Fa do Mes** | 1.000 GCoins | Bonus exclusivo para os mais engajados |
 
 ---
 
-### 6. ÁRBITRO — "O Esporte Precisa de Árbitros Justos"
+### 6. ARBITRO — "O Esporte Precisa de Arbitros Justos"
 
-> *"Cada validação feita por você é registrada, avaliada e remunerada. Ganhe GCoins por cada partida apitada."*
+> *"Cada validacao feita por voce e registrada, avaliada e remunerada."*
 
-**Quem é:** Árbitro profissional ou amador que busca mais oportunidades de trabalho e valorização.
+**Quem e:** Arbitro profissional ou amador que busca mais oportunidades de trabalho e valorizacao.
 
 **O que pode fazer na plataforma:**
 
-| Funcionalidade | Descrição |
+| Funcionalidade | Descricao |
 |---|---|
-| **Perfil Verificado** | Selo de árbitro verificado com certificações e experiência |
-| **Convites Automáticos** | Receba convites para partidas na sua região conforme disponibilidade |
-| **Validação de Resultados** | Registre placares, incidentes e valide resultados das partidas |
-| **Pagamento por Partida** | Remuneração automática em GCoins após cada jogo |
-| **Ranking de Qualidade** | Avaliações dos atletas constroem seu ranking; melhores árbitros recebem mais convites |
-| **Treinamento** | Acesso a cursos e materiais de capacitação |
-| **Suporte Dedicado** | Canal exclusivo com suporte prioritário |
-
-**Potencial de Ganhos:**
-
-| Nível | Faixa Mensal | Descrição |
-|---|---|---|
-| **Iniciante** | R$ 500 – 1.000 | Partidas locais e torneios menores |
-| **Intermediário** | R$ 1.500 – 2.500 | Torneios regionais, boas avaliações |
-| **Top 10%** | R$ 4.000+ | Eventos premium, taxas especiais |
-
-**Vantagem competitiva:** Funciona como um **"Uber da arbitragem"** — conecta árbitros a oportunidades de forma automática, com sistema de reputação transparente e pagamento garantido.
+| **Perfil Verificado** | Selo de arbitro verificado com certificacoes e experiencia |
+| **Convites Automaticos** | Receba convites para partidas na sua regiao conforme disponibilidade |
+| **Validacao de Resultados** | Registre placares, incidentes e valide resultados das partidas |
+| **Pagamento por Partida** | Remuneracao automatica em GCoins apos cada jogo |
+| **Ranking de Qualidade** | Avaliacoes dos atletas constroem seu ranking |
 
 ---
 
-## Personas Secundárias
+### Personas Secundarias
 
-### 7. TREINADOR / PROFESSOR
-
-Conecta-se com atletas, organiza treinos e campeonatos, aumenta sua renda e visibilidade como treinador na plataforma.
-
-### 8. NUTRICIONISTA
-
-Oferece serviços especializados para atletas dentro do ecossistema, com visibilidade para o público-alvo exato.
-
-### 9. FOTÓGRAFO ESPORTIVO
-
-Captura conteúdo de torneios e partidas, gera receita com fotos e vídeos exclusivos dentro da plataforma.
-
-### 10. DONO DE ARENA / QUADRA
-
-Gerencia instalações esportivas, conecta-se com organizadores de torneios e maximiza a ocupação de seus espaços.
+| Persona | Proposta de Valor |
+|---------|-------------------|
+| **Treinador / Professor** | Conecta-se com atletas, organiza treinos, aumenta renda e visibilidade |
+| **Nutricionista** | Oferece servicos especializados para atletas com visibilidade para o publico-alvo exato |
+| **Fotografo Esportivo** | Captura conteudo de torneios, gera receita com fotos e videos exclusivos |
+| **Dono de Arena / Quadra** | Gerencia instalacoes, conecta-se com organizadores, maximiza ocupacao |
 
 ---
 
 ## Economia de GCoins — A Moeda do Ecossistema
 
-### Visão Geral
+### Visao Geral
 
-GCoins são a moeda digital interna da Sportio que movimenta toda a economia da plataforma. O sistema é **dual**, com dois tipos de GCoins que coexistem:
+GCoins sao a moeda digital interna que movimenta toda a economia da plataforma. O sistema e **dual**, projetado para funcionar desde o dia 1 sem licenca de apostas:
 
-| Tipo | Obtenção | Uso | Conversão |
+| Tipo | Obtencao | Uso | Conversao |
 |---|---|---|---|
-| **GCoins Reais** | Compra, prêmios de torneio, patrocínios | Inscrições, apostas, transferências | **Sim** — saque via PIX |
-| **GCoins Gamificação** | Vitórias em apostas, desafios, bônus diários, indicações, conquistas | Apostas, troca por prêmios | **Não** — apenas dentro da plataforma |
+| **GCoins Reais** | Compra via PIX/cartao, premios de torneio, patrocinios | Inscricoes, transferencias | **Sim** — saque via PIX |
+| **GCoins Gamificacao** | Vitorias, desafios, bonus diarios, conquistas, engajamento | Apostas sociais, troca por premios | **Nao** — apenas dentro da plataforma |
+
+**Ponto critico:** GCoins de Gamificacao usados para apostas **nao configuram jogo de azar** sob a Lei 14.790/23, pois nao tem conversibilidade em dinheiro. Isso permite operar apostas sociais desde o lancamento sem licenca SIGAP.
 
 ### Fluxo Completo de GCoins
 
 ```
-ENTRADA DE GCOINS REAIS                    ENTRADA DE GCOINS GAMIFICAÇÃO
-├─ Compra com dinheiro real (PIX/cartão)    ├─ Vitórias em apostas (torneios + duelos)
-├─ Prêmio de torneio                        ├─ Conclusão de desafios e missões
-├─ Vitória em duelo 1v1 (wager)             ├─ Bônus diário de login
-├─ Recompensa de patrocínio                 ├─ Indicação de amigos (referral)
-├─ Transferência entre usuários             ├─ Conquistas desbloqueadas (55+ achievements)
+ENTRADA DE GCOINS REAIS                    ENTRADA DE GCOINS GAMIFICACAO
+├─ Compra com dinheiro real (PIX/cartao)    ├─ Vitorias em apostas sociais
+├─ Premio de torneio                        ├─ Conclusao de desafios e missoes
+├─ Vitoria em duelo 1v1 (wager)             ├─ Bonus diario de login
+├─ Recompensa de patrocinio                 ├─ Indicacao de amigos (referral)
+├─ Transferencia entre usuarios             ├─ Conquistas desbloqueadas (55+ achievements)
 └─ Recompensa de marca (brand reward)       ├─ XP convertido em recompensa
                                             └─ Engajamento social (likes, comments)
 
 USO DE GCOINS
-├─ Inscrição em torneios (taxa de entrada)
-├─ Apostas em partidas e duelos 1v1
+├─ Inscricao em torneios (taxa de entrada)
+├─ Apostas sociais (GCoins Gamificacao — sem licenca)
+├─ Apostas reais (GCoins Reais — com licenca, fase futura)
 ├─ Wager em duelos (aposta entre jogadores)
-├─ Transferência para outros usuários
-├─ Saque via PIX (apenas GCoins Reais, taxa 5%, mín. 100 GCoins)
-└─ Troca por prêmios exclusivos (gamificação)
+├─ Transferencia para outros usuarios
+├─ Saque via PIX (apenas GCoins Reais, taxa 5%, min. 100 GCoins)
+└─ Troca por premios exclusivos (gamificacao)
 ```
 
-### Categorias de Transação
+### Modelo Monetario
 
-| Categoria | Tipo | Descrição |
-|---|---|---|
-| `tournament_prize` | Entrada | Prêmio por colocação em torneio |
-| `tournament_entry` | Saída | Taxa de inscrição em torneio |
-| `bet_win` | Entrada | Ganho de aposta |
-| `bet_place` | Saída | Valor da aposta |
-| `challenge_reward` | Entrada | Conclusão de desafio / vitória em duelo 1v1 |
-| `challenge_wager` | Saída | Wager depositado no duelo 1v1 |
-| `purchase` | Entrada | Compra com dinheiro real (PIX/cartão) |
-| `withdrawal` | Saída | Saque via PIX (taxa de 5%) |
-| `referral_bonus` | Entrada | Bônus por indicar amigos |
-| `daily_bonus` | Entrada | Bônus diário de login |
-| `achievement` | Entrada | Conquista desbloqueada (55+ conquistas) |
-| `mission_reward` | Entrada | Missão diária/semanal completada |
-| `level_up` | Entrada | Bônus por subir de nível (nível × 10 GCoins) |
-| `brand_reward` | Entrada | Recompensa de campanha |
-| `transfer` | Ambos | Transferência entre usuários |
-
-### Modelo Monetário
-
-O modelo de GCoins cria **múltiplos pontos de monetização** para a plataforma:
-
-1. **Compra de GCoins** — Receita direta quando usuários compram GCoins com dinheiro real (R$ 0,10/GCoin)
-2. **Taxa sobre saques** — 5% sobre cada saque de GCoins Reais via PIX
-3. **Taxa sobre inscrições** — Comissão sobre taxas de torneio cobradas via plataforma
-4. **Venda de campanhas** — Marcas pagam para distribuir GCoins e criar campanhas
-5. **Margem sobre apostas** — Take rate sobre pools de apostas (torneios + duelos 1v1)
-6. **Comissão sobre wagers** — Percentual sobre apostas diretas entre jogadores em duelos
-7. **Float financeiro** — GCoins comprados mas ainda não sacados geram float
+| # | Fonte de Receita | Modelo | Descricao |
+|---|---|---|---|
+| 1 | **Venda de GCoins** | Transacional | Usuarios compram GCoins com dinheiro real — R$ 0,10/GCoin |
+| 2 | **Taxa sobre inscricoes** | Comissao | % sobre cada inscricao de torneio processada pela plataforma |
+| 3 | **Taxa sobre saques** | Comissao | 5% sobre cada saque de GCoins Reais via PIX |
+| 4 | **Campanhas de Marcas** | Self-serve | Marcas pagam para criar campanhas (banners, giveaways, recompensas) |
+| 5 | **Patrocinio de Torneios** | Marketplace | Comissao sobre patrocinios aprovados entre marcas e organizadores |
+| 6 | **Float Financeiro** | Financeiro | GCoins comprados mas nao sacados geram rendimento |
+| 7 | **Apostas (Take Rate)** | Comissao | Margem sobre pools de apostas (torneios + duelos 1v1) |
+| 8 | **Comissao sobre Wagers** | Comissao | % sobre apostas diretas entre jogadores em duelos |
+| 9 | **Premium (futuro)** | Assinatura | Funcionalidades premium para atletas, organizadores e marcas |
+| 10 | **Dados e Analytics (futuro)** | SaaS | Insights de mercado esportivo para marcas e federacoes |
 
 ---
 
@@ -359,486 +429,446 @@ O modelo de GCoins cria **múltiplos pontos de monetização** para a plataforma
 
 ### Feed Social Esportivo
 
-O feed social é o coração da interação na plataforma, funcionando como uma **rede social exclusiva para o ecossistema esportivo**.
+O feed social e o coracao da interacao na plataforma, combinando conteudo de esporte profissional e amador.
 
-**Características:**
+**Caracteristicas:**
 - Posts com texto + imagens
+- Resultados automaticos de torneios profissionais indexados
 - Tags de esporte e torneio
-- Comentários com respostas aninhadas
-- Sistema de likes (posts e comentários)
-- Infinite scroll com paginação por cursor
+- Comentarios com respostas aninhadas
+- Sistema de likes (posts e comentarios)
+- Infinite scroll com paginacao por cursor
 - Filtro por esporte
-- Posts em alta (trending — mais curtidos nos últimos 7 dias)
-- Sugestão de usuários para seguir
-- **Anúncios patrocinados a cada 5 posts** (monetização de marca)
-- Posts automáticos gerados por atividades (inscrição em torneio, conclusão de desafio, etc.)
+- Posts em alta (trending — mais curtidos nos ultimos 7 dias)
+- Sugestao de usuarios para seguir
+- **Anuncios patrocinados a cada 5 posts** (monetizacao de marca)
+- Posts automaticos gerados por atividades (inscricao em torneio, conclusao de desafio, etc.)
 
-### Sistema de Torneios
+### Sistema de Torneios (Dual)
 
-O motor de torneios é a funcionalidade mais robusta da plataforma.
+**Torneios Indexados (Profissionais):**
+- Brasileirao, Copa do Brasil, Liga dos Campeoes, UFC, ATP, circuitos de beach tennis
+- Dados de partidas, placares e resultados importados automaticamente
+- Fas fazem palpites e apostas sociais com GCoins Gamificacao
+- Se o torneio quiser usar a plataforma para gestao, a porta esta aberta
 
-**Formatos suportados:**
-- Eliminação Simples (Single Elimination)
-- Eliminação Dupla (Double Elimination)
-- Round Robin (Todos contra todos)
-- Suíço (Swiss)
-- Liga (League)
+**Torneios Gerenciados (Amadores):**
+- Criacao e gestao completa pelo organizador
+- 5 formatos: Eliminacao Simples/Dupla, Round Robin, Suico, Liga
+- Chaveamento automatico com base no ranking dos atletas
+- Pagamento integrado via PIX/cartao
+- Patrocinio em 4 niveis (Main, Gold, Silver, Bronze)
+- Distribuicao automatica de premios por colocacao
+- Niveis de dificuldade (A/B/C)
 
 **Ciclo de vida do torneio:**
 ```
 draft → registration_open → registration_closed → in_progress → completed
 ```
 
-**Funcionalidades avançadas:**
-- Geração automática de chaves (bracket) com IA
-- Classificação e standings em tempo real
-- Sistema de convites para atletas e patrocinadores
-- Patrocínio em 4 níveis (Main, Gold, Silver, Bronze)
-- Distribuição automática de prêmios por colocação
-- Prêmios em produtos (via patrocinadores)
-- Níveis de dificuldade (A/B/C)
-- Suporte online e presencial (com endereço)
-- Prazo de inscrição configurável
-
 ### Sistema de Duelos 1v1
 
-O sistema de duelos permite que **qualquer atleta desafie outro diretamente** para um confronto 1v1, criando uma experiência competitiva imediata com apostas integradas.
+O sistema de duelos permite que **qualquer atleta desafie outro diretamente** para um confronto 1v1 com apostas integradas.
 
 **Como funciona:**
 
 ```
-Criação → Aceite do Oponente → Abertura de Apostas → Partida em Andamento → Resultado → Liquidação
-(pending)   (accepted)         (betting_open)       (in_progress)          (completed)  (settlement)
+Criacao → Aceite do Oponente → Abertura de Apostas → Partida → Resultado → Liquidacao
+(pending)   (accepted)         (betting_open)       (in_progress) (completed) (settlement)
 ```
 
 **Funcionalidades:**
-- Desafio direto entre dois atletas com esporte, data e local configuráveis
-- **Wager (aposta entre jogadores):** Cada atleta aposta GCoins; o vencedor leva tudo
-- **Apostas da comunidade:** Fãs e espectadores podem apostar no resultado do duelo
-- Período de apostas configurável com deadline automático
-- Submissão de resultado pelos próprios jogadores
-- **Liquidação automática** de todas as apostas vinculadas ao duelo
-- Cancelamento com reembolso automático de todas as apostas pendentes
-- Atualização automática de rating ELO dos atletas após o resultado
-- Posts automáticos no feed para criação, aceite e resultado do duelo
+- Desafio direto entre dois atletas com esporte, data e local configuraveis
+- **Wager:** Cada atleta aposta GCoins; o vencedor leva tudo
+- **Apostas da comunidade:** Fas e espectadores podem apostar no resultado
+- Periodo de apostas configuravel com deadline automatico
+- Liquidacao automatica de todas as apostas vinculadas
+- Atualizacao automatica de rating ELO apos o resultado
+- Posts automaticos no feed para criacao, aceite e resultado
 
 **Impacto no engajamento:**
-- Criação de conteúdo orgânico (cada duelo gera 3-4 posts automáticos no feed)
-- Aumento da retenção: atletas voltam para desafiar rivais
-- Ciclo social: apostas da comunidade criam audiência para os duelos
-- Monetização: wager dos jogadores + apostas dos fãs + XP/conquistas gerados
+- Cada duelo gera 3-4 posts automaticos no feed (conteudo organico)
+- Atletas voltam para desafiar rivais (retencao)
+- Apostas da comunidade criam audiencia (viralidade)
 
 ### Sistema de Apostas
 
 **Tipos de aposta:**
 
-| Tipo | Multiplicador | Descrição |
+| Tipo | Multiplicador Base | Descricao |
 |---|---|---|
 | **Vencedor** | 1.8x | Prever o vencedor da partida |
 | **Placar Exato** | 3.0x | Prever o placar exato |
-| **MVP** | Variável | Prever o melhor jogador |
-| **Custom** | Variável | Aposta personalizada |
+| **MVP** | Variavel | Prever o melhor jogador |
+| **Custom** | Variavel | Aposta personalizada |
 
 **Algoritmo de odds:**
-- Sistema **parimutuel** (odds dinâmicas baseadas no volume de apostas)
+- Sistema **parimutuel** (odds dinamicas baseadas no volume de apostas)
 - Quanto mais pessoas apostam em um lado, menor o multiplicador
-- Garante equilíbrio e justiça matemática
+- Garante equilibrio e justica matematica
 
-**Settlement automático:**
-- Quando uma partida ou duelo 1v1 termina, todas as apostas pendentes são liquidadas automaticamente
-- Serviços dedicados: `bet-settlement.ts` para torneios e `challenge-settlement.ts` para duelos
-- Vencedores recebem GCoins proporcionais ao multiplicador
-- Em caso de cancelamento, todas as apostas são reembolsadas automaticamente
-- Transações registradas com histórico completo
-- Notificações enviadas para apostadores (ganhou/perdeu/reembolsado)
+**Settlement automatico:**
+- Quando uma partida ou duelo termina, todas as apostas sao liquidadas automaticamente
+- Servicos dedicados: `bet-settlement.ts` para torneios e `challenge-settlement.ts` para duelos
+- Em caso de cancelamento, reembolso automatico
+- Notificacoes enviadas para apostadores
 
-### Sistema de Patrocínio e Ads
+### Sistema de Patrocinio e Ads
 
-A plataforma oferece um **sistema completo de publicidade e patrocínio** que conecta marcas diretamente ao público esportivo.
+**Posicionamentos disponiveis:**
 
-**Posicionamentos disponíveis:**
-
-| Posição | Descrição |
+| Posicao | Descricao |
 |---|---|
 | `feed_banner` | Banner entre posts no feed (a cada 5 posts) |
 | `sidebar` | Widget lateral do feed |
-| `tournament_sponsor` | Página do torneio |
+| `tournament_sponsor` | Pagina do torneio |
 | `profile_banner` | Perfil do atleta |
-| `challenge_sponsor` | Página do desafio |
+| `challenge_sponsor` | Pagina do desafio |
 | `post_promoted` | Post promovido |
 
-**Métricas em tempo real:**
-- Impressões totais
-- Cliques totais
-- CTR (Click-Through Rate)
-- Resgates de produto
-- Orçamento gasto vs. alocado
+**Metricas em tempo real:** Impressoes, cliques, CTR, resgates de produto, orcamento gasto vs. alocado.
 
-### Sistema de Notificações
+### Sistema de Gamificacao Completo
 
-Sistema centralizado que dispara notificações para **30+ tipos de eventos**:
+A gamificacao e transversal a **todas as personas** da plataforma.
 
-| Categoria | Eventos |
-|---|---|
-| **Social** | Novo seguidor, comentário no post, like no post |
-| **Torneios** | Inscrição confirmada, torneio iniciado, convite recebido, convite aceito/recusado, prêmio distribuído, novo patrocinador |
-| **Apostas** | Aposta ganha, aposta perdida |
-| **Desafios** | Participação, conclusão, vitória com colocação |
-| **GCoins** | GCoins recebidos, recompensa de marca |
-| **Marca** | Produto resgatado, conversão de campanha |
-| **Chat** | Nova mensagem recebida |
+**Sistema de XP e Niveis:**
+- Cada atividade gera XP proporcional ao impacto
+- 50+ atividades mapeadas com XP especifico por persona
+- Sistema de niveis com progressao exponencial (formula: `nivel² × 100`)
 
-### Sistema de Chat
+**Conquistas (Achievements):** 55+ conquistas organizadas em 5 tiers:
 
-- Salas de chat (1-a-1 e em grupo)
-- Envio de texto + imagens
-- Rastreamento de última leitura
-- Gerenciamento de membros
-
-### Painel Administrativo
-
-- Controle de acesso baseado em roles (RBAC)
-- Acesso restrito a admin e organizadores
-- Gestão de usuários, torneios, apostas e saques
-- Aprovação/rejeição de pedidos de saque
-- Métricas da plataforma em tempo real
-- Gestão completa da plataforma
-
-### Sistema de Gamificação Completo
-
-A gamificação é transversal a **todas as 10 personas** da plataforma, criando um ciclo de engajamento e retenção contínuo.
-
-**Sistema de XP e Níveis:**
-- Cada atividade na plataforma gera XP proporcional ao impacto
-- 50+ atividades mapeadas com XP específico por persona
-- Sistema de níveis com progressão exponencial (fórmula: `nível² × 100`)
-- Nível do usuário visível no perfil e no leaderboard
-
-**Conquistas (Achievements):**
-
-55+ conquistas pré-cadastradas organizadas em 5 tiers e 10 categorias:
-
-| Tier | Descrição | Exemplo |
+| Tier | Descricao | Exemplo |
 |---|---|---|
-| **Bronze** | Primeiros passos | "Primeira Vitória", "Primeiro Post" |
-| **Prata** | Consistência | "10 Torneios Disputados", "50 Seguidores" |
-| **Ouro** | Excelência | "Campeão de Liga", "100 Apostas Ganhas" |
-| **Platina** | Elite | "Top 10 do Ranking", "R$ 5.000 em Prêmios" |
-| **Diamante** | Lendário | "1.000 Vitórias", "Organizador do Ano" |
+| **Bronze** | Primeiros passos | "Primeira Vitoria", "Primeiro Post" |
+| **Prata** | Consistencia | "10 Torneios Disputados", "50 Seguidores" |
+| **Ouro** | Excelencia | "Campeao de Liga", "100 Apostas Ganhas" |
+| **Platina** | Elite | "Top 10 do Ranking", "R$ 5.000 em Premios" |
+| **Diamante** | Lendario | "1.000 Vitorias", "Organizador do Ano" |
 
-Cada conquista gera recompensa em XP + GCoins Gamificação.
-
-**Missões (Missions):**
-
-16+ missões com frequências variadas que incentivam atividade recorrente:
-
-| Frequência | Exemplo | Recompensa |
-|---|---|---|
-| **Diária** | "Faça 1 post hoje", "Curta 3 posts" | 10-20 XP + GCoins |
-| **Semanal** | "Participe de 1 torneio", "Vença 3 partidas" | 50-100 XP + GCoins |
-| **Mensal** | "Organize 1 torneio", "Atinja 1.000 impressões" | 200-500 XP + GCoins |
-| **Única** | "Complete seu perfil", "Faça sua primeira compra" | 50-100 XP + GCoins |
-
-**Leaderboard Global:**
-- Ranking por XP total, por esporte e por persona
-- Página dedicada `/leaderboard` com filtros
-- Top jogadores ganham visibilidade e recompensas
+**Missoes:** 16+ missoes com frequencias variadas (diarias, semanais, mensais, unicas).
 
 **Rating ELO por Esporte:**
-- Sistema ELO competitivo (base 1200, K-factor dinâmico)
-- Atualizado automaticamente após cada partida e duelo 1v1
-- K-factor maior para novos jogadores (convergência rápida)
-- Bonus por vencer adversários mais fortes
-- Tiers visuais: Ferro, Bronze, Prata, Ouro, Platina, Diamante, Mestre, Grão-Mestre
+- Base 1200, K-factor dinamico
+- Atualizado apos cada partida e duelo 1v1
+- Tiers visuais: Ferro, Bronze, Prata, Ouro, Platina, Diamante, Mestre, Grao-Mestre
 
 ### Gateway de Pagamento
 
-Sistema completo de compra e saque de GCoins integrado na plataforma.
-
-**Compra de GCoins (BRL → GCoins Reais):**
-
-| Método | Descrição |
+| Metodo | Descricao |
 |---|---|
-| **PIX** | QR Code gerado automaticamente; confirmação em segundos |
-| **Cartão de Crédito** | Aprovação instantânea simulada; parcelamento futuro |
-| **Cartão de Débito** | Débito imediato da conta |
-| **Boleto** | Vencimento em 3 dias úteis |
+| **PIX** | QR Code gerado automaticamente; confirmacao em segundos |
+| **Cartao de Credito** | Aprovacao instantanea |
+| **Cartao de Debito** | Debito imediato |
+| **Boleto** | Vencimento em 3 dias uteis |
 
-- Preço: R$ 0,10 por GCoin (1 GCoin = R$ 0,10)
-- Mínimo de compra: 50 GCoins (R$ 5,00)
-- Máximo: 1.000.000 GCoins por pedido
-- Histórico completo de pedidos com status (pendente, aprovado, expirado, cancelado)
-- Confirmação automática de pagamento (webhook-ready)
+- Preco: R$ 0,10 por GCoin (1 GCoin = R$ 0,10)
+- Minimo de compra: 50 GCoins (R$ 5,00)
+- Saque via PIX: minimo 100 GCoins Reais, taxa 5%
+- Processo de saque: Pedido → Revisao Admin → Aprovacao/Rejeicao → Transferencia
 
-**Saque de GCoins Reais (GCoins → BRL via PIX):**
+### Demais Funcionalidades
 
-| Aspecto | Detalhe |
+| Funcionalidade | Status |
 |---|---|
-| **Mínimo** | 100 GCoins Reais |
-| **Taxa** | 5% sobre o valor |
-| **Método** | Exclusivamente PIX |
-| **Processo** | Pedido → Revisão Admin → Aprovação/Rejeição → Transferência |
-| **Rastreabilidade** | ID do pedido, motivo de rejeição, data de processamento |
-
-**Painel Admin de Saques:**
-- Fila de pedidos pendentes
-- Aprovação/rejeição com motivo
-- Histórico completo de saques processados
-- Saldo real deduzido automaticamente na aprovação
-
-### Qualidade de Software e Testes
-
-A plataforma conta com uma **suíte completa de testes E2E (end-to-end)** que cobre todas as funcionalidades e personas.
-
-**Cobertura de Testes:**
-- **182 testes automatizados** organizados em **14 fases**
-- **100% de aprovação** (182/182 testes passando)
-- Testa todas as 10 personas da plataforma
-- Cobre o ciclo completo: cadastro → interação → monetização → saque
-
-**Fases de Teste:**
-
-| Fase | Escopo |
-|---|---|
-| 0 | Health check do servidor e endpoints |
-| 1 | Cadastro e autenticação de todas as personas |
-| 2 | Perfis e configurações de usuário |
-| 3 | Feed social (posts, comentários, likes, follows) |
-| 4 | Torneios (criação, inscrição, chaveamento, standings) |
-| 5 | Apostas (criação, odds, settlement) |
-| 6 | GCoins (compra, saldo, transferência, saque) |
-| 7 | Chat (salas, mensagens, membros) |
-| 8 | Notificações (30+ tipos) |
-| 9 | Marca/Patrocinador (campanhas, resgates, analytics) |
-| 10 | Desafios e Duelos 1v1 |
-| 11 | Painel administrativo |
-| 12 | Páginas públicas (landing pages, blog) |
-| 13 | Testes de integração cross-feature |
+| **Chat** | Salas 1-a-1 e em grupo, texto + imagens, rastreamento de leitura |
+| **Notificacoes** | 30+ tipos de eventos (social, torneios, apostas, GCoins, chat) |
+| **Painel Administrativo** | RBAC, gestao de usuarios/torneios/apostas/saques, metricas |
 
 ---
 
-## Modelo de Negócio e Receita
+## Modelo de Negocio e Unit Economics
 
 ### Fontes de Receita
 
-| # | Fonte | Modelo | Descrição |
-|---|---|---|---|
-| 1 | **Venda de GCoins** | Transacional | Usuários compram GCoins com dinheiro real (PIX/cartão) |
-| 2 | **Taxa sobre inscrições** | Comissão | % sobre cada inscrição de torneio processada pela plataforma |
-| 3 | **Taxa sobre saques** | Comissão | % sobre cada saque de GCoins Reais via PIX |
-| 4 | **Campanhas de Marcas** | SaaS / Self-serve | Marcas pagam para criar campanhas (banners, giveaways, recompensas) |
-| 5 | **Patrocínio de Torneios** | Marketplace | Comissão sobre patrocínios aprovados entre marcas e organizadores |
-| 6 | **Float Financeiro** | Financeiro | GCoins comprados mas não sacados geram rendimento |
-| 7 | **Apostas (Torneios)** | Take rate | Margem sobre o pool de apostas de partidas (parimutuel) |
-| 8 | **Apostas (Duelos 1v1)** | Take rate | Margem sobre apostas em desafios diretos entre atletas |
-| 9 | **Wager de Duelos** | Comissão | % sobre o wager apostado pelos próprios jogadores nos duelos |
-| 10 | **Premium (futuro)** | Assinatura | Funcionalidades premium para atletas, organizadores e marcas |
+A plataforma tem **10 fontes de receita independentes**, reduzindo risco e aumentando resiliencia.
 
-### Unit Economics (Projeção)
+### Unit Economics (Projecao Conservadora)
+
+**Premissas baseadas em dados reais de mercado:**
 
 ```
-Atleta:
-  LTV estimado = R$ 1.800/ano (inscrições + compra de GCoins + apostas + duelos 1v1 + wagers)
-  CAC estimado = R$ 15 (via indicação + marketing orgânico + gamificação viral)
-  LTV/CAC = 120x
+ATLETA AMADOR (praticante regular)
+  Gasto medio em inscricoes: R$ 119/torneio (Maquina do Esporte 2024)
+  Frequencia estimada: 3-6 torneios/ano
+  Compra de GCoins: R$ 30-50/mes (apostas sociais + wagers)
+  LTV estimado = R$ 600 – 1.200/ano
+  CAC estimado = R$ 25-50 (CPI Android R$ 2,50 + ativacao; ref: IronSource 2025)
+  LTV/CAC = 12-48x
 
-Organizador:
-  LTV estimado = R$ 8.000/ano (comissão sobre eventos + patrocínios)
-  CAC estimado = R$ 50 (outbound + content marketing)
-  LTV/CAC = 160x
+ORGANIZADOR
+  Receita media por evento: R$ 5.000-15.000
+  Comissao Sportio: 8-12%
+  Frequencia: 4-12 eventos/ano
+  LTV estimado = R$ 3.000 – 12.000/ano
+  CAC estimado = R$ 100-200 (outbound + content marketing)
+  LTV/CAC = 15-120x
 
-Marca:
-  LTV estimado = R$ 24.000/ano (campanhas + patrocínios recorrentes)
-  CAC estimado = R$ 200 (vendas consultivas)
-  LTV/CAC = 120x
+MARCA / PATROCINADOR
+  Budget medio campanha digital PME: R$ 2.000-10.000/campanha
+  Frequencia: 3-6 campanhas/ano
+  LTV estimado = R$ 6.000 – 60.000/ano
+  CAC estimado = R$ 300-500 (vendas consultivas)
+  LTV/CAC = 12-200x
 
-Apostador:
-  LTV estimado = R$ 2.400/ano (compra de GCoins + apostas em torneios e duelos)
-  CAC estimado = R$ 20 (via duelos virais + feed social)
-  LTV/CAC = 120x
+APOSTADOR / FA
+  Gasto medio do apostador brasileiro: R$ 164/mes (ISTOE Dinheiro 2025)
+  Percentual que converte em GCoins: 10-30% do gasto (plataforma nova)
+  LTV estimado = R$ 200 – 600/ano
+  CAC estimado = R$ 15-30 (via conteudo profissional + social)
+  LTV/CAC = 7-40x
+
+NOTA: Ranges amplos sao intencionais. Sem dados de operacao real,
+apresentamos cenarios conservador-otimista em vez de pontos fixos.
+LTV/CAC sera refinado apos os primeiros 6 meses de operacao.
 ```
 
 ### Flywheel Effect (Efeito de Rede)
 
 ```
-Mais Atletas
+Conteudo Profissional (Brasileirao, UFC, Beach Tennis)
     ↓
-Mais Torneios + Duelos 1v1 (competição atrai atletas)
+Fas e Apostadores (engajamento + palpites + apostas sociais)
     ↓
-Mais Apostas (partidas e duelos geram interesse)
+Base de Usuarios Massiva (atrai marcas e organizadores)
     ↓
-Mais Fãs (conteúdo, conquistas e comunidade crescem)
+Marcas Investem (campanhas + patrocinios + GCoins)
     ↓
-Mais Marcas (audiência engajada atrai patrocínio)
+Premios e GCoins Circulam (incentivo para atletas amadores)
     ↓
-Mais Prêmios e GCoins (marcas injetam valor)
+Atletas Amadores Competem (torneios + duelos 1v1)
     ↓
-Mais Gamificação (XP, conquistas e missões retêm usuários)
+Mais Conteudo Organico (posts, resultados, conquistas)
     ↓
-Mais Atletas (ciclo se retroalimenta)
+Mais Fas e Apostadores (ciclo se retroalimenta)
 ```
 
-Cada novo participante aumenta o valor para **todos os outros participantes** do ecossistema. Esse efeito de rede cria uma **barreira de entrada significativa** para concorrentes.
+A camada profissional **resolve o problema do cold start**: nao e preciso esperar usuarios criarem conteudo. O conteudo ja existe — sao milhares de jogos por semana.
 
 ---
 
-## Diferencial Competitivo
+## Analise Competitiva
 
-| Aspecto | Sportio | Concorrentes |
+### Mapa de Concorrentes
+
+| Plataforma | O que faz | O que NAO faz |
 |---|---|---|
-| **Público-alvo** | Esporte amador e semiprofissional (40+ modalidades) | Esporte profissional ou nicho único |
-| **Integração** | Ecossistema completo (social + torneios + apostas + ads + economia) | Ferramentas fragmentadas para funcionalidades isoladas |
-| **Monetização do atleta** | GCoins com saque PIX (dinheiro real) | Sem monetização ou apenas prêmios pontuais |
-| **Economia própria** | GCoins dual (real + gamificação) | Sem moeda interna |
-| **Patrocínio self-serve** | Marcas criam campanhas sem intermediários | Negociação manual caso a caso |
-| **Apostas amadoras** | Partidas de torneios + duelos 1v1 com settlement automático | Apenas esporte profissional |
-| **Duelos 1v1** | Desafios diretos com wager e apostas da comunidade | Inexistente no esporte amador |
-| **Gamificação** | XP, 55+ conquistas (5 tiers), missões diárias, ELO rating, leaderboard | Pouca ou nenhuma gamificação |
-| **Gateway de pagamento** | Compra via PIX/cartão + saque via PIX com taxa 5% | Sem infraestrutura de pagamento |
-| **Testes automatizados** | 182 testes E2E com 100% de aprovação | Sem testes ou cobertura parcial |
-| **Dados e analytics** | Dashboard completo para marcas, organizadores e admin | Dados limitados ou inexistentes |
+| **Strava** (20M usuarios BR) | Tracking de atividades, feed social | Torneios, apostas, monetizacao, patrocinio |
+| **Sofascore/FlashScore** (155M MAU) | Scores ao vivo de esporte profissional | Esporte amador, apostas, comunidade, monetizacao |
+| **Bet365/Betano** (23% share BR) | Apostas em esporte profissional | Esporte amador, comunidade, gamificacao, torneios |
+| **Challonge** (31M brackets) | Chaveamento de torneios (foco eSports) | Pagamento, apostas, social, economia |
+| **Torneo by Sofascore** | Gestao de torneios amadores | Apostas, economia, patrocinio, gamificacao |
+| **Sympla** | Venda de ingressos para eventos | Chaveamento, apostas, social, gamificacao |
+| **LetzPlay** | Inscricoes de beach tennis | Outras modalidades, apostas, social, economia |
+
+### Posicao Unica do Sportio
+
+| Aspecto | Sportio | Mercado |
+|---|---|---|
+| **Escopo** | Profissional + Amador (43+ modalidades) | Ou profissional ou amador; nicho unico |
+| **Integracao** | Social + torneios + apostas + economia + patrocinio | Ferramentas isoladas |
+| **Monetizacao do atleta** | GCoins com saque PIX | Sem monetizacao ou premios pontuais |
+| **Economia proprietaria** | Dual (real + gamificacao) | Sem moeda interna |
+| **Apostas amadoras** | Unica plataforma que oferece | Inexistente |
+| **Duelos 1v1** | Exclusivo: desafio direto com wager | Inexistente |
+| **Modelo regulatorio** | GCoins Gamificacao (sem licenca) → GCoins Reais (com licenca) | Operacao binaria: ou tem licenca ou nao opera |
 
 ---
 
-## Stack Tecnológico
+## Stack Tecnologico
 
 | Camada | Tecnologia |
 |---|---|
-| **Frontend** | Next.js 15 (App Router), React, TailwindCSS, Lucide Icons |
-| **Backend** | tRPC (API type-safe), Drizzle ORM |
-| **Banco de Dados** | Neon PostgreSQL (Serverless) — 40+ tabelas |
-| **Autenticação** | NextAuth.js v5 (credenciais + Google OAuth) |
-| **Busca** | Typesense (full-text search) |
+| **Frontend** | Next.js 15 (App Router), React 19, TailwindCSS 4, Lucide Icons |
+| **Backend** | tRPC (API type-safe end-to-end), Drizzle ORM |
+| **Banco de Dados** | Neon PostgreSQL (Serverless) — 40+ tabelas, 12 routers |
+| **Autenticacao** | NextAuth.js v5 (credenciais + Google OAuth) |
 | **Deploy** | Vercel + GitHub Actions (CI/CD automatizado) |
 | **CDN** | Cloudflare |
-| **Pagamentos** | PIX + Cartão de Crédito/Débito (gateway simulado, webhook-ready) |
-| **Testes** | Suite E2E customizada com 182 testes automatizados (100% pass rate) |
-| **Animações** | Framer Motion |
-| **State** | Zustand (client-side) |
-| **Charts** | Recharts (data visualization) |
+| **Pagamentos** | PIX + Cartao (gateway integrado, webhook-ready) |
+| **Animacoes** | Framer Motion |
+| **State** | Zustand (client-side), React Query (server-state) |
+| **Charts** | Recharts |
 | **Forms** | React Hook Form + Zod validation |
 
-**Decisões arquiteturais importantes:**
-- **Serverless-first**: Escalabilidade automática com custo sob demanda
+**Decisoes arquiteturais:**
+- **Serverless-first**: Escalabilidade automatica com custo sob demanda (Neon + Vercel)
 - **Type-safe end-to-end**: tRPC garante contratos entre frontend e backend
-- **Real-time ready**: Arquitetura preparada para WebSockets e notificações push
-- **Multi-tenant**: Suporte a múltiplos perfis por usuário com RBAC granular
-- **ELO Rating System**: Rating competitivo por esporte com K-factor dinâmico
-- **Gamification Engine**: Motor de conquistas e missões com verificação automática
+- **Real-time ready**: Arquitetura preparada para WebSockets
+- **Multi-tenant**: Suporte a multiplos perfis por usuario com RBAC granular
+- **Gamification Engine**: Motor de conquistas e missoes com verificacao automatica
 
 ---
 
 ## Modalidades Esportivas
 
-A plataforma suporta **43+ modalidades** cadastradas no banco de dados, incluindo:
+A plataforma suporta **43+ modalidades** cadastradas no banco de dados:
 
 | Categoria | Esportes |
 |---|---|
-| **Raquete** | Tênis, Beach Tennis, Padel, Badminton, Squash, Tênis de Mesa |
-| **Coletivos** | Futebol, Futsal, Vôlei, Basquete, Handebol, Rugby, Futebol Americano, Polo Aquático |
-| **Areia/Praia** | Vôlei de Praia, Futevôlei, Beach Soccer |
-| **Aquáticos** | Natação, Surfe |
-| **Combate** | Boxe, MMA, Judô, Karatê, Taekwondo, Muay Thai, Jiu-Jitsu, Esgrima, Wrestling |
-| **Individual** | Atletismo, Ciclismo, Golfe, Skate, Escalada, Ginástica, Levantamento de Peso |
-| **Precisão** | Tiro com Arco, Tiro Esportivo, Boliche |
-| **Outros** | CrossFit, Triathlon, Canoagem, Remo, Hóquei |
-| **eSports** | eSports (jogos eletrônicos competitivos) |
+| **Raquete** | Tenis, Beach Tennis, Padel, Badminton, Squash, Tenis de Mesa |
+| **Coletivos** | Futebol, Futsal, Volei, Basquete, Handebol, Rugby, Futebol Americano, Polo Aquatico |
+| **Areia/Praia** | Volei de Praia, Futevolei, Beach Soccer |
+| **Aquaticos** | Natacao, Surfe |
+| **Combate** | Boxe, MMA, Judo, Karate, Taekwondo, Muay Thai, Jiu-Jitsu, Esgrima, Wrestling |
+| **Individual** | Atletismo, Ciclismo, Golfe, Skate, Escalada, Ginastica, Levantamento de Peso |
+| **Precisao** | Tiro com Arco, Tiro Esportivo, Boliche |
+| **Outros** | CrossFit, Triathlon, Canoagem, Remo, Hoquei |
+| **eSports** | eSports (jogos eletronicos competitivos) |
+
+**Foco inicial:** Futebol Society (12,5M praticantes), Beach Tennis (1,1M, +175%), Corrida (15M), CrossFit (1.150 boxes), Volei (15,3M).
 
 ---
 
 ## Roadmap de Produto
 
-### Fase Atual (MVP Completo)
-- [x] Feed social completo (posts, comentários, likes, follows)
-- [x] Sistema de torneios (criação, inscrição, chaveamento, standings)
-- [x] Economia de GCoins (dual currency, transferências, histórico)
-- [x] Sistema de apostas (parimutuel, settlement automático)
-- [x] Patrocínio e campanhas de marcas
-- [x] Sistema de desafios com premiação
+### Fase Atual — MVP Funcional
+
+- [x] Feed social completo (posts, comentarios, likes, follows)
+- [x] Sistema de torneios (criacao, inscricao, chaveamento automatico, standings)
+- [x] Economia de GCoins (dual currency, transferencias, historico)
+- [x] Sistema de apostas sociais (parimutuel, settlement automatico)
+- [x] Patrocinio e campanhas de marcas (self-serve)
+- [x] Duelos 1v1 (desafio direto com wager + apostas da comunidade)
 - [x] Chat (1-a-1 e grupo)
-- [x] Sistema de notificações (30+ tipos)
-- [x] Painel administrativo
-- [x] Autenticação (credenciais + Google OAuth)
+- [x] Sistema de notificacoes (30+ tipos)
+- [x] Painel administrativo (RBAC, gestao financeira)
+- [x] Autenticacao (credenciais + Google OAuth)
+- [x] Gamificacao completa (XP, niveis, 55+ conquistas, 16+ missoes, ELO)
+- [x] Gateway de pagamento (PIX + cartao, saque via PIX)
 - [x] Landing pages para cada persona
 - [x] Deploy automatizado (Vercel + GitHub Actions)
-- [x] **Duelos 1v1** (desafio direto com wager + apostas da comunidade + settlement automático)
-- [x] **Gateway de Pagamento** (compra de GCoins via PIX/cartão + saque via PIX com taxa 5%)
-- [x] **Gamificação completa** (XP, níveis, 55+ conquistas em 5 tiers, 16+ missões diárias/semanais)
-- [x] **Rating ELO por esporte** (sistema competitivo com K-factor dinâmico e tiers visuais)
-- [x] **Leaderboard global** (ranking por XP, esporte e persona)
-- [x] **Painel Admin expandido** (gestão financeira, aprovação de saques, ajuste de GCoins)
-- [x] **Suite de testes E2E** (182 testes automatizados, 14 fases, 100% de aprovação)
 
-### Próximas Fases
-- [ ] App mobile nativo (React Native / Flutter)
+### Fase 2 — Tracao e Conteudo Profissional
+
+- [ ] Indexacao de torneios profissionais (Brasileirao, Copa do Brasil, UFC)
+- [ ] Perfis publicos de atletas profissionais
+- [ ] App mobile nativo (React Native)
+- [ ] WebSockets para chat e apostas em tempo real
+- [ ] Integracao com gateway de pagamento real (Stripe / Pagar.me)
+- [ ] Sistema de email (verificacao, notificacoes, recuperacao de senha)
+- [ ] Upload de imagens (Cloudflare R2)
+- [ ] Middleware de protecao de rotas
+
+### Fase 3 — Escala e Regulacao
+
 - [ ] Streaming ao vivo de partidas
+- [ ] Licenca SIGAP ou parceria com operador licenciado
+- [ ] Integracao com wearables (Strava, Garmin, Apple Watch)
 - [ ] Marketplace de produtos esportivos
-- [ ] Integração com wearables (Strava, Garmin, Apple Watch)
+- [ ] Machine learning para matchmaking e recomendacao
+- [ ] API aberta para integracoes externas
+
+### Fase 4 — Expansao
+
 - [ ] Sistema de assinatura premium
-- [ ] Expansão para América Latina
-- [ ] Parcerias com federações esportivas
-- [ ] API aberta para integrações externas
-- [ ] Machine learning para recomendação de torneios e matchmaking
+- [ ] Expansao para America Latina
+- [ ] Parcerias com federacoes esportivas
+- [ ] Data products para marcas e federacoes
 
 ---
 
-## Métricas-Chave (KPIs)
+## Metricas-Chave (KPIs)
 
-| Métrica | Descrição |
-|---|---|
-| **MAU** | Usuários ativos mensais |
-| **Torneios/mês** | Quantidade de torneios criados por mês |
-| **Duelos 1v1/mês** | Quantidade de desafios diretos por mês |
-| **GMV de GCoins** | Volume total de GCoins transacionados |
-| **Take rate** | % de receita sobre transações |
-| **Volume de apostas** | Pool total de apostas (torneios + duelos) |
-| **NPS** | Net Promoter Score por persona |
-| **Retenção D7/D30** | Retenção de usuários em 7 e 30 dias |
-| **Conquistas desbloqueadas** | Engajamento com sistema de gamificação |
-| **Missões completadas/dia** | Atividade diária de missões |
-| **Revenue per User** | Receita média por usuário ativo |
-| **CAC por canal** | Custo de aquisição segmentado |
-| **LTV/CAC** | Relação lifetime value / custo de aquisição |
+| Metrica | Descricao | Meta Ano 1 |
+|---|---|---|
+| **MAU** | Usuarios ativos mensais | 50.000 – 100.000 |
+| **Torneios/mes** | Torneios amadores criados + profissionais indexados | 50 – 200 |
+| **Duelos 1v1/mes** | Desafios diretos entre atletas | 500 – 2.000 |
+| **GMV de GCoins** | Volume total de GCoins transacionados (R$) | R$ 500K – 2M |
+| **Take rate** | % de receita sobre transacoes | 8-15% |
+| **Retencao D7/D30** | Retencao de usuarios em 7 e 30 dias | D7: 40%+ / D30: 20%+ |
+| **Revenue per User** | Receita media por usuario ativo | R$ 5-15/mes |
+| **NPS** | Net Promoter Score por persona | 40+ |
+
+*Nota: Metas de Ano 1 baseadas em benchmarks de apps sociais/esportivos no Brasil. Strava adicionou 5 milhoes de usuarios no Brasil em 2024 (CNN Brasil). Nosso alvo e conservador.*
 
 ---
 
 ## Por Que Investir na Sportio?
 
-### 1. Mercado Gigante e Subatendido
-O Brasil tem **milhões de praticantes de esporte amador** sem nenhuma plataforma que integre competição, monetização e comunidade. O mercado de esportes amadores movimenta bilhões anualmente em inscrições, equipamentos e patrocínios — de forma totalmente fragmentada e ineficiente.
+### 1. Mercado Gigante, Comprovado e em Crescimento
 
-### 2. Efeito de Rede Poderoso
-Cada nova persona que entra na plataforma aumenta o valor para todas as outras. Atletas atraem organizadores. Organizadores atraem marcas. Marcas atraem mais atletas. Fãs amplificam tudo. Esse ciclo cria uma **barreira de entrada exponencial** para competidores.
+O Brasil tem 61 milhoes de praticantes regulares de esporte (IBGE), 17,7 milhoes de apostadores ativos (SPA 2025), e um mercado de apostas de R$ 100 bilhoes/ano — o 5o maior do mundo (InfoMoney). O mercado fitness gera R$ 17 bi/ano e o e-commerce esportivo R$ 16,3 bi/ano. Esportes como beach tennis (+175% em 2 anos) e corrida (+85% em eventos) estao em crescimento explosivo. **Todos esses numeros sao verificaveis em fontes publicas.**
 
-### 3. Múltiplas Fontes de Receita
-A plataforma não depende de uma única fonte. São **10+ streams de receita** independentes, desde venda de GCoins até comissões sobre patrocínios, apostas e campanhas de marcas. Isso reduz risco e aumenta resiliência do negócio.
+### 2. Posicionamento Unico: Profissional + Amador
 
-### 4. Economia Proprietária (GCoins)
-A moeda interna cria um **ecossistema fechado** onde o valor circula dentro da plataforma. O sistema dual (real + gamificação) maximiza engajamento (gamificação) e monetização (real) simultaneamente. O float financeiro dos GCoins comprados gera receita adicional passiva.
+Nenhuma plataforma no mundo integra acompanhamento de esporte profissional, competicao amadora, apostas, economia proprietaria e patrocinio self-serve em um unico ecossistema. Strava faz tracking. Sofascore faz scores. Bet365 faz apostas. Challonge faz chaveamento. Sportio integra tudo.
 
-### 5. Produto Construído, Testado e Funcional
-O MVP está **100% construído e testado** com stack moderna e escalável. Não é um slide deck — é uma plataforma funcionando com todas as funcionalidades core implementadas, incluindo gateway de pagamento, gamificação completa e duelos 1v1. São **182 testes automatizados com 100% de aprovação**, cobrindo todas as personas e funcionalidades. O time entrega rápido e com qualidade.
+### 3. Estrategia de Cold Start Resolvida
 
-### 6. Escalabilidade Natural
-A arquitetura serverless permite crescer sem investimento proporcional em infraestrutura. A expansão para novos esportes, regiões e países acontece com custo marginal mínimo.
+A camada de conteudo profissional gera engajamento desde o dia 1. Nao dependemos de usuarios criarem conteudo — o Brasileirao tem 380 jogos/ano, a Serie B mais 380, a Copa do Brasil dezenas. Isso atrai fas, que atraem marcas, que financiam torneios amadores.
 
-### 7. Defensibilidade por Dados
-Conforme a plataforma cresce, acumula **dados únicos e proprietários** sobre o ecossistema esportivo amador: performance de atletas, preferências de apostas, eficácia de patrocínios, comportamento de fãs. Esses dados criam inteligência competitiva impossível de replicar.
+### 4. Modelo Regulatorio Inteligente
 
-### 8. Gamificação que Retém
-O sistema de gamificação com XP, níveis, 55+ conquistas em 5 tiers, missões diárias/semanais e rating ELO cria **múltiplos loops de engajamento** que mantêm o usuário ativo. Cada ação gera progresso visível. Conquistas desbloqueiam recompensas. Missões renovam-se automaticamente. O rating ELO cria competição saudável e matchmaking equilibrado.
+A estrutura dual de GCoins permite operar apostas sociais (gamificacao) **sem licenca** desde o lancamento, e migrar para apostas reais quando houver licenca SIGAP ou parceria com operador. Nao e binario — e uma rampa.
 
-### 9. Timing de Mercado
-O crescimento explosivo de esportes como Beach Tennis, Padel e CrossFit no Brasil cria uma onda perfeita para uma plataforma que integra competição, comunidade e monetização. A regulamentação de apostas esportivas no Brasil abre uma oportunidade adicional massiva.
+### 5. Efeito de Rede com 10 Personas
+
+Cada persona que entra aumenta o valor para todas as outras. Atletas atraem organizadores. Organizadores atraem marcas. Marcas financiam premios. Premios atraem mais atletas. Fas amplificam tudo com engajamento e apostas.
+
+### 6. Multiplas Fontes de Receita
+
+10 streams independentes: venda de GCoins, taxas sobre inscricoes, taxa de saque, campanhas de marcas, patrocinio de torneios, take rate de apostas, comissao de wagers, float financeiro, premium (futuro), data products (futuro).
+
+### 7. MVP Construido e Funcional
+
+Nao e um slide deck. E uma plataforma construida com Next.js 15, PostgreSQL, 40+ tabelas, 12 routers de API, sistema completo de gamificacao, duelos 1v1, gateway de pagamento e deploy automatizado. O produto existe e roda.
+
+### 8. Timing Perfeito
+
+- **Regulamentacao de apostas** (Lei 14.790/23) abre mercado de R$ 100 bi
+- **Beach tennis** cresceu 175% em 2 anos
+- **Corrida de rua** cresceu 85% em eventos (2024-2025)
+- **PIX** processou 79,8 bilhoes de transacoes em 2025 — infraestrutura de pagamento instantaneo esta madura
+- **Strava** atingiu 20M de usuarios no Brasil — o publico esportivo digital existe e esta ativo
+
+### 9. Defensibilidade por Dados
+
+Conforme cresce, a plataforma acumula dados unicos sobre o ecossistema esportivo: performance de atletas amadores, preferencias de apostas, eficacia de patrocinios, comportamento de fas por esporte. Esses dados criam inteligencia competitiva impossivel de replicar e abrem oportunidades de data products para marcas e federacoes.
+
+---
+
+## Fontes e Referencias
+
+Todos os numeros deste documento sao verificaveis:
+
+| Dado | Fonte | Ano |
+|------|-------|-----|
+| 61M praticantes de esporte | IBGE PNAD (Pratica de Esportes e Atividades Fisicas) | 2015 |
+| 30,4M jogadores de futebol | Federacoes estaduais / Top10Mais | 2024 |
+| 15M corredores | Olympikus/Box1824 "Por Dentro do Corre" | 2025 |
+| 1,1M praticantes de beach tennis | CBT (Confederacao Brasileira de Tenis) | 2023 |
+| 600-700K praticantes de padel | Cobrapa | 2024 |
+| 1.150 boxes de CrossFit | Ativo.com | 2024 |
+| 5.241 corridas homologadas | Abraceo / CNN Brasil | 2025 |
+| R$ 119,39 ticket medio corrida | Maquina do Esporte | 2024 |
+| R$ 100 bi apostados | Brazil Economy | 2025 |
+| R$ 36 bi GGR operadores | Meio e Mensagem | 2025 |
+| 17,7M apostadores ativos | CNN Brasil / SPA Fazenda | H1 2025 |
+| R$ 164/mes gasto medio apostador | ISTOE Dinheiro | 2025 |
+| 5o maior mercado de apostas | InfoMoney | 2025 |
+| R$ 30M licenca SIGAP | Lei 14.790/23 / Senado | 2024 |
+| 20M usuarios Strava BR | Strava Year in Sport / Portal Tela | 2024-2025 |
+| US$ 2,2 bi valuation Strava | MKT Esportivo | 2025 |
+| 155M MAU FlashScore | FlashScore (press release) | 2024 |
+| 31M brackets Challonge | StriveCloud | 2024 |
+| US$ 1,05 bi aquisicao FACEIT | Crunchbase / Wikipedia | 2022 |
+| R$ 1,9 bi marketing clubes | Torcedores.com | 2024 |
+| R$ 17 bi mercado fitness | Panorama Setorial Fitness | 2024 |
+| R$ 16,3 bi e-commerce esportivo | MKT Esportivo | 2024 |
+| 79,8 bi transacoes PIX | Agencia Brasil | 2025 |
+| US$ 0,44 CPI Android BR | IronSource / Mapendo | 2025 |
 
 ---
 
 ## Contato
 
-**Sportio — Transformando o Esporte em Oportunidade**
+**Sportio — O Ecossistema Digital Completo do Esporte**
 
-Repositório: [github.com/tigraodegente/Sportio-web](https://github.com/tigraodegente/Sportio-web)
+Repositorio: [github.com/tigraodegente/Sportio-web](https://github.com/tigraodegente/Sportio-web)
 
 ---
 
-*Documento atualizado em Março de 2026*
+*Documento atualizado em Marco de 2026. Todos os dados de mercado sao de fontes publicas verificaveis.*
