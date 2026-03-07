@@ -1028,6 +1028,82 @@ parlay_legs (id, parlay_id, match_id, market_type, selection, odds, status)
 
 ---
 
+## Parte 6: App Mobile — React Native + Expo
+
+### Decisão Técnica
+
+**Escolha: React Native + Expo SDK 52+**
+
+Justificativa:
+- Time é AI-driven (Claude + agentes) — domínio total de React/TypeScript
+- Reutiliza ~60-70% do código web (tipos, Zod, tRPC, utils, stores)
+- Performance near-native (95%) — comprovada em escala (Discord 200M+ users, Shopify, Coinbase)
+- Expo resolve complexidade de build nativo (EAS Build, sem precisar de Mac para iOS)
+- OTA updates via Expo Updates (corrigir bugs sem App Store review)
+
+### Stack Mobile
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Framework | Expo SDK 52+ (managed workflow) |
+| Navegação | Expo Router (file-based, como Next.js) |
+| UI Components | NativeWind (Tailwind para React Native) |
+| Animações | React Native Reanimated (60fps, UI thread) |
+| Gestos | React Native Gesture Handler |
+| State | Zustand + TanStack Query (mesmo que web) |
+| API | tRPC client (mesmo backend) |
+| Auth | Expo AuthSession + SecureStore |
+| Push | Expo Notifications (iOS + Android) |
+| Storage local | MMKV (30x mais rápido que AsyncStorage) |
+| Pagamento | Stripe React Native SDK |
+| Mapas | React Native Maps |
+| Câmera | Expo Camera |
+| Deep links | Expo Linking |
+| OTA updates | EAS Update |
+| Build/Deploy | EAS Build (TestFlight + Play Store) |
+
+### Estrutura do Monorepo Atualizado
+
+```
+Sportio/
+├── apps/
+│   ├── web/              ← Next.js (existente)
+│   └── mobile/           ← Expo React Native (NOVO)
+│       ├── app/          ← Expo Router (screens)
+│       │   ├── (tabs)/   ← Bottom tab navigator
+│       │   │   ├── index.tsx        ← Home
+│       │   │   ├── compete.tsx      ← Torneios + Desafios
+│       │   │   ├── feed.tsx         ← Social
+│       │   │   ├── wallet.tsx       ← GCoins
+│       │   │   └── profile.tsx      ← Perfil
+│       │   ├── match/[id].tsx       ← Live match
+│       │   ├── athlete/[id].tsx     ← Perfil creator
+│       │   ├── tournament/[id].tsx  ← Torneio
+│       │   └── auth/                ← Login/Register
+│       ├── components/              ← UI components nativos
+│       ├── hooks/                   ← Hooks mobile-specific
+│       └── app.config.ts            ← Expo config
+├── packages/
+│   ├── shared/           ← Tipos, Zod, utils (WEB + MOBILE)
+│   ├── api-client/       ← tRPC client (WEB + MOBILE)
+│   └── ui/               ← Design tokens (cores, spacing)
+└── package.json
+```
+
+### Features Nativas Exclusivas do Mobile
+
+1. **Push notifications** — gol, resultado, gift recebido, torneio perto
+2. **Biometria** — Face ID/Touch ID para apostas e saques PIX
+3. **GPS nativo** — "Torneios perto de você" com mapa
+4. **Câmera** — Posts com foto, stories, QR code check-in
+5. **Haptic feedback** — Vibração ao receber gift, ganhar aposta
+6. **Offline-first** — Stats e histórico sem internet (MMKV cache)
+7. **Deep links** — Compartilhar perfil/torneio/aposta via link
+8. **Widgets** — Placar ao vivo na home screen (iOS/Android)
+9. **App Clips / Instant Apps** — Preview sem instalar
+
+---
+
 ## Resumo: De MVP para Produto Completo
 
 | Métrica | Hoje | Produto Completo |
@@ -1044,3 +1120,4 @@ parlay_legs (id, parlay_id, match_id, market_type, selection, odds, status)
 | Upload de arquivos | ❌ | ✅ R2/S3 |
 | Busca | ❌ | ✅ Typesense full-text |
 | PWA | ❌ | ✅ Instalável |
+| App Mobile | ❌ | ✅ React Native + Expo (iOS + Android) |
