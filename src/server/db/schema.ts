@@ -158,6 +158,14 @@ export const gcoinCategoryEnum = pgEnum("gcoin_category", [
   "achievement",
   "brand_reward",
   "transfer",
+  "bet_cashout",
+  "gift_sent",
+  "gift_received",
+  "subscription_payment",
+  "subscription_revenue",
+  "shoutout_payment",
+  "shoutout_revenue",
+  "affiliate_commission",
 ]);
 
 export const enrollmentStatusEnum = pgEnum("enrollment_status", [

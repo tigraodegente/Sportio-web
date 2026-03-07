@@ -32,7 +32,7 @@ const cleanupTimer = setInterval(() => {
 
 // Allow Node.js to exit gracefully without waiting for this timer.
 if (typeof cleanupTimer === "object" && "unref" in cleanupTimer) {
-  cleanupTimer.unref();
+  (cleanupTimer as { unref: () => void }).unref();
 }
 
 export interface RateLimitConfig {

@@ -19,8 +19,9 @@ import superjson from "superjson";
  *   export const trpc = createSportioTRPC<AppRouter>();
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createSportioTRPC<TRouter extends Record<string, any>>() {
-  return createTRPCReact<TRouter>();
+export function createSportioTRPC<TRouter>() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return createTRPCReact<any>();
 }
 
 /**
