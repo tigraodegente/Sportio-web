@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/server/lib/stripe";
+import { getStripe } from "@/server/lib/stripe";
 import { db } from "@/server/db";
 import { users, gcoinTransactions, paymentOrders } from "@/server/db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!

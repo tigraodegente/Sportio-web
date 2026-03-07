@@ -10,7 +10,7 @@ import {
   gcoinTransactions,
 } from "@/server/db/schema";
 import { notifyGcoinReceived } from "@/server/services/notification-service";
-import { stripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
+import { getStripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
 
 // GCoin price: R$ 0,10 per GCoin
 const GCOIN_PRICE_BRL = 0.1;
@@ -49,7 +49,7 @@ export const paymentRouter = createTRPCRouter({
             : ["card"];
 
       // Create Stripe Checkout Session
-      const checkoutSession = await stripe.checkout.sessions.create({
+      const checkoutSession = await getStripe().checkout.sessions.create({
         mode: "payment",
         payment_method_types: paymentMethodTypes,
         line_items: [
@@ -213,7 +213,7 @@ export const paymentRouter = createTRPCRouter({
             : ["card"];
 
       // Create Stripe Checkout Session
-      const checkoutSession = await stripe.checkout.sessions.create({
+      const checkoutSession = await getStripe().checkout.sessions.create({
         mode: "payment",
         payment_method_types: paymentMethodTypes,
         line_items: [

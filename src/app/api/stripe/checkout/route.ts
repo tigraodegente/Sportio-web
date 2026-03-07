@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
-import { stripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
+import { getStripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Pacote invalido" }, { status: 400 });
   }
 
-  const checkoutSession = await stripe.checkout.sessions.create({
+  const checkoutSession = await getStripe().checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card", "boleto"],
     line_items: [

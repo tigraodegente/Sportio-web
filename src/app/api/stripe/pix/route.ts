@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/server/auth";
-import { stripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
+import { getStripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Create PaymentIntent for PIX
-  const paymentIntent = await stripe.paymentIntents.create({
+  const paymentIntent = await getStripe().paymentIntents.create({
     amount: Math.round(pkg.priceBrl * 100),
     currency: "brl",
     payment_method_types: ["pix"],
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Confirm to generate PIX QR code
-  const confirmed = await stripe.paymentIntents.confirm(paymentIntent.id, {
+  const confirmed = await getStripe().paymentIntents.confirm(paymentIntent.id, {
     payment_method_data: { type: "pix" },
     return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gcoins`,
   });

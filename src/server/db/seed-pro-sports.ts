@@ -50,12 +50,24 @@ export async function seedProSports() {
     .onConflictDoNothing()
     .returning();
 
+  let competitionId: string;
   if (!competition) {
-    console.log("Competition already exists, skipping seed.");
-    return;
+    const existing = await db.query.proCompetitions.findFirst({
+      where: eq(proCompetitions.externalId, brasileiraoData.externalId),
+    });
+    if (!existing) {
+      console.log("Failed to create or find competition.");
+      return;
+    }
+    competitionId = existing.id;
+    console.log(`Using existing competition: ${existing.name} (${existing.id})`);
+  } else {
+    competitionId = competition.id;
   }
 
-  console.log(`Created competition: ${competition.name} (${competition.id})`);
+  if (competition) {
+    console.log(`Created competition: ${competition.name} (${competitionId})`);
+  }
 
   // 2. Seed teams
   const teamIds: Record<string, string> = {};
@@ -194,7 +206,7 @@ export async function seedProSports() {
       .insert(proMatches)
       .values({
         externalId: m.externalId,
-        competitionId: competition.id,
+        competitionId: competitionId,
         homeTeamId: homeId,
         awayTeamId: awayId,
         status: m.status,
@@ -229,7 +241,7 @@ export async function seedProSports() {
       .insert(proMatches)
       .values({
         externalId: `match-scheduled-${i + 1}`,
-        competitionId: competition.id,
+        competitionId: competitionId,
         homeTeamId: homeId,
         awayTeamId: awayId,
         status: "scheduled",
@@ -252,12 +264,18 @@ export async function seedProSports() {
     if (!match?.externalId) continue;
 
     const odds = generateMockOdds(match.externalId);
+    const marketTypeMap: Record<string, "1x2" | "over_under" | "btts" | "handicap" | "correct_score" | "goalscorer"> = {
+      match_winner: "1x2",
+      both_score: "btts",
+      over_under_2_5: "over_under",
+    };
     for (const odd of odds) {
+      const mappedType = marketTypeMap[odd.marketType] ?? "1x2";
       await db
         .insert(proMatchOdds)
         .values({
           matchId,
-          marketType: odd.marketType as "1x2" | "over_under" | "btts" | "handicap" | "correct_score" | "goalscorer",
+          marketType: mappedType,
           selection: odd.selection,
           oddsDecimal: odd.odds.toString(),
           isActive: true,
