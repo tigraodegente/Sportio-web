@@ -11,6 +11,8 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  date,
+  real,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -1116,6 +1118,249 @@ export const userMissions = pgTable(
   ]
 );
 
+// ==================== PRO SPORTS (Professional Leagues) ====================
+
+export const proMatchStatusEnum = pgEnum("pro_match_status", [
+  "scheduled",
+  "live",
+  "completed",
+  "postponed",
+  "cancelled",
+]);
+
+export const proBetStatusEnum = pgEnum("pro_bet_status", [
+  "pending",
+  "won",
+  "lost",
+  "cashed_out",
+  "void",
+]);
+
+export const parlayStatusEnum = pgEnum("parlay_status", [
+  "pending",
+  "won",
+  "lost",
+  "partial",
+  "cashed_out",
+  "void",
+]);
+
+export const favoriteEntityTypeEnum = pgEnum("favorite_entity_type", [
+  "team",
+  "athlete",
+  "competition",
+]);
+
+export const proTeams = pgTable(
+  "pro_teams",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    externalId: varchar("external_id", { length: 100 }),
+    name: varchar("name", { length: 255 }).notNull(),
+    shortName: varchar("short_name", { length: 50 }),
+    logo: text("logo"),
+    country: varchar("country", { length: 100 }).default("Brasil"),
+    city: varchar("city", { length: 100 }),
+    founded: integer("founded"),
+    venue: varchar("venue", { length: 255 }),
+    sportId: uuid("sport_id").references(() => sports.id),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_teams_sport_idx").on(table.sportId),
+    uniqueIndex("pro_teams_external_idx").on(table.externalId),
+  ]
+);
+
+export const proAthletes = pgTable(
+  "pro_athletes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    externalId: varchar("external_id", { length: 100 }),
+    name: varchar("name", { length: 255 }).notNull(),
+    photo: text("photo"),
+    position: varchar("position", { length: 100 }),
+    number: integer("number"),
+    nationality: varchar("nationality", { length: 100 }),
+    birthDate: timestamp("birth_date"),
+    teamId: uuid("team_id").references(() => proTeams.id),
+    stats: jsonb("stats"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_athletes_team_idx").on(table.teamId),
+    uniqueIndex("pro_athletes_external_idx").on(table.externalId),
+  ]
+);
+
+export const proCompetitions = pgTable(
+  "pro_competitions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    externalId: varchar("external_id", { length: 100 }),
+    name: varchar("name", { length: 255 }).notNull(),
+    shortName: varchar("short_name", { length: 50 }),
+    logo: text("logo"),
+    country: varchar("country", { length: 100 }),
+    season: varchar("season", { length: 20 }),
+    sportId: uuid("sport_id").references(() => sports.id),
+    isActive: boolean("is_active").default(true),
+    startDate: timestamp("start_date"),
+    endDate: timestamp("end_date"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_competitions_sport_idx").on(table.sportId),
+    index("pro_competitions_active_idx").on(table.isActive),
+  ]
+);
+
+export const proMatches = pgTable(
+  "pro_matches",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    externalId: varchar("external_id", { length: 100 }),
+    competitionId: uuid("competition_id")
+      .notNull()
+      .references(() => proCompetitions.id),
+    homeTeamId: uuid("home_team_id")
+      .notNull()
+      .references(() => proTeams.id),
+    awayTeamId: uuid("away_team_id")
+      .notNull()
+      .references(() => proTeams.id),
+    status: proMatchStatusEnum("status").default("scheduled"),
+    homeScore: integer("home_score"),
+    awayScore: integer("away_score"),
+    round: varchar("round", { length: 50 }),
+    kickoffAt: timestamp("kickoff_at"),
+    venue: varchar("venue", { length: 255 }),
+    events: jsonb("events"),
+    stats: jsonb("stats"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_matches_competition_idx").on(table.competitionId),
+    index("pro_matches_status_idx").on(table.status),
+    index("pro_matches_kickoff_idx").on(table.kickoffAt),
+    index("pro_matches_home_team_idx").on(table.homeTeamId),
+    index("pro_matches_away_team_idx").on(table.awayTeamId),
+  ]
+);
+
+export const proMatchOdds = pgTable(
+  "pro_match_odds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => proMatches.id, { onDelete: "cascade" }),
+    marketType: varchar("market_type", { length: 50 }).notNull(),
+    selection: varchar("selection", { length: 100 }).notNull(),
+    odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_match_odds_match_idx").on(table.matchId),
+    index("pro_match_odds_market_idx").on(table.matchId, table.marketType),
+  ]
+);
+
+export const proBets = pgTable(
+  "pro_bets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => proMatches.id),
+    marketType: varchar("market_type", { length: 50 }).notNull(),
+    selection: varchar("selection", { length: 100 }).notNull(),
+    odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
+    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+    potentialWin: decimal("potential_win", { precision: 12, scale: 2 }).notNull(),
+    status: proBetStatusEnum("status").default("pending"),
+    settledAt: timestamp("settled_at"),
+    cashOutAmount: decimal("cash_out_amount", { precision: 12, scale: 2 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("pro_bets_user_idx").on(table.userId),
+    index("pro_bets_match_idx").on(table.matchId),
+    index("pro_bets_status_idx").on(table.status),
+  ]
+);
+
+export const parlays = pgTable(
+  "parlays",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+    combinedOdds: decimal("combined_odds", { precision: 12, scale: 2 }).notNull(),
+    potentialWin: decimal("potential_win", { precision: 12, scale: 2 }).notNull(),
+    status: parlayStatusEnum("status").default("pending"),
+    settledAt: timestamp("settled_at"),
+    cashOutAmount: decimal("cash_out_amount", { precision: 12, scale: 2 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("parlays_user_idx").on(table.userId),
+    index("parlays_status_idx").on(table.status),
+  ]
+);
+
+export const parlayLegs = pgTable(
+  "parlay_legs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    parlayId: uuid("parlay_id")
+      .notNull()
+      .references(() => parlays.id, { onDelete: "cascade" }),
+    matchId: uuid("match_id")
+      .notNull()
+      .references(() => proMatches.id),
+    marketType: varchar("market_type", { length: 50 }).notNull(),
+    selection: varchar("selection", { length: 100 }).notNull(),
+    odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
+    status: proBetStatusEnum("status").default("pending"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("parlay_legs_parlay_idx").on(table.parlayId),
+    index("parlay_legs_match_idx").on(table.matchId),
+  ]
+);
+
+export const userFavorites = pgTable(
+  "user_favorites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    entityType: favoriteEntityTypeEnum("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_favorites_unique_idx").on(table.userId, table.entityType, table.entityId),
+    index("user_favorites_user_idx").on(table.userId),
+    index("user_favorites_entity_idx").on(table.entityType, table.entityId),
+  ]
+);
+
 // ==================== RELATIONS ====================
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -1128,6 +1373,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   teams: many(teams),
   posts: many(posts),
   bets: many(bets),
+  proBets: many(proBets),
+  parlays: many(parlays),
+  favorites: many(userFavorites),
   gcoinTransactions: many(gcoinTransactions),
   notifications: many(notifications),
   followers: many(followers, { relationName: "following" }),
@@ -1315,4 +1563,362 @@ export const missionsRelations = relations(missions, ({ many }) => ({
 export const userMissionsRelations = relations(userMissions, ({ one }) => ({
   user: one(users, { fields: [userMissions.userId], references: [users.id] }),
   mission: one(missions, { fields: [userMissions.missionId], references: [missions.id] }),
+}));
+
+// ==================== CREATOR ECONOMY ====================
+
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "active",
+  "cancelled",
+  "expired",
+  "past_due",
+]);
+
+export const shoutoutStatusEnum = pgEnum("shoutout_status", [
+  "pending",
+  "accepted",
+  "completed",
+  "cancelled",
+  "expired",
+]);
+
+export const fanBadgeTierEnum = pgEnum("fan_badge_tier", [
+  "bronze",
+  "silver",
+  "gold",
+  "diamond",
+]);
+
+// Creator Tiers (subscription levels a creator offers)
+export const creatorTiers = pgTable(
+  "creator_tiers",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 100 }).notNull(),
+    priceMonthlyC: integer("price_monthly_cents").notNull(),
+    description: text("description"),
+    benefits: jsonb("benefits").$type<string[]>().default([]),
+    sortOrder: integer("sort_order").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("creator_tiers_creator_idx").on(table.creatorId),
+    index("creator_tiers_active_idx").on(table.creatorId, table.isActive),
+  ]
+);
+
+// Fan Subscriptions (fan subscribes to a creator's tier)
+export const fanSubscriptions = pgTable(
+  "fan_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fanId: uuid("fan_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tierId: uuid("tier_id")
+      .notNull()
+      .references(() => creatorTiers.id),
+    status: subscriptionStatusEnum("status").default("active"),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    expiresAt: timestamp("expires_at"),
+    autoRenew: boolean("auto_renew").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("fan_subscriptions_fan_idx").on(table.fanId),
+    index("fan_subscriptions_creator_idx").on(table.creatorId),
+    index("fan_subscriptions_status_idx").on(table.status),
+    uniqueIndex("fan_subscriptions_unique_idx").on(table.fanId, table.creatorId),
+  ]
+);
+
+// Gift Types (system-defined gift options)
+export const giftTypes = pgTable("gift_types", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 100 }).notNull(),
+  emoji: varchar("emoji", { length: 10 }).notNull(),
+  gcoinCost: integer("gcoin_cost").notNull(),
+  animationUrl: text("animation_url"),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Gifts (sent from one user to another)
+export const gifts = pgTable(
+  "gifts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    senderId: uuid("sender_id")
+      .notNull()
+      .references(() => users.id),
+    receiverId: uuid("receiver_id")
+      .notNull()
+      .references(() => users.id),
+    giftTypeId: uuid("gift_type_id")
+      .notNull()
+      .references(() => giftTypes.id),
+    message: text("message"),
+    postId: uuid("post_id").references(() => posts.id),
+    gcoinAmount: integer("gcoin_amount").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("gifts_sender_idx").on(table.senderId),
+    index("gifts_receiver_idx").on(table.receiverId),
+    index("gifts_created_idx").on(table.createdAt),
+  ]
+);
+
+// Fan Badges (tracks fan engagement with a creator)
+export const fanBadges = pgTable(
+  "fan_badges",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fanId: uuid("fan_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tier: fanBadgeTierEnum("tier").notNull(),
+    totalGcoinsGiven: integer("total_gcoins_given").default(0),
+    monthsSubscribed: integer("months_subscribed").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("fan_badges_unique_idx").on(table.fanId, table.creatorId),
+    index("fan_badges_creator_idx").on(table.creatorId),
+  ]
+);
+
+// Shoutout Requests (personalized video requests, Cameo model)
+export const shoutoutRequests = pgTable(
+  "shoutout_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    fanId: uuid("fan_id")
+      .notNull()
+      .references(() => users.id),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id),
+    message: text("message").notNull(),
+    gcoinAmount: integer("gcoin_amount").notNull(),
+    status: shoutoutStatusEnum("status").default("pending"),
+    videoUrl: text("video_url"),
+    deadline: timestamp("deadline").notNull(),
+    completedAt: timestamp("completed_at"),
+    cancelledAt: timestamp("cancelled_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("shoutout_requests_fan_idx").on(table.fanId),
+    index("shoutout_requests_creator_idx").on(table.creatorId),
+    index("shoutout_requests_status_idx").on(table.status),
+  ]
+);
+
+// Affiliate Products ("Meu Equipamento")
+export const affiliateProducts = pgTable(
+  "affiliate_products",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    productName: varchar("product_name", { length: 255 }).notNull(),
+    productUrl: text("product_url").notNull(),
+    imageUrl: text("image_url"),
+    priceCents: integer("price_cents").notNull(),
+    commissionPct: decimal("commission_pct", { precision: 5, scale: 2 }).notNull(),
+    clicks: integer("clicks").default(0),
+    purchases: integer("purchases").default(0),
+    totalRevenue: integer("total_revenue").default(0),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("affiliate_products_creator_idx").on(table.creatorId),
+    index("affiliate_products_active_idx").on(table.creatorId, table.isActive),
+  ]
+);
+
+// Gated Content (posts locked behind a subscription tier)
+export const gatedContent = pgTable(
+  "gated_content",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => posts.id, { onDelete: "cascade" }),
+    minTierId: uuid("min_tier_id")
+      .notNull()
+      .references(() => creatorTiers.id),
+    teaserText: text("teaser_text"),
+    teaserImageUrl: text("teaser_image_url"),
+  },
+  (table) => [
+    index("gated_content_creator_idx").on(table.creatorId),
+    index("gated_content_post_idx").on(table.postId),
+  ]
+);
+
+// Super Comments (highlighted / pinned comments with GCoin payment)
+export const superComments = pgTable(
+  "super_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    commentId: uuid("comment_id")
+      .notNull()
+      .references(() => comments.id, { onDelete: "cascade" }),
+    gcoinAmount: integer("gcoin_amount").notNull(),
+    highlightColor: varchar("highlight_color", { length: 20 }),
+    isPinned: boolean("is_pinned").default(false),
+  },
+  (table) => [
+    uniqueIndex("super_comments_comment_idx").on(table.commentId),
+  ]
+);
+
+// Creator Stats (daily aggregated analytics for a creator)
+export const creatorStats = pgTable(
+  "creator_stats",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    date: date("date").notNull(),
+    subscribers: integer("subscribers").default(0),
+    giftsReceived: integer("gifts_received").default(0),
+    giftRevenueCents: integer("gift_revenue_cents").default(0),
+    subscriptionRevenueCents: integer("subscription_revenue_cents").default(0),
+    affiliateRevenueCents: integer("affiliate_revenue_cents").default(0),
+    impressions: integer("impressions").default(0),
+    profileViews: integer("profile_views").default(0),
+  },
+  (table) => [
+    index("creator_stats_creator_idx").on(table.creatorId),
+    index("creator_stats_date_idx").on(table.date),
+    uniqueIndex("creator_stats_unique_idx").on(table.creatorId, table.date),
+  ]
+);
+
+// ==================== CREATOR ECONOMY RELATIONS ====================
+
+export const creatorTiersRelations = relations(creatorTiers, ({ one, many }) => ({
+  creator: one(users, { fields: [creatorTiers.creatorId], references: [users.id] }),
+  subscriptions: many(fanSubscriptions),
+  gatedContent: many(gatedContent),
+}));
+
+export const fanSubscriptionsRelations = relations(fanSubscriptions, ({ one }) => ({
+  fan: one(users, { fields: [fanSubscriptions.fanId], references: [users.id], relationName: "fanSubscriptions" }),
+  creator: one(users, { fields: [fanSubscriptions.creatorId], references: [users.id], relationName: "creatorSubscriptions" }),
+  tier: one(creatorTiers, { fields: [fanSubscriptions.tierId], references: [creatorTiers.id] }),
+}));
+
+export const giftTypesRelations = relations(giftTypes, ({ many }) => ({
+  gifts: many(gifts),
+}));
+
+export const giftsRelations = relations(gifts, ({ one }) => ({
+  sender: one(users, { fields: [gifts.senderId], references: [users.id], relationName: "giftsSent" }),
+  receiver: one(users, { fields: [gifts.receiverId], references: [users.id], relationName: "giftsReceived" }),
+  giftType: one(giftTypes, { fields: [gifts.giftTypeId], references: [giftTypes.id] }),
+  post: one(posts, { fields: [gifts.postId], references: [posts.id] }),
+}));
+
+export const fanBadgesRelations = relations(fanBadges, ({ one }) => ({
+  fan: one(users, { fields: [fanBadges.fanId], references: [users.id] }),
+  creator: one(users, { fields: [fanBadges.creatorId], references: [users.id] }),
+}));
+
+export const shoutoutRequestsRelations = relations(shoutoutRequests, ({ one }) => ({
+  fan: one(users, { fields: [shoutoutRequests.fanId], references: [users.id] }),
+  creator: one(users, { fields: [shoutoutRequests.creatorId], references: [users.id] }),
+}));
+
+export const affiliateProductsRelations = relations(affiliateProducts, ({ one }) => ({
+  creator: one(users, { fields: [affiliateProducts.creatorId], references: [users.id] }),
+}));
+
+export const gatedContentRelations = relations(gatedContent, ({ one }) => ({
+  creator: one(users, { fields: [gatedContent.creatorId], references: [users.id] }),
+  post: one(posts, { fields: [gatedContent.postId], references: [posts.id] }),
+  minTier: one(creatorTiers, { fields: [gatedContent.minTierId], references: [creatorTiers.id] }),
+}));
+
+export const superCommentsRelations = relations(superComments, ({ one }) => ({
+  comment: one(comments, { fields: [superComments.commentId], references: [comments.id] }),
+}));
+
+export const creatorStatsRelations = relations(creatorStats, ({ one }) => ({
+  creator: one(users, { fields: [creatorStats.creatorId], references: [users.id] }),
+}));
+
+// ==================== PRO SPORTS RELATIONS ====================
+
+export const proTeamsRelations = relations(proTeams, ({ one, many }) => ({
+  sport: one(sports, { fields: [proTeams.sportId], references: [sports.id] }),
+  athletes: many(proAthletes),
+  homeMatches: many(proMatches, { relationName: "homeTeam" }),
+  awayMatches: many(proMatches, { relationName: "awayTeam" }),
+}));
+
+export const proAthletesRelations = relations(proAthletes, ({ one }) => ({
+  team: one(proTeams, { fields: [proAthletes.teamId], references: [proTeams.id] }),
+}));
+
+export const proCompetitionsRelations = relations(proCompetitions, ({ one, many }) => ({
+  sport: one(sports, { fields: [proCompetitions.sportId], references: [sports.id] }),
+  matches: many(proMatches),
+}));
+
+export const proMatchesRelations = relations(proMatches, ({ one, many }) => ({
+  competition: one(proCompetitions, { fields: [proMatches.competitionId], references: [proCompetitions.id] }),
+  homeTeam: one(proTeams, { fields: [proMatches.homeTeamId], references: [proTeams.id], relationName: "homeTeam" }),
+  awayTeam: one(proTeams, { fields: [proMatches.awayTeamId], references: [proTeams.id], relationName: "awayTeam" }),
+  odds: many(proMatchOdds),
+  bets: many(proBets),
+  parlayLegs: many(parlayLegs),
+}));
+
+export const proMatchOddsRelations = relations(proMatchOdds, ({ one }) => ({
+  match: one(proMatches, { fields: [proMatchOdds.matchId], references: [proMatches.id] }),
+}));
+
+export const proBetsRelations = relations(proBets, ({ one }) => ({
+  user: one(users, { fields: [proBets.userId], references: [users.id] }),
+  match: one(proMatches, { fields: [proBets.matchId], references: [proMatches.id] }),
+}));
+
+export const parlaysRelations = relations(parlays, ({ one, many }) => ({
+  user: one(users, { fields: [parlays.userId], references: [users.id] }),
+  legs: many(parlayLegs),
+}));
+
+export const parlayLegsRelations = relations(parlayLegs, ({ one }) => ({
+  parlay: one(parlays, { fields: [parlayLegs.parlayId], references: [parlays.id] }),
+  match: one(proMatches, { fields: [parlayLegs.matchId], references: [proMatches.id] }),
+}));
+
+export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
+  user: one(users, { fields: [userFavorites.userId], references: [users.id] }),
 }));

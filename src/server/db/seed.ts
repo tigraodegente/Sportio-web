@@ -1,6 +1,8 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
+import { seedGiftTypes } from "./seed-gift-types";
+import { seedProTeams } from "./seed-pro-teams";
 
 // Achievement definitions for all 10 personas
 const ACHIEVEMENT_DEFINITIONS = [
@@ -214,10 +216,18 @@ async function seed() {
   }
   console.log(`  [OK] ${MISSION_DEFINITIONS.length} missions inserted\n`);
 
+  // Seed Gift Types (7 virtual gifts)
+  await seedGiftTypes(db);
+
+  // Seed Pro Teams (Brasileirao Serie A)
+  await seedProTeams(db);
+
   console.log("[OK] Seed completed successfully!");
   console.log("  - 43 sports");
   console.log(`  - ${ACHIEVEMENT_DEFINITIONS.length} achievements (all personas)`);
   console.log(`  - ${MISSION_DEFINITIONS.length} missions (daily + weekly)`);
+  console.log("  - 7 gift types");
+  console.log("  - 20 Brasileirao Serie A teams");
 }
 
 seed()

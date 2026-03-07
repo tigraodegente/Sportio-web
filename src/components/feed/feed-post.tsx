@@ -15,10 +15,13 @@ import {
   Send,
   X,
   Check,
+  Gift,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { GiftBadge } from "@/components/gifts/GiftBadge";
+import { useGift } from "@/contexts/GiftContext";
 import { trpc } from "@/lib/trpc";
 import { formatDistanceToNow } from "@/lib/utils";
 
@@ -57,6 +60,12 @@ interface FeedPostProps {
     sport: FeedPostSport | null;
     comments: FeedPostComment[];
     isLiked: boolean;
+    /** Total GCoins received on this post (gifts) */
+    giftsGCoins?: number;
+    /** Number of individual gifts on this post */
+    giftsCount?: number;
+    /** Number of unique fans who gifted this post */
+    giftsFanCount?: number;
   };
   currentUserId?: string;
   onPostDeleted?: () => void;
@@ -97,6 +106,7 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
   const shareMenuRef = useRef<HTMLDivElement>(null);
   const postMenuRef = useRef<HTMLDivElement>(null);
 
+  const { openGiftPicker } = useGift();
   const utils = trpc.useUtils();
 
   const isOwner = currentUserId === post.userId;
@@ -386,6 +396,34 @@ export function FeedPost({ post, currentUserId, onPostDeleted }: FeedPostProps) 
             {localCommentsCount}
           </span>
         </button>
+
+        {/* Gift button */}
+        <button
+          onClick={() =>
+            currentUserId &&
+            openGiftPicker({
+              userId: post.userId,
+              userName: post.user.name,
+              postId: post.id,
+            })
+          }
+          disabled={!currentUserId}
+          className={`flex items-center gap-1.5 text-sm text-slate-500 hover:text-amber-600 px-3 py-1.5 rounded-xl hover:bg-amber-50/50 transition-all duration-200 ${
+            !currentUserId ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <Gift className="w-4 h-4" />
+          <span className="font-medium hidden sm:inline">Gift</span>
+        </button>
+
+        {/* Gift badge (if post has received gifts) */}
+        {post.giftsGCoins && post.giftsGCoins > 0 && (
+          <GiftBadge
+            totalGCoins={post.giftsGCoins}
+            giftCount={post.giftsCount ?? 0}
+            fanCount={post.giftsFanCount ?? 0}
+          />
+        )}
 
         {/* Share button */}
         <div className="relative ml-auto" ref={shareMenuRef}>
