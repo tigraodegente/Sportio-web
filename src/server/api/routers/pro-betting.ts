@@ -38,11 +38,10 @@ export const proBettingRouter = createTRPCRouter({
           return mockOdds.map((o) => ({
             id: crypto.randomUUID(),
             matchId: input.matchId,
-            marketType: o.marketType,
+            marketType: o.marketType as "1x2" | "over_under" | "btts" | "handicap" | "correct_score" | "goalscorer",
             selection: o.selection,
-            odds: o.odds.toString(),
+            oddsDecimal: o.odds.toString(),
             isActive: true,
-            createdAt: new Date(),
             updatedAt: new Date(),
           }));
         }
@@ -56,7 +55,7 @@ export const proBettingRouter = createTRPCRouter({
     .input(
       z.object({
         matchId: z.string().uuid(),
-        marketType: z.string().min(1),
+        marketType: z.enum(["1x2", "over_under", "btts", "handicap", "correct_score", "goalscorer"]),
         selection: z.string().min(1),
         gcoinAmount: z.number().positive().max(50000),
       })
@@ -99,7 +98,7 @@ export const proBettingRouter = createTRPCRouter({
       // Use DB odds or fall back to mock
       let oddsValue: number;
       if (oddsRecord) {
-        oddsValue = Number(oddsRecord.odds);
+        oddsValue = Number(oddsRecord.oddsDecimal);
       } else if (match.externalId) {
         const mockOdds = await sportsData.getMatchOdds(match.externalId);
         const found = mockOdds.find(
@@ -113,7 +112,7 @@ export const proBettingRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Odds nao disponiveis para esta partida" });
       }
 
-      const potentialWin = input.gcoinAmount * oddsValue;
+      const potentialWin = Math.round(input.gcoinAmount * oddsValue);
 
       // Deduct GCoins
       await ctx.db
@@ -131,9 +130,9 @@ export const proBettingRouter = createTRPCRouter({
           matchId: input.matchId,
           marketType: input.marketType,
           selection: input.selection,
-          odds: oddsValue.toString(),
-          amount: input.gcoinAmount.toString(),
-          potentialWin: potentialWin.toString(),
+          oddsAtPlacement: oddsValue.toFixed(2),
+          gcoinAmount: input.gcoinAmount,
+          potentialWinnings: potentialWin,
         })
         .returning();
 
@@ -143,7 +142,7 @@ export const proBettingRouter = createTRPCRouter({
         type: "gamification",
         category: "bet_place",
         amount: (-input.gcoinAmount).toString(),
-        description: `Aposta profissional colocada`,
+        description: "Aposta profissional colocada",
         referenceId: bet!.id,
         referenceType: "pro_bet",
       });
@@ -161,7 +160,7 @@ export const proBettingRouter = createTRPCRouter({
           .array(
             z.object({
               matchId: z.string().uuid(),
-              marketType: z.string().min(1),
+              marketType: z.enum(["1x2", "over_under", "btts", "handicap", "correct_score", "goalscorer"]),
               selection: z.string().min(1),
             })
           )
@@ -210,7 +209,7 @@ export const proBettingRouter = createTRPCRouter({
 
         let oddsValue: number;
         if (oddsRecord) {
-          oddsValue = Number(oddsRecord.odds);
+          oddsValue = Number(oddsRecord.oddsDecimal);
         } else if (match.externalId) {
           const mockOdds = await sportsData.getMatchOdds(match.externalId);
           const found = mockOdds.find(
@@ -239,7 +238,7 @@ export const proBettingRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "Saldo insuficiente de GCoins" });
       }
 
-      const potentialWin = input.gcoinAmount * combinedOdds;
+      const potentialWin = Math.round(input.gcoinAmount * combinedOdds);
 
       // Deduct GCoins
       await ctx.db
@@ -254,9 +253,9 @@ export const proBettingRouter = createTRPCRouter({
         .insert(parlays)
         .values({
           userId: ctx.session.user.id,
-          amount: input.gcoinAmount.toString(),
-          combinedOdds: combinedOdds.toFixed(2),
-          potentialWin: potentialWin.toFixed(2),
+          gcoinAmount: input.gcoinAmount,
+          totalOdds: combinedOdds.toFixed(2),
+          potentialWinnings: potentialWin,
         })
         .returning();
 
@@ -318,7 +317,7 @@ export const proBettingRouter = createTRPCRouter({
         }
 
         // Cash out value: 70% of potential win (simplified)
-        const cashOutValue = Number(bet.potentialWin) * 0.7;
+        const cashOutValue = Math.round(Number(bet.potentialWinnings) * 0.7);
 
         // Credit user
         await ctx.db
@@ -333,7 +332,6 @@ export const proBettingRouter = createTRPCRouter({
           .update(proBets)
           .set({
             status: "cashed_out",
-            cashOutAmount: cashOutValue.toFixed(2),
             settledAt: new Date(),
           })
           .where(eq(proBets.id, input.betId))
@@ -344,8 +342,8 @@ export const proBettingRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           type: "gamification",
           category: "bet_cashout",
-          amount: cashOutValue.toFixed(2),
-          description: `Cash out de aposta profissional`,
+          amount: cashOutValue.toString(),
+          description: "Cash out de aposta profissional",
           referenceId: input.betId,
           referenceType: "pro_bet",
         });
@@ -370,7 +368,7 @@ export const proBettingRouter = createTRPCRouter({
         }
 
         // Cash out value: 60% of potential win for parlays
-        const cashOutValue = Number(parlay.potentialWin) * 0.6;
+        const cashOutValue = Math.round(Number(parlay.potentialWinnings) * 0.6);
 
         // Credit user
         await ctx.db
@@ -385,7 +383,6 @@ export const proBettingRouter = createTRPCRouter({
           .update(parlays)
           .set({
             status: "cashed_out",
-            cashOutAmount: cashOutValue.toFixed(2),
             settledAt: new Date(),
           })
           .where(eq(parlays.id, input.betId))
@@ -396,8 +393,8 @@ export const proBettingRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           type: "gamification",
           category: "bet_cashout",
-          amount: cashOutValue.toFixed(2),
-          description: `Cash out de parlay`,
+          amount: cashOutValue.toString(),
+          description: "Cash out de parlay",
           referenceId: input.betId,
           referenceType: "parlay",
         });
@@ -492,13 +489,13 @@ export const proBettingRouter = createTRPCRouter({
           userId: proBets.userId,
           totalBets: sql<number>`count(*)::int`,
           totalWins: sql<number>`count(*) filter (where ${proBets.status} = 'won')::int`,
-          totalProfit: sql<number>`coalesce(sum(case when ${proBets.status} = 'won' then cast(${proBets.potentialWin} as numeric) else -cast(${proBets.amount} as numeric) end), 0)`,
+          totalProfit: sql<number>`coalesce(sum(case when ${proBets.status} = 'won' then ${proBets.potentialWinnings} else -${proBets.gcoinAmount} end), 0)`,
         })
         .from(proBets)
         .where(where)
         .groupBy(proBets.userId)
         .orderBy(
-          sql`coalesce(sum(case when ${proBets.status} = 'won' then cast(${proBets.potentialWin} as numeric) else -cast(${proBets.amount} as numeric) end), 0) desc`
+          sql`coalesce(sum(case when ${proBets.status} = 'won' then ${proBets.potentialWinnings} else -${proBets.gcoinAmount} end), 0) desc`
         )
         .limit(50);
 

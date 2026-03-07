@@ -78,21 +78,21 @@ export const favoritesRouter = createTRPCRouter({
           if (fav.entityType === "team") {
             const team = await ctx.db.query.proTeams.findFirst({
               where: eq(proTeams.id, fav.entityId),
-              columns: { id: true, name: true, shortName: true, logo: true, city: true },
+              columns: { id: true, name: true, shortName: true, logoUrl: true },
             });
-            entity = team ? { name: team.name, logo: team.logo } : null;
+            entity = team ? { name: team.name, logo: team.logoUrl } : null;
           } else if (fav.entityType === "athlete") {
             const athlete = await ctx.db.query.proAthletes.findFirst({
               where: eq(proAthletes.id, fav.entityId),
-              columns: { id: true, name: true, photo: true, position: true },
+              columns: { id: true, name: true, photoUrl: true, position: true },
             });
-            entity = athlete ? { name: athlete.name, photo: athlete.photo } : null;
+            entity = athlete ? { name: athlete.name, photo: athlete.photoUrl } : null;
           } else if (fav.entityType === "competition") {
             const comp = await ctx.db.query.proCompetitions.findFirst({
               where: eq(proCompetitions.id, fav.entityId),
-              columns: { id: true, name: true, logo: true, season: true },
+              columns: { id: true, name: true, logoUrl: true, season: true },
             });
-            entity = comp ? { name: comp.name, logo: comp.logo } : null;
+            entity = comp ? { name: comp.name, logo: comp.logoUrl } : null;
           }
 
           return { ...fav, entity };

@@ -226,7 +226,7 @@ export const proSportsRouter = createTRPCRouter({
           awayTeam: true,
           competition: true,
         },
-        orderBy: [desc(proMatches.completedAt)],
+        orderBy: [desc(proMatches.kickoffAt)],
         limit: 5,
       });
 
@@ -285,12 +285,11 @@ export const proSportsRouter = createTRPCRouter({
             externalId: t.externalId,
             name: t.name,
             shortName: t.shortName,
-            logo: t.logo,
+            logoUrl: t.logo,
             country: t.country,
-            city: t.city,
-            founded: t.founded,
-            venue: t.venue,
-            sportId: null,
+            league: null,
+            metadata: null,
+            sportId: "",
             createdAt: new Date(),
             updatedAt: new Date(),
           }));

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/server/db";
 import {
   proTeams,
@@ -5,6 +6,7 @@ import {
   proCompetitions,
   proMatches,
   proMatchOdds,
+  sports,
 } from "@/server/db/schema";
 import {
   BRASILEIRAO_TEAMS,
@@ -22,6 +24,16 @@ import {
 export async function seedProSports() {
   console.log("Seeding pro sports data...");
 
+  // Get futebol sport ID
+  const futebolSport = await db.query.sports.findFirst({
+    where: eq(sports.slug, "futebol"),
+  });
+  if (!futebolSport) {
+    console.log("Sport 'futebol' not found. Run main seed first.");
+    return;
+  }
+  const sportId = futebolSport.id;
+
   // 1. Seed competition
   const brasileiraoData = MOCK_COMPETITIONS[0]!;
   const [competition] = await db
@@ -29,13 +41,11 @@ export async function seedProSports() {
     .values({
       externalId: brasileiraoData.externalId,
       name: brasileiraoData.name,
-      shortName: brasileiraoData.shortName,
-      logo: brasileiraoData.logo,
+      logoUrl: brasileiraoData.logo,
       country: brasileiraoData.country,
       season: brasileiraoData.season,
+      sportId,
       isActive: true,
-      startDate: new Date("2026-04-01"),
-      endDate: new Date("2026-12-01"),
     })
     .onConflictDoNothing()
     .returning();
@@ -56,11 +66,9 @@ export async function seedProSports() {
         externalId: teamData.externalId,
         name: teamData.name,
         shortName: teamData.shortName,
-        logo: teamData.logo,
+        logoUrl: teamData.logo,
         country: teamData.country,
-        city: teamData.city,
-        founded: teamData.founded,
-        venue: teamData.venue,
+        sportId,
       })
       .onConflictDoNothing()
       .returning();
@@ -77,11 +85,11 @@ export async function seedProSports() {
 
   if (flamengoId) {
     const flamengoPlayers = [
-      { name: "Gabriel Barbosa", position: "Atacante", number: 10, nationality: "Brasil" },
-      { name: "De Arrascaeta", position: "Meia", number: 14, nationality: "Uruguai" },
-      { name: "Everton Ribeiro", position: "Meia", number: 7, nationality: "Brasil" },
-      { name: "David Luiz", position: "Zagueiro", number: 23, nationality: "Brasil" },
-      { name: "Agustin Rossi", position: "Goleiro", number: 1, nationality: "Argentina" },
+      { name: "Gabriel Barbosa", position: "Atacante", nationality: "Brasil" },
+      { name: "De Arrascaeta", position: "Meia", nationality: "Uruguai" },
+      { name: "Everton Ribeiro", position: "Meia", nationality: "Brasil" },
+      { name: "David Luiz", position: "Zagueiro", nationality: "Brasil" },
+      { name: "Agustin Rossi", position: "Goleiro", nationality: "Argentina" },
     ];
 
     for (const p of flamengoPlayers) {
@@ -90,9 +98,9 @@ export async function seedProSports() {
         .values({
           name: p.name,
           position: p.position,
-          number: p.number,
           nationality: p.nationality,
           teamId: flamengoId,
+          sportId,
           stats: { goals: Math.floor(Math.random() * 15), assists: Math.floor(Math.random() * 10), appearances: Math.floor(Math.random() * 30) + 5 },
         })
         .onConflictDoNothing();
@@ -101,11 +109,11 @@ export async function seedProSports() {
 
   if (palmeirasId) {
     const palmeirasPlayers = [
-      { name: "Endrick", position: "Atacante", number: 9, nationality: "Brasil" },
-      { name: "Raphael Veiga", position: "Meia", number: 23, nationality: "Brasil" },
-      { name: "Gustavo Gomez", position: "Zagueiro", number: 15, nationality: "Paraguai" },
-      { name: "Weverton", position: "Goleiro", number: 21, nationality: "Brasil" },
-      { name: "Dudu", position: "Atacante", number: 7, nationality: "Brasil" },
+      { name: "Endrick", position: "Atacante", nationality: "Brasil" },
+      { name: "Raphael Veiga", position: "Meia", nationality: "Brasil" },
+      { name: "Gustavo Gomez", position: "Zagueiro", nationality: "Paraguai" },
+      { name: "Weverton", position: "Goleiro", nationality: "Brasil" },
+      { name: "Dudu", position: "Atacante", nationality: "Brasil" },
     ];
 
     for (const p of palmeirasPlayers) {
@@ -114,9 +122,9 @@ export async function seedProSports() {
         .values({
           name: p.name,
           position: p.position,
-          number: p.number,
           nationality: p.nationality,
           teamId: palmeirasId,
+          sportId,
           stats: { goals: Math.floor(Math.random() * 15), assists: Math.floor(Math.random() * 10), appearances: Math.floor(Math.random() * 30) + 5 },
         })
         .onConflictDoNothing();
@@ -139,7 +147,6 @@ export async function seedProSports() {
       status: "live" as const,
       homeScore: 2,
       awayScore: 1,
-      round: "Rodada 5",
       kickoffAt: new Date(now.getTime() - 60 * 60 * 1000),
       venue: "Maracana",
       events: [
@@ -163,7 +170,6 @@ export async function seedProSports() {
       status: "live" as const,
       homeScore: 0,
       awayScore: 0,
-      round: "Rodada 5",
       kickoffAt: new Date(now.getTime() - 30 * 60 * 1000),
       venue: "Neo Quimica Arena",
       events: [
@@ -194,7 +200,6 @@ export async function seedProSports() {
         status: m.status,
         homeScore: m.homeScore,
         awayScore: m.awayScore,
-        round: m.round,
         kickoffAt: m.kickoffAt,
         venue: m.venue,
         events: m.events,
@@ -228,7 +233,6 @@ export async function seedProSports() {
         homeTeamId: homeId,
         awayTeamId: awayId,
         status: "scheduled",
-        round: "Rodada 6",
         kickoffAt: kickoff,
         venue: BRASILEIRAO_TEAMS[homeIdx]?.venue ?? "Estadio",
       })
@@ -243,7 +247,7 @@ export async function seedProSports() {
   // 5. Seed odds for each match
   for (const matchId of createdMatchIds) {
     const match = await db.query.proMatches.findFirst({
-      where: (m, { eq }) => eq(m.id, matchId),
+      where: (m, { eq: e }) => e(m.id, matchId),
     });
     if (!match?.externalId) continue;
 
@@ -253,9 +257,9 @@ export async function seedProSports() {
         .insert(proMatchOdds)
         .values({
           matchId,
-          marketType: odd.marketType,
+          marketType: odd.marketType as "1x2" | "over_under" | "btts" | "handicap" | "correct_score" | "goalscorer",
           selection: odd.selection,
-          odds: odd.odds.toString(),
+          oddsDecimal: odd.odds.toString(),
           isActive: true,
         })
         .onConflictDoNothing();

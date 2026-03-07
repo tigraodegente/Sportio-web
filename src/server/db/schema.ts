@@ -1131,9 +1131,10 @@ export const userMissions = pgTable(
 export const proMatchStatusEnum = pgEnum("pro_match_status", [
   "scheduled",
   "live",
+  "halftime",
   "completed",
-  "postponed",
   "cancelled",
+  "postponed",
 ]);
 
 export const proBetStatusEnum = pgEnum("pro_bet_status", [
@@ -1153,6 +1154,22 @@ export const parlayStatusEnum = pgEnum("parlay_status", [
   "void",
 ]);
 
+export const proMarketTypeEnum = pgEnum("pro_market_type", [
+  "1x2",
+  "over_under",
+  "btts",
+  "handicap",
+  "correct_score",
+  "goalscorer",
+]);
+
+export const parlayLegStatusEnum = pgEnum("parlay_leg_status", [
+  "pending",
+  "won",
+  "lost",
+  "void",
+]);
+
 export const favoriteEntityTypeEnum = pgEnum("favorite_entity_type", [
   "team",
   "athlete",
@@ -1163,21 +1180,22 @@ export const proTeams = pgTable(
   "pro_teams",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    externalId: varchar("external_id", { length: 100 }),
     name: varchar("name", { length: 255 }).notNull(),
     shortName: varchar("short_name", { length: 50 }),
-    logo: text("logo"),
-    country: varchar("country", { length: 100 }).default("Brasil"),
-    city: varchar("city", { length: 100 }),
-    founded: integer("founded"),
-    venue: varchar("venue", { length: 255 }),
-    sportId: uuid("sport_id").references(() => sports.id),
+    logoUrl: text("logo_url"),
+    sportId: uuid("sport_id")
+      .notNull()
+      .references(() => sports.id),
+    league: text("league"),
+    country: varchar("country", { length: 100 }),
+    externalId: text("external_id").unique(),
+    metadata: jsonb("metadata"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("pro_teams_sport_idx").on(table.sportId),
-    uniqueIndex("pro_teams_external_idx").on(table.externalId),
+    uniqueIndex("pro_teams_external_id_idx").on(table.externalId),
   ]
 );
 
@@ -1185,21 +1203,23 @@ export const proAthletes = pgTable(
   "pro_athletes",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    externalId: varchar("external_id", { length: 100 }),
     name: varchar("name", { length: 255 }).notNull(),
-    photo: text("photo"),
-    position: varchar("position", { length: 100 }),
-    number: integer("number"),
-    nationality: varchar("nationality", { length: 100 }),
-    birthDate: timestamp("birth_date"),
+    photoUrl: text("photo_url"),
     teamId: uuid("team_id").references(() => proTeams.id),
+    sportId: uuid("sport_id")
+      .notNull()
+      .references(() => sports.id),
+    position: varchar("position", { length: 100 }),
+    nationality: varchar("nationality", { length: 100 }),
+    externalId: text("external_id").unique(),
     stats: jsonb("stats"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("pro_athletes_team_idx").on(table.teamId),
-    uniqueIndex("pro_athletes_external_idx").on(table.externalId),
+    index("pro_athletes_sport_idx").on(table.sportId),
+    uniqueIndex("pro_athletes_external_id_idx").on(table.externalId),
   ]
 );
 
@@ -1207,22 +1227,20 @@ export const proCompetitions = pgTable(
   "pro_competitions",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    externalId: varchar("external_id", { length: 100 }),
     name: varchar("name", { length: 255 }).notNull(),
-    shortName: varchar("short_name", { length: 50 }),
-    logo: text("logo"),
+    sportId: uuid("sport_id")
+      .notNull()
+      .references(() => sports.id),
     country: varchar("country", { length: 100 }),
-    season: varchar("season", { length: 20 }),
-    sportId: uuid("sport_id").references(() => sports.id),
+    season: varchar("season", { length: 50 }),
+    logoUrl: text("logo_url"),
+    externalId: text("external_id").unique(),
     isActive: boolean("is_active").default(true),
-    startDate: timestamp("start_date"),
-    endDate: timestamp("end_date"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("pro_competitions_sport_idx").on(table.sportId),
-    index("pro_competitions_active_idx").on(table.isActive),
+    uniqueIndex("pro_competitions_external_id_idx").on(table.externalId),
   ]
 );
 
@@ -1230,7 +1248,6 @@ export const proMatches = pgTable(
   "pro_matches",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    externalId: varchar("external_id", { length: 100 }),
     competitionId: uuid("competition_id")
       .notNull()
       .references(() => proCompetitions.id),
@@ -1241,23 +1258,22 @@ export const proMatches = pgTable(
       .notNull()
       .references(() => proTeams.id),
     status: proMatchStatusEnum("status").default("scheduled"),
-    homeScore: integer("home_score"),
-    awayScore: integer("away_score"),
-    round: varchar("round", { length: 50 }),
+    homeScore: integer("home_score").default(0),
+    awayScore: integer("away_score").default(0),
     kickoffAt: timestamp("kickoff_at"),
-    venue: varchar("venue", { length: 255 }),
-    events: jsonb("events"),
+    venue: text("venue"),
+    externalId: text("external_id").unique(),
     stats: jsonb("stats"),
-    completedAt: timestamp("completed_at"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    events: jsonb("events"),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("pro_matches_competition_idx").on(table.competitionId),
-    index("pro_matches_status_idx").on(table.status),
-    index("pro_matches_kickoff_idx").on(table.kickoffAt),
     index("pro_matches_home_team_idx").on(table.homeTeamId),
     index("pro_matches_away_team_idx").on(table.awayTeamId),
+    index("pro_matches_status_idx").on(table.status),
+    index("pro_matches_kickoff_idx").on(table.kickoffAt),
+    uniqueIndex("pro_matches_external_id_idx").on(table.externalId),
   ]
 );
 
@@ -1268,16 +1284,15 @@ export const proMatchOdds = pgTable(
     matchId: uuid("match_id")
       .notNull()
       .references(() => proMatches.id, { onDelete: "cascade" }),
-    marketType: varchar("market_type", { length: 50 }).notNull(),
-    selection: varchar("selection", { length: 100 }).notNull(),
-    odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
+    marketType: proMarketTypeEnum("market_type").notNull(),
+    selection: text("selection").notNull(),
+    oddsDecimal: decimal("odds_decimal", { precision: 8, scale: 2 }).notNull(),
     isActive: boolean("is_active").default(true),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("pro_match_odds_match_idx").on(table.matchId),
-    index("pro_match_odds_market_idx").on(table.matchId, table.marketType),
+    index("pro_match_odds_market_idx").on(table.marketType),
   ]
 );
 
@@ -1291,14 +1306,13 @@ export const proBets = pgTable(
     matchId: uuid("match_id")
       .notNull()
       .references(() => proMatches.id),
-    marketType: varchar("market_type", { length: 50 }).notNull(),
-    selection: varchar("selection", { length: 100 }).notNull(),
-    odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    potentialWin: decimal("potential_win", { precision: 12, scale: 2 }).notNull(),
+    marketType: proMarketTypeEnum("market_type").notNull(),
+    selection: text("selection").notNull(),
+    gcoinAmount: integer("gcoin_amount").notNull(),
+    oddsAtPlacement: decimal("odds_at_placement", { precision: 8, scale: 2 }).notNull(),
+    potentialWinnings: integer("potential_winnings").notNull(),
     status: proBetStatusEnum("status").default("pending"),
     settledAt: timestamp("settled_at"),
-    cashOutAmount: decimal("cash_out_amount", { precision: 12, scale: 2 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
@@ -1315,13 +1329,12 @@ export const parlays = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    combinedOdds: decimal("combined_odds", { precision: 12, scale: 2 }).notNull(),
-    potentialWin: decimal("potential_win", { precision: 12, scale: 2 }).notNull(),
+    gcoinAmount: integer("gcoin_amount").notNull(),
+    totalOdds: decimal("total_odds", { precision: 10, scale: 2 }).notNull(),
+    potentialWinnings: integer("potential_winnings").notNull(),
     status: parlayStatusEnum("status").default("pending"),
-    settledAt: timestamp("settled_at"),
-    cashOutAmount: decimal("cash_out_amount", { precision: 12, scale: 2 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    settledAt: timestamp("settled_at"),
   },
   (table) => [
     index("parlays_user_idx").on(table.userId),
@@ -1339,11 +1352,10 @@ export const parlayLegs = pgTable(
     matchId: uuid("match_id")
       .notNull()
       .references(() => proMatches.id),
-    marketType: varchar("market_type", { length: 50 }).notNull(),
-    selection: varchar("selection", { length: 100 }).notNull(),
+    marketType: proMarketTypeEnum("market_type").notNull(),
+    selection: text("selection").notNull(),
     odds: decimal("odds", { precision: 8, scale: 2 }).notNull(),
-    status: proBetStatusEnum("status").default("pending"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    status: parlayLegStatusEnum("status").default("pending"),
   },
   (table) => [
     index("parlay_legs_parlay_idx").on(table.parlayId),
@@ -1406,6 +1418,9 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
 export const sportsRelations = relations(sports, ({ many }) => ({
   userSports: many(userSports),
   tournaments: many(tournaments),
+  proTeams: many(proTeams),
+  proAthletes: many(proAthletes),
+  proCompetitions: many(proCompetitions),
 }));
 
 export const userSportsRelations = relations(userSports, ({ one }) => ({
@@ -1892,6 +1907,7 @@ export const proTeamsRelations = relations(proTeams, ({ one, many }) => ({
 
 export const proAthletesRelations = relations(proAthletes, ({ one }) => ({
   team: one(proTeams, { fields: [proAthletes.teamId], references: [proTeams.id] }),
+  sport: one(sports, { fields: [proAthletes.sportId], references: [sports.id] }),
 }));
 
 export const proCompetitionsRelations = relations(proCompetitions, ({ one, many }) => ({
@@ -1930,3 +1946,4 @@ export const parlayLegsRelations = relations(parlayLegs, ({ one }) => ({
 export const userFavoritesRelations = relations(userFavorites, ({ one }) => ({
   user: one(users, { fields: [userFavorites.userId], references: [users.id] }),
 }));
+

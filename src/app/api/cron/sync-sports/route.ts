@@ -5,11 +5,24 @@ import {
   proMatches,
   proTeams,
   proCompetitions,
+  sports,
 } from "@/server/db/schema";
 import { ApiFootballProvider } from "@/server/services/sports-data";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Allow up to 60s for Vercel
+
+// Cache the futebol sport ID for the duration of the request
+let _futebolSportId: string | null = null;
+async function getFutebolSportId(): Promise<string> {
+  if (_futebolSportId) return _futebolSportId;
+  const futebol = await db.query.sports.findFirst({
+    where: eq(sports.slug, "futebol"),
+  });
+  if (!futebol) throw new Error("Sport 'futebol' not found. Run seed first.");
+  _futebolSportId = futebol.id;
+  return futebol.id;
+}
 
 // Cron route to sync today's matches from API-Football to the database.
 //
@@ -66,12 +79,13 @@ export async function GET(request: Request) {
         } else {
           // Fetch competition details from API if not in DB yet
           // (we only have the ID from the fixture response)
+          const sportId = await getFutebolSportId();
           const [inserted] = await db
             .insert(proCompetitions)
             .values({
               externalId: competitionExternalId,
-              name: `League ${competitionExternalId}`, // Will be enriched on next full sync
-              shortName: competitionExternalId,
+              name: `League ${competitionExternalId}`,
+              sportId,
               country: "",
               season: new Date().getFullYear().toString(),
               isActive: true,
@@ -112,15 +126,10 @@ export async function GET(request: Request) {
               status: match.status,
               homeScore: match.homeScore,
               awayScore: match.awayScore,
-              round: match.round,
               kickoffAt: match.kickoffAt,
               venue: match.venue,
               events: match.events.length > 0 ? match.events : existingMatch.events,
               stats: match.stats ?? existingMatch.stats,
-              completedAt:
-                match.status === "completed" && !existingMatch.completedAt
-                  ? new Date()
-                  : existingMatch.completedAt,
               updatedAt: new Date(),
             })
             .where(eq(proMatches.id, existingMatch.id));
@@ -134,12 +143,10 @@ export async function GET(request: Request) {
             status: match.status,
             homeScore: match.homeScore,
             awayScore: match.awayScore,
-            round: match.round,
             kickoffAt: match.kickoffAt,
             venue: match.venue,
             events: match.events,
             stats: match.stats,
-            completedAt: match.status === "completed" ? new Date() : null,
           });
         }
 
@@ -223,17 +230,14 @@ async function upsertTeam(
 
   if (existing) {
     // Update logo/name if they changed
-    if (existing.logo !== team.logo || existing.name !== team.name) {
+    if (existing.logoUrl !== team.logo || existing.name !== team.name) {
       await db
         .update(proTeams)
         .set({
           name: team.name,
           shortName: team.shortName || existing.shortName,
-          logo: team.logo || existing.logo,
+          logoUrl: team.logo || existing.logoUrl,
           country: team.country || existing.country,
-          city: team.city || existing.city,
-          founded: team.founded || existing.founded,
-          venue: team.venue || existing.venue,
           updatedAt: new Date(),
         })
         .where(eq(proTeams.id, existing.id));
@@ -241,17 +245,16 @@ async function upsertTeam(
     return { id: existing.id, isNew: false };
   }
 
+  const sportId = await getFutebolSportId();
   const [inserted] = await db
     .insert(proTeams)
     .values({
       externalId: team.externalId,
       name: team.name,
       shortName: team.shortName,
-      logo: team.logo,
+      logoUrl: team.logo,
+      sportId,
       country: team.country || "Unknown",
-      city: team.city,
-      founded: team.founded || null,
-      venue: team.venue,
     })
     .onConflictDoNothing()
     .returning({ id: proTeams.id });

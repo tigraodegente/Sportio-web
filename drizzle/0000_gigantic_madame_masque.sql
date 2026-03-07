@@ -16,11 +16,13 @@ CREATE TYPE "public"."level" AS ENUM('A', 'B', 'C');--> statement-breakpoint
 CREATE TYPE "public"."match_status" AS ENUM('scheduled', 'live', 'completed', 'cancelled');--> statement-breakpoint
 CREATE TYPE "public"."mission_frequency" AS ENUM('daily', 'weekly', 'monthly', 'one_time');--> statement-breakpoint
 CREATE TYPE "public"."notification_type" AS ENUM('tournament', 'match', 'gcoin', 'social', 'bet', 'chat', 'system', 'challenge');--> statement-breakpoint
+CREATE TYPE "public"."parlay_leg_status" AS ENUM('pending', 'won', 'lost', 'void');--> statement-breakpoint
 CREATE TYPE "public"."parlay_status" AS ENUM('pending', 'won', 'lost', 'partial', 'cashed_out', 'void');--> statement-breakpoint
 CREATE TYPE "public"."payment_method" AS ENUM('pix', 'credit_card', 'debit_card', 'boleto');--> statement-breakpoint
 CREATE TYPE "public"."payment_status" AS ENUM('pending', 'processing', 'completed', 'failed', 'refunded', 'expired');--> statement-breakpoint
 CREATE TYPE "public"."pro_bet_status" AS ENUM('pending', 'won', 'lost', 'cashed_out', 'void');--> statement-breakpoint
-CREATE TYPE "public"."pro_match_status" AS ENUM('scheduled', 'live', 'completed', 'postponed', 'cancelled');--> statement-breakpoint
+CREATE TYPE "public"."pro_market_type" AS ENUM('1x2', 'over_under', 'btts', 'handicap', 'correct_score', 'goalscorer');--> statement-breakpoint
+CREATE TYPE "public"."pro_match_status" AS ENUM('scheduled', 'live', 'halftime', 'completed', 'cancelled', 'postponed');--> statement-breakpoint
 CREATE TYPE "public"."shoutout_status" AS ENUM('pending', 'accepted', 'completed', 'cancelled', 'expired');--> statement-breakpoint
 CREATE TYPE "public"."sponsor_tier" AS ENUM('main', 'gold', 'silver', 'bronze');--> statement-breakpoint
 CREATE TYPE "public"."sponsorship_status" AS ENUM('pending', 'active', 'paused', 'completed', 'rejected');--> statement-breakpoint
@@ -405,23 +407,21 @@ CREATE TABLE "parlay_legs" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"parlay_id" uuid NOT NULL,
 	"match_id" uuid NOT NULL,
-	"market_type" varchar(50) NOT NULL,
-	"selection" varchar(100) NOT NULL,
+	"market_type" "pro_market_type" NOT NULL,
+	"selection" text NOT NULL,
 	"odds" numeric(8, 2) NOT NULL,
-	"status" "pro_bet_status" DEFAULT 'pending',
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"status" "parlay_leg_status" DEFAULT 'pending'
 );
 --> statement-breakpoint
 CREATE TABLE "parlays" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
-	"amount" numeric(12, 2) NOT NULL,
-	"combined_odds" numeric(12, 2) NOT NULL,
-	"potential_win" numeric(12, 2) NOT NULL,
+	"gcoin_amount" integer NOT NULL,
+	"total_odds" numeric(10, 2) NOT NULL,
+	"potential_winnings" integer NOT NULL,
 	"status" "parlay_status" DEFAULT 'pending',
-	"settled_at" timestamp,
-	"cash_out_amount" numeric(12, 2),
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"settled_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "payment_orders" (
@@ -455,93 +455,86 @@ CREATE TABLE "posts" (
 --> statement-breakpoint
 CREATE TABLE "pro_athletes" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"external_id" varchar(100),
 	"name" varchar(255) NOT NULL,
-	"photo" text,
-	"position" varchar(100),
-	"number" integer,
-	"nationality" varchar(100),
-	"birth_date" timestamp,
+	"photo_url" text,
 	"team_id" uuid,
+	"sport_id" uuid NOT NULL,
+	"position" varchar(100),
+	"nationality" varchar(100),
+	"external_id" text,
 	"stats" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "pro_athletes_external_id_unique" UNIQUE("external_id")
 );
 --> statement-breakpoint
 CREATE TABLE "pro_bets" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"match_id" uuid NOT NULL,
-	"market_type" varchar(50) NOT NULL,
-	"selection" varchar(100) NOT NULL,
-	"odds" numeric(8, 2) NOT NULL,
-	"amount" numeric(12, 2) NOT NULL,
-	"potential_win" numeric(12, 2) NOT NULL,
+	"market_type" "pro_market_type" NOT NULL,
+	"selection" text NOT NULL,
+	"gcoin_amount" integer NOT NULL,
+	"odds_at_placement" numeric(8, 2) NOT NULL,
+	"potential_winnings" integer NOT NULL,
 	"status" "pro_bet_status" DEFAULT 'pending',
 	"settled_at" timestamp,
-	"cash_out_amount" numeric(12, 2),
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "pro_competitions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"external_id" varchar(100),
 	"name" varchar(255) NOT NULL,
-	"short_name" varchar(50),
-	"logo" text,
+	"sport_id" uuid NOT NULL,
 	"country" varchar(100),
-	"season" varchar(20),
-	"sport_id" uuid,
+	"season" varchar(50),
+	"logo_url" text,
+	"external_id" text,
 	"is_active" boolean DEFAULT true,
-	"start_date" timestamp,
-	"end_date" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	CONSTRAINT "pro_competitions_external_id_unique" UNIQUE("external_id")
 );
 --> statement-breakpoint
 CREATE TABLE "pro_match_odds" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"match_id" uuid NOT NULL,
-	"market_type" varchar(50) NOT NULL,
-	"selection" varchar(100) NOT NULL,
-	"odds" numeric(8, 2) NOT NULL,
+	"market_type" "pro_market_type" NOT NULL,
+	"selection" text NOT NULL,
+	"odds_decimal" numeric(8, 2) NOT NULL,
 	"is_active" boolean DEFAULT true,
-	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "pro_matches" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"external_id" varchar(100),
 	"competition_id" uuid NOT NULL,
 	"home_team_id" uuid NOT NULL,
 	"away_team_id" uuid NOT NULL,
 	"status" "pro_match_status" DEFAULT 'scheduled',
-	"home_score" integer,
-	"away_score" integer,
-	"round" varchar(50),
+	"home_score" integer DEFAULT 0,
+	"away_score" integer DEFAULT 0,
 	"kickoff_at" timestamp,
-	"venue" varchar(255),
-	"events" jsonb,
+	"venue" text,
+	"external_id" text,
 	"stats" jsonb,
-	"completed_at" timestamp,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"events" jsonb,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "pro_matches_external_id_unique" UNIQUE("external_id")
 );
 --> statement-breakpoint
 CREATE TABLE "pro_teams" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"external_id" varchar(100),
 	"name" varchar(255) NOT NULL,
 	"short_name" varchar(50),
-	"logo" text,
-	"country" varchar(100) DEFAULT 'Brasil',
-	"city" varchar(100),
-	"founded" integer,
-	"venue" varchar(255),
-	"sport_id" uuid,
+	"logo_url" text,
+	"sport_id" uuid NOT NULL,
+	"league" text,
+	"country" varchar(100),
+	"external_id" text,
+	"metadata" jsonb,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "pro_teams_external_id_unique" UNIQUE("external_id")
 );
 --> statement-breakpoint
 CREATE TABLE "sessions" (
@@ -864,6 +857,7 @@ ALTER TABLE "posts" ADD CONSTRAINT "posts_user_id_users_id_fk" FOREIGN KEY ("use
 ALTER TABLE "posts" ADD CONSTRAINT "posts_sport_id_sports_id_fk" FOREIGN KEY ("sport_id") REFERENCES "public"."sports"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "posts" ADD CONSTRAINT "posts_tournament_id_tournaments_id_fk" FOREIGN KEY ("tournament_id") REFERENCES "public"."tournaments"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "pro_athletes" ADD CONSTRAINT "pro_athletes_team_id_pro_teams_id_fk" FOREIGN KEY ("team_id") REFERENCES "public"."pro_teams"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pro_athletes" ADD CONSTRAINT "pro_athletes_sport_id_sports_id_fk" FOREIGN KEY ("sport_id") REFERENCES "public"."sports"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "pro_bets" ADD CONSTRAINT "pro_bets_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "pro_bets" ADD CONSTRAINT "pro_bets_match_id_pro_matches_id_fk" FOREIGN KEY ("match_id") REFERENCES "public"."pro_matches"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "pro_competitions" ADD CONSTRAINT "pro_competitions_sport_id_sports_id_fk" FOREIGN KEY ("sport_id") REFERENCES "public"."sports"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -974,21 +968,23 @@ CREATE INDEX "payment_orders_created_idx" ON "payment_orders" USING btree ("crea
 CREATE INDEX "posts_user_idx" ON "posts" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "posts_created_idx" ON "posts" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "pro_athletes_team_idx" ON "pro_athletes" USING btree ("team_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "pro_athletes_external_idx" ON "pro_athletes" USING btree ("external_id");--> statement-breakpoint
+CREATE INDEX "pro_athletes_sport_idx" ON "pro_athletes" USING btree ("sport_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "pro_athletes_external_id_idx" ON "pro_athletes" USING btree ("external_id");--> statement-breakpoint
 CREATE INDEX "pro_bets_user_idx" ON "pro_bets" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "pro_bets_match_idx" ON "pro_bets" USING btree ("match_id");--> statement-breakpoint
 CREATE INDEX "pro_bets_status_idx" ON "pro_bets" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "pro_competitions_sport_idx" ON "pro_competitions" USING btree ("sport_id");--> statement-breakpoint
-CREATE INDEX "pro_competitions_active_idx" ON "pro_competitions" USING btree ("is_active");--> statement-breakpoint
+CREATE UNIQUE INDEX "pro_competitions_external_id_idx" ON "pro_competitions" USING btree ("external_id");--> statement-breakpoint
 CREATE INDEX "pro_match_odds_match_idx" ON "pro_match_odds" USING btree ("match_id");--> statement-breakpoint
-CREATE INDEX "pro_match_odds_market_idx" ON "pro_match_odds" USING btree ("match_id","market_type");--> statement-breakpoint
+CREATE INDEX "pro_match_odds_market_idx" ON "pro_match_odds" USING btree ("market_type");--> statement-breakpoint
 CREATE INDEX "pro_matches_competition_idx" ON "pro_matches" USING btree ("competition_id");--> statement-breakpoint
-CREATE INDEX "pro_matches_status_idx" ON "pro_matches" USING btree ("status");--> statement-breakpoint
-CREATE INDEX "pro_matches_kickoff_idx" ON "pro_matches" USING btree ("kickoff_at");--> statement-breakpoint
 CREATE INDEX "pro_matches_home_team_idx" ON "pro_matches" USING btree ("home_team_id");--> statement-breakpoint
 CREATE INDEX "pro_matches_away_team_idx" ON "pro_matches" USING btree ("away_team_id");--> statement-breakpoint
+CREATE INDEX "pro_matches_status_idx" ON "pro_matches" USING btree ("status");--> statement-breakpoint
+CREATE INDEX "pro_matches_kickoff_idx" ON "pro_matches" USING btree ("kickoff_at");--> statement-breakpoint
+CREATE UNIQUE INDEX "pro_matches_external_id_idx" ON "pro_matches" USING btree ("external_id");--> statement-breakpoint
 CREATE INDEX "pro_teams_sport_idx" ON "pro_teams" USING btree ("sport_id");--> statement-breakpoint
-CREATE UNIQUE INDEX "pro_teams_external_idx" ON "pro_teams" USING btree ("external_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "pro_teams_external_id_idx" ON "pro_teams" USING btree ("external_id");--> statement-breakpoint
 CREATE INDEX "sessions_user_idx" ON "sessions" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "shoutout_requests_fan_idx" ON "shoutout_requests" USING btree ("fan_id");--> statement-breakpoint
 CREATE INDEX "shoutout_requests_creator_idx" ON "shoutout_requests" USING btree ("creator_id");--> statement-breakpoint

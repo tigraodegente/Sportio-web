@@ -1,5 +1,5 @@
 {
-  "id": "319817af-8dc7-431b-a2eb-54cecd73f3a9",
+  "id": "4c12c675-e661-4c8c-afb7-14bf261b5b4a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -4023,13 +4023,14 @@
         },
         "market_type": {
           "name": "market_type",
-          "type": "varchar(50)",
+          "type": "pro_market_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "selection": {
           "name": "selection",
-          "type": "varchar(100)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -4041,18 +4042,11 @@
         },
         "status": {
           "name": "status",
-          "type": "pro_bet_status",
+          "type": "parlay_leg_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'pending'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         }
       },
       "indexes": {
@@ -4138,21 +4132,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "amount": {
-          "name": "amount",
-          "type": "numeric(12, 2)",
+        "gcoin_amount": {
+          "name": "gcoin_amount",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "combined_odds": {
-          "name": "combined_odds",
-          "type": "numeric(12, 2)",
+        "total_odds": {
+          "name": "total_odds",
+          "type": "numeric(10, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "potential_win": {
-          "name": "potential_win",
-          "type": "numeric(12, 2)",
+        "potential_winnings": {
+          "name": "potential_winnings",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -4164,24 +4158,18 @@
           "notNull": false,
           "default": "'pending'"
         },
-        "settled_at": {
-          "name": "settled_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "cash_out_amount": {
-          "name": "cash_out_amount",
-          "type": "numeric(12, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "settled_at": {
+          "name": "settled_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -4555,33 +4543,33 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "external_id": {
-          "name": "external_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "photo": {
-          "name": "photo",
+        "photo_url": {
+          "name": "photo_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "position": {
-          "name": "position",
-          "type": "varchar(100)",
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "number": {
-          "name": "number",
-          "type": "integer",
+        "sport_id": {
+          "name": "sport_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
@@ -4591,15 +4579,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "birth_date": {
-          "name": "birth_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "team_id": {
-          "name": "team_id",
-          "type": "uuid",
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -4640,8 +4622,23 @@
           "method": "btree",
           "with": {}
         },
-        "pro_athletes_external_idx": {
-          "name": "pro_athletes_external_idx",
+        "pro_athletes_sport_idx": {
+          "name": "pro_athletes_sport_idx",
+          "columns": [
+            {
+              "expression": "sport_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pro_athletes_external_id_idx": {
+          "name": "pro_athletes_external_id_idx",
           "columns": [
             {
               "expression": "external_id",
@@ -4669,10 +4666,31 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "pro_athletes_sport_id_sports_id_fk": {
+          "name": "pro_athletes_sport_id_sports_id_fk",
+          "tableFrom": "pro_athletes",
+          "tableTo": "sports",
+          "columnsFrom": [
+            "sport_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "pro_athletes_external_id_unique": {
+          "name": "pro_athletes_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -4702,31 +4720,32 @@
         },
         "market_type": {
           "name": "market_type",
-          "type": "varchar(50)",
+          "type": "pro_market_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "selection": {
           "name": "selection",
-          "type": "varchar(100)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "odds": {
-          "name": "odds",
+        "gcoin_amount": {
+          "name": "gcoin_amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "odds_at_placement": {
+          "name": "odds_at_placement",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true
         },
-        "amount": {
-          "name": "amount",
-          "type": "numeric(12, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "potential_win": {
-          "name": "potential_win",
-          "type": "numeric(12, 2)",
+        "potential_winnings": {
+          "name": "potential_winnings",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -4741,12 +4760,6 @@
         "settled_at": {
           "name": "settled_at",
           "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "cash_out_amount": {
-          "name": "cash_out_amount",
-          "type": "numeric(12, 2)",
           "primaryKey": false,
           "notNull": false
         },
@@ -4850,29 +4863,17 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "external_id": {
-          "name": "external_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "short_name": {
-          "name": "short_name",
-          "type": "varchar(50)",
+        "sport_id": {
+          "name": "sport_id",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": false
-        },
-        "logo": {
-          "name": "logo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "country": {
           "name": "country",
@@ -4882,13 +4883,19 @@
         },
         "season": {
           "name": "season",
-          "type": "varchar(20)",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
-        "sport_id": {
-          "name": "sport_id",
-          "type": "uuid",
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -4899,27 +4906,8 @@
           "notNull": false,
           "default": true
         },
-        "start_date": {
-          "name": "start_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "end_date": {
-          "name": "end_date",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -4942,17 +4930,17 @@
           "method": "btree",
           "with": {}
         },
-        "pro_competitions_active_idx": {
-          "name": "pro_competitions_active_idx",
+        "pro_competitions_external_id_idx": {
+          "name": "pro_competitions_external_id_idx",
           "columns": [
             {
-              "expression": "is_active",
+              "expression": "external_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -4974,7 +4962,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "pro_competitions_external_id_unique": {
+          "name": "pro_competitions_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -4998,18 +4994,19 @@
         },
         "market_type": {
           "name": "market_type",
-          "type": "varchar(50)",
+          "type": "pro_market_type",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
         "selection": {
           "name": "selection",
-          "type": "varchar(100)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "odds": {
-          "name": "odds",
+        "odds_decimal": {
+          "name": "odds_decimal",
           "type": "numeric(8, 2)",
           "primaryKey": false,
           "notNull": true
@@ -5020,13 +5017,6 @@
           "primaryKey": false,
           "notNull": false,
           "default": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
@@ -5055,12 +5045,6 @@
         "pro_match_odds_market_idx": {
           "name": "pro_match_odds_market_idx",
           "columns": [
-            {
-              "expression": "match_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
             {
               "expression": "market_type",
               "isExpression": false,
@@ -5106,12 +5090,6 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "external_id": {
-          "name": "external_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "competition_id": {
           "name": "competition_id",
           "type": "uuid",
@@ -5142,19 +5120,15 @@
           "name": "home_score",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
         "away_score": {
           "name": "away_score",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
-        },
-        "round": {
-          "name": "round",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 0
         },
         "kickoff_at": {
           "name": "kickoff_at",
@@ -5164,13 +5138,13 @@
         },
         "venue": {
           "name": "venue",
-          "type": "varchar(255)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "events": {
-          "name": "events",
-          "type": "jsonb",
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -5180,18 +5154,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "timestamp",
+        "events": {
+          "name": "events",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
@@ -5207,6 +5174,36 @@
           "columns": [
             {
               "expression": "competition_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pro_matches_home_team_idx": {
+          "name": "pro_matches_home_team_idx",
+          "columns": [
+            {
+              "expression": "home_team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "pro_matches_away_team_idx": {
+          "name": "pro_matches_away_team_idx",
+          "columns": [
+            {
+              "expression": "away_team_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -5247,32 +5244,17 @@
           "method": "btree",
           "with": {}
         },
-        "pro_matches_home_team_idx": {
-          "name": "pro_matches_home_team_idx",
+        "pro_matches_external_id_idx": {
+          "name": "pro_matches_external_id_idx",
           "columns": [
             {
-              "expression": "home_team_id",
+              "expression": "external_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "pro_matches_away_team_idx": {
-          "name": "pro_matches_away_team_idx",
-          "columns": [
-            {
-              "expression": "away_team_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -5320,7 +5302,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "pro_matches_external_id_unique": {
+          "name": "pro_matches_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -5336,12 +5326,6 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "external_id": {
-          "name": "external_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "name": {
           "name": "name",
           "type": "varchar(255)",
@@ -5354,8 +5338,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "logo": {
-          "name": "logo",
+        "logo_url": {
+          "name": "logo_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sport_id": {
+          "name": "sport_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "league": {
+          "name": "league",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -5364,30 +5360,17 @@
           "name": "country",
           "type": "varchar(100)",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'Brasil'"
+          "notNull": false
         },
-        "city": {
-          "name": "city",
-          "type": "varchar(100)",
+        "external_id": {
+          "name": "external_id",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "founded": {
-          "name": "founded",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "venue": {
-          "name": "venue",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sport_id": {
-          "name": "sport_id",
-          "type": "uuid",
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -5422,8 +5405,8 @@
           "method": "btree",
           "with": {}
         },
-        "pro_teams_external_idx": {
-          "name": "pro_teams_external_idx",
+        "pro_teams_external_id_idx": {
+          "name": "pro_teams_external_id_idx",
           "columns": [
             {
               "expression": "external_id",
@@ -5454,7 +5437,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "pro_teams_external_id_unique": {
+          "name": "pro_teams_external_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "external_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -8313,6 +8304,16 @@
         "challenge"
       ]
     },
+    "public.parlay_leg_status": {
+      "name": "parlay_leg_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "won",
+        "lost",
+        "void"
+      ]
+    },
     "public.parlay_status": {
       "name": "parlay_status",
       "schema": "public",
@@ -8358,15 +8359,28 @@
         "void"
       ]
     },
+    "public.pro_market_type": {
+      "name": "pro_market_type",
+      "schema": "public",
+      "values": [
+        "1x2",
+        "over_under",
+        "btts",
+        "handicap",
+        "correct_score",
+        "goalscorer"
+      ]
+    },
     "public.pro_match_status": {
       "name": "pro_match_status",
       "schema": "public",
       "values": [
         "scheduled",
         "live",
+        "halftime",
         "completed",
-        "postponed",
-        "cancelled"
+        "cancelled",
+        "postponed"
       ]
     },
     "public.shoutout_status": {

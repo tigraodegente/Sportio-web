@@ -54,11 +54,10 @@ export async function seedProCompetitions(db: DB) {
       PRO_COMPETITIONS.map((comp) => ({
         externalId: comp.externalId,
         name: comp.name,
-        shortName: comp.shortName,
         country: comp.country,
         season: comp.season,
-        sportId: futebolSport?.id ?? null,
-        logo: null,
+        sportId: futebolSport!.id,
+        logoUrl: null,
         isActive: true,
       }))
     )
