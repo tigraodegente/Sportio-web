@@ -10,6 +10,7 @@ import {
   gcoinTransactions,
 } from "@/server/db/schema";
 import { notifyGcoinReceived } from "@/server/services/notification-service";
+import { stripe, GCOIN_PACKAGES } from "@/server/lib/stripe";
 
 // GCoin price: R$ 0,10 per GCoin
 const GCOIN_PRICE_BRL = 0.1;
@@ -18,49 +19,60 @@ const MIN_WITHDRAWAL_GCOINS = 100;
 // Withdrawal fee: 5%
 const WITHDRAWAL_FEE_PCT = 0.05;
 
-// Simulated gateway: generates a fake PIX code or card confirmation
-function simulateGateway(method: string, amount: number) {
-  const txId = `SIM-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-
-  if (method === "pix") {
-    // Simulated PIX QR code payload
-    const pixCode = `00020126580014br.gov.bcb.pix0136${txId}5204000053039865802BR5925SPORTIO PLATAFORMA LTDA6009SAO PAULO62070503***6304`;
-    return {
-      gatewayId: txId,
-      gatewayData: {
-        pixCode,
-        pixQrBase64: null, // In production, this would be a real QR code image
-        expiresInMinutes: 30,
-      },
-    };
-  }
-
-  // Credit/debit card - auto-approve simulation
-  return {
-    gatewayId: txId,
-    gatewayData: {
-      cardLast4: "4242",
-      brand: "Visa",
-      installments: 1,
-      authCode: Math.random().toString(36).slice(2, 8).toUpperCase(),
-    },
-  };
-}
-
 export const paymentRouter = createTRPCRouter({
   // ==================== PURCHASE GCOINS ====================
 
-  // Create a purchase order (step 1: generate payment)
+  // Create a purchase order via Stripe Checkout (step 1: generate payment)
   createOrder: protectedProcedure
     .input(
       z.object({
         gcoinAmount: z.number().int().positive().min(50).max(1000000),
         method: z.enum(["pix", "credit_card", "debit_card", "boleto"]),
+        packageId: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const brlAmount = input.gcoinAmount * GCOIN_PRICE_BRL;
-      const gateway = simulateGateway(input.method, brlAmount);
+
+      // If a package was selected, use its price instead
+      const pkg = input.packageId
+        ? GCOIN_PACKAGES.find((p) => p.id === input.packageId)
+        : null;
+      const finalBrl = pkg ? pkg.priceBrl : brlAmount;
+
+      // Determine payment method types for Stripe
+      const paymentMethodTypes: ("card" | "boleto" | "pix")[] =
+        input.method === "pix"
+          ? ["pix"]
+          : input.method === "boleto"
+            ? ["boleto"]
+            : ["card"];
+
+      // Create Stripe Checkout Session
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: paymentMethodTypes,
+        line_items: [
+          {
+            price_data: {
+              currency: "brl",
+              product_data: {
+                name: pkg ? pkg.label : `${input.gcoinAmount} GCoins`,
+                description: `${input.gcoinAmount} GCoins para sua carteira Sportio`,
+              },
+              unit_amount: Math.round(finalBrl * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          userId: ctx.session.user.id,
+          gcoinAmount: input.gcoinAmount.toString(),
+          packageId: input.packageId ?? "",
+        },
+        success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gcoins?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gcoins?cancelled=true`,
+      });
 
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 30);
@@ -71,11 +83,15 @@ export const paymentRouter = createTRPCRouter({
           id: crypto.randomUUID(),
           userId: ctx.session.user.id,
           gcoinAmount: input.gcoinAmount.toString(),
-          brlAmount: brlAmount.toFixed(2),
+          brlAmount: finalBrl.toFixed(2),
           method: input.method,
           status: "pending",
-          gatewayId: gateway.gatewayId,
-          gatewayData: gateway.gatewayData,
+          gatewayId: checkoutSession.id,
+          gatewayData: {
+            stripeSessionId: checkoutSession.id,
+            stripeUrl: checkoutSession.url,
+            packageId: input.packageId ?? null,
+          },
           expiresAt,
           paidAt: null,
           createdAt: new Date(),
@@ -86,16 +102,20 @@ export const paymentRouter = createTRPCRouter({
       return {
         orderId: order.id,
         gcoinAmount: input.gcoinAmount,
-        brlAmount,
+        brlAmount: finalBrl,
         method: input.method,
-        gatewayId: gateway.gatewayId,
-        gatewayData: gateway.gatewayData,
+        gatewayId: checkoutSession.id,
+        gatewayData: {
+          stripeSessionId: checkoutSession.id,
+          stripeUrl: checkoutSession.url,
+        },
+        checkoutUrl: checkoutSession.url,
         expiresAt,
       };
     }),
 
-  // Confirm/simulate payment (step 2: process payment)
-  // In production, this would be called by a webhook from the payment gateway
+  // Confirm payment by checking Stripe session status
+  // Can be called by the client after redirect from Stripe Checkout, or by the webhook
   confirmPayment: protectedProcedure
     .input(
       z.object({
@@ -166,67 +186,88 @@ export const paymentRouter = createTRPCRouter({
       };
     }),
 
-  // Quick buy: create order + auto-confirm in one step (for card payments or testing)
+  // Quick buy: create Stripe Checkout Session and redirect (for card/boleto payments)
   quickBuy: protectedProcedure
     .input(
       z.object({
         gcoinAmount: z.number().int().positive().min(50).max(1000000),
         method: z.enum(["pix", "credit_card", "debit_card", "boleto"]),
+        packageId: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const brlAmount = input.gcoinAmount * GCOIN_PRICE_BRL;
-      const gateway = simulateGateway(input.method, brlAmount);
 
-      // Create order as completed
+      // If a package was selected, use its price
+      const pkg = input.packageId
+        ? GCOIN_PACKAGES.find((p) => p.id === input.packageId)
+        : null;
+      const finalBrl = pkg ? pkg.priceBrl : brlAmount;
+
+      // Determine Stripe payment method types
+      const paymentMethodTypes: ("card" | "boleto" | "pix")[] =
+        input.method === "pix"
+          ? ["pix"]
+          : input.method === "boleto"
+            ? ["boleto"]
+            : ["card"];
+
+      // Create Stripe Checkout Session
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: paymentMethodTypes,
+        line_items: [
+          {
+            price_data: {
+              currency: "brl",
+              product_data: {
+                name: pkg ? pkg.label : `${input.gcoinAmount} GCoins`,
+                description: `${input.gcoinAmount} GCoins para sua carteira Sportio`,
+              },
+              unit_amount: Math.round(finalBrl * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        metadata: {
+          userId: ctx.session.user.id,
+          gcoinAmount: input.gcoinAmount.toString(),
+          packageId: input.packageId ?? "",
+        },
+        success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gcoins?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/gcoins?cancelled=true`,
+      });
+
+      // Create order as pending (webhook will confirm it)
       const [order] = await ctx.db
         .insert(paymentOrders)
         .values({
           id: crypto.randomUUID(),
           userId: ctx.session.user.id,
           gcoinAmount: input.gcoinAmount.toString(),
-          brlAmount: brlAmount.toFixed(2),
+          brlAmount: finalBrl.toFixed(2),
           method: input.method,
-          status: "completed",
-          gatewayId: gateway.gatewayId,
-          gatewayData: gateway.gatewayData,
-          paidAt: new Date(),
+          status: "pending",
+          gatewayId: checkoutSession.id,
+          gatewayData: {
+            stripeSessionId: checkoutSession.id,
+            stripeUrl: checkoutSession.url,
+            packageId: input.packageId ?? null,
+          },
+          paidAt: null,
           expiresAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
         })
         .returning();
 
-      // Credit GCoins
-      await ctx.db
-        .update(users)
-        .set({
-          gcoinsReal: sql`${users.gcoinsReal} + ${input.gcoinAmount}`,
-        })
-        .where(eq(users.id, ctx.session.user.id));
-
-      // Log transaction
-      await ctx.db.insert(gcoinTransactions).values({
-        id: crypto.randomUUID(),
-        userId: ctx.session.user.id,
-        type: "real",
-        category: "purchase",
-        amount: input.gcoinAmount.toString(),
-        balanceAfter: null,
-        description: `Compra de ${input.gcoinAmount} GCoins via ${input.method === "pix" ? "PIX" : input.method === "credit_card" ? "Cartao de Credito" : "Cartao de Debito"}`,
-        referenceId: order.id,
-        referenceType: "payment_order",
-        createdAt: new Date(),
-      });
-
-      notifyGcoinReceived(ctx.session.user.id, input.gcoinAmount, "Sportio").catch(() => {});
-
       return {
         success: true,
         orderId: order.id,
         gcoinAmount: input.gcoinAmount,
-        brlAmount,
-        gatewayId: gateway.gatewayId,
+        brlAmount: finalBrl,
+        gatewayId: checkoutSession.id,
+        checkoutUrl: checkoutSession.url,
       };
     }),
 

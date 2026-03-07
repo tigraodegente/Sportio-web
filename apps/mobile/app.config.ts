@@ -13,5 +13,27 @@ export default {
     experiments: {
       typedRoutes: true,
     },
+    extra: {
+      eas: {
+        projectId: process.env.EAS_PROJECT_ID || "YOUR_EAS_PROJECT_ID",
+      },
+    },
+    updates: {
+      url: "https://u.expo.dev/YOUR_EAS_PROJECT_ID",
+    },
+    runtimeVersion: {
+      policy: "appVersion",
+    },
+    ios: {
+      bundleIdentifier: "com.sportio.app",
+      supportsTablet: true,
+    },
+    android: {
+      package: "com.sportio.app",
+      adaptiveIcon: {
+        foregroundImage: "./assets/icon.png",
+        backgroundColor: "#0A1628",
+      },
+    },
   },
 };

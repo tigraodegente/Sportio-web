@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 import { seedGiftTypes } from "./seed-gift-types";
 import { seedProTeams } from "./seed-pro-teams";
+import { seedProCompetitions } from "./seed-pro-competitions";
 
 // Achievement definitions for all 10 personas
 const ACHIEVEMENT_DEFINITIONS = [
@@ -118,6 +119,43 @@ async function seed() {
 
   console.log("[INFO] Seeding database...\n");
 
+  // Seed Admin User
+  console.log("[INFO] Creating admin user...");
+  const [admin] = await db
+    .insert(schema.users)
+    .values({
+      name: "Admin Sportio",
+      email: "admin@sportio.com.br",
+      gcoinsReal: "10000",
+      gcoinsGamification: "50000",
+      xp: 99999,
+      level: 99,
+      isVerified: true,
+      city: "Sao Paulo",
+      state: "SP",
+      country: "Brasil",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoNothing()
+    .returning();
+
+  if (admin) {
+    await db
+      .insert(schema.userRoles)
+      .values({
+        userId: admin.id,
+        role: "admin",
+        verificationStatus: "verified",
+        verifiedAt: new Date(),
+        createdAt: new Date(),
+      })
+      .onConflictDoNothing();
+    console.log(`  [OK] Admin created: ${admin.id}\n`);
+  } else {
+    console.log("  [OK] Admin already exists, skipping.\n");
+  }
+
   // Seed Sports
   console.log("[INFO] Inserting sports...");
   const sportsData = [
@@ -222,12 +260,17 @@ async function seed() {
   // Seed Pro Teams (Brasileirao Serie A)
   await seedProTeams(db);
 
+  // Seed Pro Competitions (Brasileirao, Copa do Brasil, Libertadores, etc.)
+  await seedProCompetitions(db);
+
   console.log("[OK] Seed completed successfully!");
+  console.log("  - 1 admin user");
   console.log("  - 43 sports");
   console.log(`  - ${ACHIEVEMENT_DEFINITIONS.length} achievements (all personas)`);
   console.log(`  - ${MISSION_DEFINITIONS.length} missions (daily + weekly)`);
   console.log("  - 7 gift types");
   console.log("  - 20 Brasileirao Serie A teams");
+  console.log("  - 5 pro competitions");
 }
 
 seed()

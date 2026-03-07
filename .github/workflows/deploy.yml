@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy
 
 on:
   push:
@@ -48,6 +48,7 @@ jobs:
         continue-on-error: true
 
   deploy-preview:
+    name: Deploy Preview (Vercel)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -91,7 +92,8 @@ jobs:
               body: `Preview deployed to: ${{ steps.deploy.outputs.url }}`
             })
 
-  deploy-production:
+  deploy-web:
+    name: Deploy Web (Vercel)
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: db-migrate
     runs-on: ubuntu-latest
@@ -141,3 +143,27 @@ jobs:
           done
           echo "All deploy attempts failed"
           exit 1
+
+  deploy-mobile:
+    name: Build Mobile (EAS)
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') &&
+      contains(github.event.head_commit.message, '[mobile]')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: cd apps/mobile && npm ci
+
+      - name: Build for all platforms
+        run: cd apps/mobile && eas build --platform all --profile preview --non-interactive
