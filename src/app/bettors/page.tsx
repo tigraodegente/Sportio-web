@@ -11,6 +11,11 @@ import {
   TrendingUp,
   ChevronRight,
   Wallet,
+  Flame,
+  Bell,
+  Trophy,
+  Lock,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -227,8 +232,181 @@ export default function BettorsPage() {
         </div>
       </section>
 
-      {/* Betting Types */}
+      {/* 7 Tipos de Aposta */}
       <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+              <Coins className="h-4 w-4" />
+              7 Tipos de Aposta
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Tabela Completa de Apostas
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Escolha o tipo que combina com seu estilo. GCoins Reais ou Gamificacao.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 max-w-4xl overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tipo de Aposta</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Detalhe</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Categoria</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Vencedor</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">Quem ganha a partida</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                    <span className="ml-1 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamif.</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Placar Exato</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">300 GCoins</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">MVP da Partida</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">200 GCoins</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Combinada</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">Multiplicador acumulado</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Live Bet</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">Aposta em tempo real</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Entre Amigos</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">Apostas privadas</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                    <span className="ml-1 inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamif.</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Gamificada</td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">Pura diversao, sem risco</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamif.</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Sistema de Odds e Seguranca */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2">
+            {/* Sistema de Odds */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Sistema de Odds Transparente
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Algoritmo justo baseado em dados reais dos atletas e torneios.
+              </p>
+              <div className="mt-8 space-y-4">
+                {[
+                  { icon: BarChart3, text: "Baseado em historico real de partidas" },
+                  { icon: Zap, text: "Atualizado em tempo real durante jogos" },
+                  { icon: Bell, text: "Alertas de oportunidades de apostas" },
+                  { icon: Eye, text: "Odds transparentes e auditaveis" },
+                ].map((item) => (
+                  <div key={item.text} className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Seguranca */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Seguranca e Jogo Responsavel
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Tecnologia e controles para uma experiencia segura.
+              </p>
+              <div className="mt-8 space-y-4">
+                {[
+                  { icon: ShieldCheck, text: "IA antifraude em todas as apostas" },
+                  { icon: Trophy, text: "Validacao por arbitros verificados" },
+                  { icon: Lock, text: "Limites configuraveis por usuario" },
+                  { icon: ShieldCheck, text: "Ferramentas de jogo responsavel" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600">
+                      <item.icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Streaks */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700">
+              <Flame className="h-4 w-4" />
+              Streaks
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Sequencias de Vitorias
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Cada vitoria seguida aumenta seu multiplicador. Construa sua reputacao no ranking de acuracia.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+            {[
+              { streak: "3 seguidas", mult: "1.5x", color: "bg-yellow-50 border-yellow-200 text-yellow-700" },
+              { streak: "5 seguidas", mult: "2x", color: "bg-orange-50 border-orange-200 text-orange-700" },
+              { streak: "10 seguidas", mult: "3x", color: "bg-red-50 border-red-200 text-red-700" },
+            ].map((s) => (
+              <div key={s.streak} className={cn("rounded-2xl border-2 p-6 text-center", s.color)}>
+                <p className="text-sm font-bold uppercase tracking-wider">{s.streak}</p>
+                <p className="mt-2 text-4xl font-black">{s.mult}</p>
+                <p className="mt-1 text-sm">multiplicador</p>
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-8 max-w-xl text-center text-sm text-gray-500">
+            Ranking de acuracia: acompanhe sua taxa de acerto e suba no ranking dos melhores apostadores da plataforma.
+          </p>
+        </div>
+      </section>
+
+      {/* Betting Types (original - two modes) */}
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -236,7 +414,7 @@ export default function BettorsPage() {
             </h2>
             <p className="mt-4 text-lg text-gray-600">
               Escolha entre GCoins Reais para sacar dinheiro ou GCoins
-              Gamificação para ganhar prêmios.
+              Gamificacao para ganhar premios.
             </p>
           </div>
           <div className="mt-16 grid gap-8 sm:grid-cols-2">

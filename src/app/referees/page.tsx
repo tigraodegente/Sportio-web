@@ -10,6 +10,12 @@ import {
   Scale,
   FileCheck,
   ChevronRight,
+  Coins,
+  Video,
+  Clock,
+  Shield,
+  Award,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -220,8 +226,162 @@ export default function RefereesPage() {
         </div>
       </section>
 
-      {/* Earnings Potential */}
+      {/* GCoins Table */}
       <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+              <Coins className="h-4 w-4" />
+              GCoins para Arbitros
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Ganhe GCoins Por Cada Partida
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Remuneracao automatica e bonus por desempenho.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acao</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">GCoins</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Tipo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Partida arbitrada</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">200</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Bonus rapidez na validacao</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Variavel</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Real</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Aprovacao em todas as partidas do mes</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">500</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">150+ partidas — Badge especial</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Badge</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Remuneracao e Requisitos */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2">
+            {/* Remuneracao */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Remuneracao
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Quanto mais partidas e melhor sua avaliacao, mais voce ganha.
+              </p>
+              <div className="mt-8 space-y-4">
+                <div className="rounded-xl border border-gray-200 bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Media mensal</span>
+                    <span className="text-lg font-bold text-gray-900">R$ 1.800/mes</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Top 10% arbitros</span>
+                    <span className="text-lg font-bold text-green-600">R$ 4.000+/mes</span>
+                  </div>
+                </div>
+                <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-yellow-800">Primeiros 3 jogos</span>
+                    <span className="text-lg font-bold text-yellow-700">+20% premium</span>
+                  </div>
+                  <p className="mt-2 text-xs text-yellow-600">Bonus de boas-vindas para novos arbitros</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Requisitos */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Requisitos
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Processo simples e rapido para comecar a arbitrar.
+              </p>
+              <div className="mt-8 space-y-4">
+                {[
+                  { icon: FileCheck, text: "Verificacao de documentos (24h)", desc: "Envie RG/CPF e receba aprovacao em ate 24 horas." },
+                  { icon: Award, text: "Certificacao CBF/federacao", desc: "Certificado de arbitragem aceito (estadual, federal ou CBF)." },
+                  { icon: GraduationCap, text: "Treinamento gratuito", desc: "Acesse cursos e materiais de capacitacao sem custo." },
+                ].map((req) => (
+                  <div key={req.text} className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                      <req.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900">{req.text}</h4>
+                      <p className="mt-1 text-sm text-gray-500">{req.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Funcoes do Arbitro */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Funcoes do Arbitro na Plataforma
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Responsabilidades claras e ferramentas para cada tarefa.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: BadgeCheck, title: "Validar resultados", desc: "Confirme placares e resultados oficiais das partidas." },
+              { icon: BarChart3, title: "Aprovar estatisticas", desc: "Valide estatisticas individuais e coletivas dos jogos." },
+              { icon: Video, title: "Confirmar jogadas em video", desc: "Revise lances polemicos com suporte de replay em video." },
+              { icon: Star, title: "Ranking de qualidade", desc: "Sua avaliacao define seu ranking e acesso a eventos premium." },
+            ].map((func) => (
+              <div key={func.title} className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm transition-all hover:shadow-md">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+                  <func.icon className="h-7 w-7" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{func.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{func.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Earnings Potential */}
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

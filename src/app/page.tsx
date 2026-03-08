@@ -34,6 +34,8 @@ import {
   Crown,
   Rocket,
   Lock,
+  Shield,
+  Repeat,
   Spade,
   LayoutGrid,
   Dices,
@@ -238,8 +240,8 @@ function HeroSection() {
         <div className="mt-10 sm:mt-24 lg:mt-28">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6">
             {[
-              { value: "Milhares", label: "de Profissionais", icon: Users, color: "from-yellow-400 to-amber-500" },
-              { value: "Centenas", label: "de Torneios", icon: Trophy, color: "from-blue-400 to-blue-600" },
+              { value: "12.500+", label: "Atletas Ativos", icon: Users, color: "from-yellow-400 to-amber-500" },
+              { value: "850", label: "Torneios/mes", icon: Trophy, color: "from-blue-400 to-blue-600" },
               { value: "PIX", label: "Saque Instantaneo", icon: CircleDollarSign, color: "from-blue-300 to-blue-500" },
               { value: "40+", label: "Modalidades", icon: Medal, color: "from-yellow-300 to-yellow-500" },
             ].map((stat) => (
@@ -415,6 +417,107 @@ function GCoinsEconomySection() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </SectionContainer>
+    </section>
+  );
+}
+
+// ============================================
+// BETTING Section
+// ============================================
+
+function BettingSection() {
+  const bettingTypes = [
+    {
+      title: "Aposta com GCoins Reais",
+      description: "Aposte com valor financeiro real. Ganhou? Saque via PIX instantaneo. Suas habilidades valem dinheiro de verdade.",
+      icon: CircleDollarSign,
+      color: "from-yellow-400 to-amber-500",
+      iconBg: "bg-yellow-50",
+      iconColor: "text-yellow-600",
+      borderColor: "border-yellow-200",
+      features: ["Valor financeiro real", "Saque via PIX", "Odds transparentes"],
+    },
+    {
+      title: "Aposta Gamificada",
+      description: "Aposte GCoins de gamificacao por pura diversao. Sem risco financeiro, so a emocao da competicao e recompensas exclusivas.",
+      icon: Gamepad2,
+      color: "from-blue-400 to-blue-600",
+      iconBg: "bg-blue-50",
+      iconColor: "text-blue-600",
+      borderColor: "border-blue-200",
+      features: ["Sem valor financeiro", "Por diversao", "Recompensas exclusivas"],
+    },
+    {
+      title: "Aposta entre Amigos",
+      description: "Crie apostas privadas no seu grupo. Desafie seus amigos em partidas e torneios com regras personalizadas.",
+      icon: Users,
+      color: "from-purple-400 to-purple-600",
+      iconBg: "bg-purple-50",
+      iconColor: "text-purple-600",
+      borderColor: "border-purple-200",
+      features: ["Privada, em grupos", "Regras personalizadas", "Entre amigos"],
+    },
+  ];
+
+  return (
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+      <SectionContainer>
+        <div className="text-center mb-12 sm:mb-20">
+          <div className="inline-flex items-center gap-2 rounded-full bg-purple-50 px-5 py-2.5 mb-6 sm:mb-8">
+            <Target className="h-4 w-4 text-purple-600" />
+            <span className="text-sm font-semibold text-purple-700">Apostas esportivas</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+            Aposte com <span className="text-purple-600">Inteligencia</span>
+          </h2>
+          <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Tres formas de apostar — escolha a que combina com voce
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {bettingTypes.map((bet) => (
+            <div
+              key={bet.title}
+              className={cn(
+                "group rounded-3xl border bg-white p-6 sm:p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl",
+                bet.borderColor
+              )}
+            >
+              <div className={cn("mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br shadow-lg", bet.color)}>
+                <bet.icon className="h-7 w-7 text-white" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">{bet.title}</h3>
+              <p className="text-gray-500 leading-relaxed mb-6">{bet.description}</p>
+              <div className="space-y-3">
+                {bet.features.map((feature) => (
+                  <div key={feature} className="flex items-center gap-3">
+                    <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-md", bet.iconBg)}>
+                      <Check className={cn("h-3.5 w-3.5", bet.iconColor)} />
+                    </div>
+                    <span className="text-sm text-gray-600">{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-gray-500">
+          <div className="flex items-center gap-2.5">
+            <Shield className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium">Odds transparentes</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Lock className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium">Antifraude ativo</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Heart className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium">Jogo responsavel</span>
           </div>
         </div>
       </SectionContainer>
@@ -686,6 +789,77 @@ function UserTypesSection() {
 }
 
 // ============================================
+// STREAKS Section
+// ============================================
+
+function StreaksSection() {
+  const streaks = [
+    { weeks: "Semana 4", multiplier: "1.1x", bonus: "+10%", width: "w-1/4" },
+    { weeks: "Semana 8", multiplier: "1.2x", bonus: "+20%", width: "w-2/4" },
+    { weeks: "Semana 12", multiplier: "1.3x", bonus: "+30%", width: "w-3/4" },
+    { weeks: "6 meses", multiplier: "1.5x", bonus: "+50%", width: "w-full" },
+  ];
+
+  return (
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute top-0 right-1/4 h-96 w-96 rounded-full bg-yellow-400/5 blur-[120px]" />
+        <div className="absolute bottom-0 left-1/4 h-96 w-96 rounded-full bg-blue-500/5 blur-[120px]" />
+      </div>
+
+      <SectionContainer className="relative">
+        <div className="text-center mb-12 sm:mb-20">
+          <div className="inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-5 py-2.5 mb-6 sm:mb-8">
+            <Flame className="h-4 w-4 text-yellow-400" />
+            <span className="text-sm font-semibold text-yellow-300">Streaks de consistencia</span>
+          </div>
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-5">
+            Consistencia que <span className="text-yellow-400">Paga</span>
+          </h2>
+          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            Quanto mais consistente, mais voce ganha. Mantenha sua sequencia ativa e multiplique seus GCoins.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+          {streaks.map((streak, index) => (
+            <div
+              key={streak.weeks}
+              className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 sm:p-7 text-center transition-all duration-300 hover:bg-white/10 hover:border-yellow-400/30"
+            >
+              <div className="mb-4">
+                <Repeat className="h-6 w-6 text-yellow-400/60 mx-auto group-hover:text-yellow-400 transition-colors" />
+              </div>
+              <div className="text-2xl sm:text-4xl font-black text-yellow-400 mb-1">{streak.multiplier}</div>
+              <div className="text-sm sm:text-base font-semibold text-white mb-1">{streak.bonus}</div>
+              <div className="text-xs sm:text-sm text-gray-500">{streak.weeks}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Progress bar visual */}
+        <div className="max-w-2xl mx-auto">
+          <div className="relative h-3 rounded-full bg-white/10 overflow-hidden">
+            <div className="absolute inset-y-0 left-0 w-3/4 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 animate-pulse" style={{ animationDuration: "3s" }} />
+          </div>
+          <div className="flex justify-between mt-3 text-xs text-gray-500">
+            <span>Inicio</span>
+            <span>4 sem</span>
+            <span>8 sem</span>
+            <span>12 sem</span>
+            <span>6 meses</span>
+          </div>
+        </div>
+
+        <p className="text-center text-gray-400 mt-10 text-sm sm:text-base">
+          Mantenha sua sequencia de atividades semanais e desbloqueie multiplicadores automaticamente
+        </p>
+      </SectionContainer>
+    </section>
+  );
+}
+
+// ============================================
 // TESTIMONIALS Section
 // ============================================
 
@@ -735,6 +909,105 @@ function TestimonialsSection() {
               </div>
             </div>
           ))}
+        </div>
+      </SectionContainer>
+    </section>
+  );
+}
+
+// ============================================
+// REFERRAL Section
+// ============================================
+
+function ReferralSection() {
+  return (
+    <section className="relative py-20 sm:py-32 lg:py-40 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      <SectionContainer>
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-5 py-2.5 mb-6 sm:mb-8">
+              <UserPlus className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-semibold text-blue-700">Programa de indicacao</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-5">
+              Indique e <span className="text-blue-600">Ganhe</span>
+            </h2>
+            <p className="text-base sm:text-lg text-gray-500 leading-relaxed mb-8">
+              Convide seus amigos para o Sportio e ganhe GCoins por cada indicacao. Sem limite — quanto mais amigos, mais voce ganha.
+            </p>
+
+            <div className="space-y-5 mb-10">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 shadow-lg">
+                  <Coins className="h-6 w-6 text-blue-900" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">200 GCoins por indicacao</h3>
+                  <p className="text-sm text-gray-500 mt-1">Cada amigo que criar uma conta, voce ganha 200 GCoins automaticamente</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg">
+                  <Zap className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Sem limite de indicacoes</h3>
+                  <p className="text-sm text-gray-500 mt-1">Indique quantos amigos quiser. Nao existe teto para seus ganhos</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 shadow-lg">
+                  <Gift className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Bonus de ativacao</h3>
+                  <p className="text-sm text-gray-500 mt-1">Seu amigo completa o primeiro desafio? +50 a 200 GCoins extras para voce</p>
+                </div>
+              </div>
+            </div>
+
+            <a
+              href="/register"
+              className="group inline-flex items-center gap-2 rounded-2xl bg-blue-600 px-8 py-4 text-base sm:text-lg font-bold text-white shadow-xl shadow-blue-600/20 transition-all duration-300 hover:bg-blue-700 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <UserPlus className="h-5 w-5" />
+              Convide Seus Amigos
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
+
+          {/* Right side visual */}
+          <div className="hidden lg:block">
+            <div className="relative rounded-3xl border border-gray-100 bg-white p-10 shadow-xl">
+              <div className="text-center mb-8">
+                <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-100 to-blue-50 mb-4">
+                  <UserPlus className="h-10 w-10 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Seus ganhos de indicacao</h3>
+              </div>
+
+              <div className="space-y-4">
+                {[
+                  { friends: "5 amigos", coins: "1.000 GCoins", bonus: "+250 bonus" },
+                  { friends: "10 amigos", coins: "2.000 GCoins", bonus: "+500 bonus" },
+                  { friends: "25 amigos", coins: "5.000 GCoins", bonus: "+1.250 bonus" },
+                ].map((tier) => (
+                  <div key={tier.friends} className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-4">
+                    <div className="flex items-center gap-3">
+                      <Users className="h-5 w-5 text-blue-600" />
+                      <span className="font-semibold text-gray-900">{tier.friends}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-yellow-600">{tier.coins}</div>
+                      <div className="text-xs text-gray-500">{tier.bonus}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </SectionContainer>
     </section>
@@ -848,9 +1121,12 @@ export default function HomePage() {
       <HeroSection />
       <HowItWorksSection />
       <GCoinsEconomySection />
+      <BettingSection />
       <SportsGridSection />
       <UserTypesSection />
+      <StreaksSection />
       <TestimonialsSection />
+      <ReferralSection />
       <CTASection />
       <FAQSection />
     </>

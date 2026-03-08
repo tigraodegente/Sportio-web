@@ -10,6 +10,11 @@ import {
   Heart,
   Target,
   ChevronRight,
+  Share2,
+  Trophy,
+  Video,
+  Flame,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -214,6 +219,103 @@ export default function FansPage() {
                 <p className="mt-2 text-sm leading-relaxed text-gray-600">
                   {benefit.description}
                 </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* GCoins Gamificacao Table */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+              <Coins className="h-4 w-4" />
+              GCoins para Torcedores
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Cada Interacao Vale GCoins
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Quanto mais voce torce, mais voce ganha. Confira a tabela completa.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Acao</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">GCoins</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Tipo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Assistir partida</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">50 / hora</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Curtir torneio</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">20</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Comentar em partida</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">50</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Compartilhar resultado</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">100</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">Gamificacao</span>
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">10 pessoas seguiram seu palpite</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">300 extras</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-bold text-yellow-700">Bonus</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Funcionalidades */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Funcionalidades Para Torcedores
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Tudo que voce precisa para viver o esporte de um jeito novo.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: Target, title: "Apostas gamificadas", desc: "Dê palpites e ganhe GCoins sem risco financeiro. Pura diversao." },
+              { icon: BarChart3, title: "Ranking de fas", desc: "Suba no ranking dos torcedores mais engajados da plataforma." },
+              { icon: Trophy, title: "Desafios de torcida", desc: "Complete desafios semanais e ganhe recompensas exclusivas." },
+              { icon: Video, title: "Stories e conteudo exclusivo", desc: "Acesse bastidores, entrevistas e conteudos dos seus atletas favoritos." },
+              { icon: Eye, title: "Lives de partidas", desc: "Assista partidas ao vivo com comentarios e interacao em tempo real." },
+            ].map((feat) => (
+              <div key={feat.title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                  <feat.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{feat.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{feat.desc}</p>
               </div>
             ))}
           </div>

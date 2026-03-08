@@ -10,6 +10,13 @@ import {
   Building2,
   Eye,
   ChevronRight,
+  Coins,
+  ShoppingBag,
+  Smartphone,
+  Megaphone,
+  Store,
+  Handshake,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -220,8 +227,144 @@ export default function BrandsPage() {
         </div>
       </section>
 
-      {/* ROI Examples */}
+      {/* Formas de Patrocinio com GCoins */}
       <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+              <Coins className="h-4 w-4" />
+              GCoins para Marcas
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Formas de Patrocinio
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Invista em visibilidade esportiva e receba GCoins proporcionais ao impacto.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Forma de Patrocinio</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">GCoins</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Campanhas pontuais</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">4.000</td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Contratos mensais</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">15.000 - 50.000</td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Posts patrocinados</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">2.000 - 10.000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* ROI Detalhado e Audiencia */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2">
+            {/* ROI Detalhado */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                ROI Detalhado
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Retorno comprovado por segmento de marca.
+              </p>
+              <div className="mt-8 space-y-4">
+                <div className="rounded-xl border border-gray-200 bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Material Esportivo</span>
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">3-5x ROI</span>
+                  </div>
+                  <div className="mt-3 h-2 w-full rounded-full bg-gray-100">
+                    <div className="h-2 w-3/4 rounded-full bg-green-500" />
+                  </div>
+                </div>
+                <div className="rounded-xl border border-gray-200 bg-white p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Patrocinador Local</span>
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-bold text-green-700">8x ROI</span>
+                  </div>
+                  <div className="mt-3 h-2 w-full rounded-full bg-gray-100">
+                    <div className="h-2 w-[95%] rounded-full bg-green-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Audiencia */}
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                Audiencia
+              </h2>
+              <p className="mt-4 text-gray-600">
+                Alcance o publico certo com precisao cirurgica.
+              </p>
+              <div className="mt-8 space-y-4">
+                {[
+                  { label: "500k+ atletas segmentados", desc: "Base ativa por esporte, regiao e perfil" },
+                  { label: "A/B testing integrado", desc: "Teste criativos e mensagens para maximizar resultados" },
+                  { label: "Analytics completo", desc: "Dashboard com impressoes, cliques, engajamento e conversoes" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                      <BarChart3 className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-gray-900">{item.label}</h4>
+                      <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tipos de Marca */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Para Todo Tipo de Marca
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Solucoes personalizadas para cada segmento do mercado esportivo.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: ShoppingBag, title: "Material Esportivo", desc: "Equipamentos, calcados e vestuario esportivo com exposicao direta ao publico-alvo." },
+              { icon: Handshake, title: "Patrocinador Local", desc: "Comercios e servicos locais que querem visibilidade na comunidade esportiva." },
+              { icon: Store, title: "Loja Esportiva", desc: "E-commerces e lojas fisicas de artigos esportivos buscando novos clientes." },
+              { icon: Smartphone, title: "App de Treino", desc: "Aplicativos fitness e de treinamento buscando usuarios engajados." },
+            ].map((brand) => (
+              <div key={brand.title} className="rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-sm transition-all hover:shadow-md">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+                  <brand.icon className="h-7 w-7" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{brand.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{brand.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ROI Examples */}
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

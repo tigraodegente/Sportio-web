@@ -10,6 +10,13 @@ import {
   CalendarCheck,
   Banknote,
   ChevronRight,
+  Coins,
+  Zap,
+  Camera,
+  Users,
+  Repeat,
+  Briefcase,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -220,8 +227,120 @@ export default function OrganizersPage() {
         </div>
       </section>
 
-      {/* Earnings Potential */}
+      {/* GCoins Table */}
       <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
+              <Coins className="h-4 w-4" />
+              GCoins para Organizadores
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Ganhe GCoins Por Cada Evento
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Cada evento organizado gera GCoins automaticamente. Quanto maior o evento, mais voce ganha.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-gray-200 shadow-sm">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tipo de Evento</th>
+                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">GCoins</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Torneio criado</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">1.000 - 8.000</td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Corrida 5K (500 inscritos)</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">8.000</td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Campeonato regional (32 times)</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">10.000</td>
+                </tr>
+                <tr className="bg-gray-50">
+                  <td className="px-6 py-4 text-sm text-gray-700">Copa relampago</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">2.500</td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="px-6 py-4 text-sm text-gray-700">Bonus por inscrito (variavel)</td>
+                  <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">50 / inscrito</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Ferramentas Inteligentes */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Ferramentas Inteligentes
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Tecnologia que faz o trabalho pesado por voce.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: BrainCircuit, title: "IA preve inscritos", desc: "Algoritmo que estima participantes com base em historico, regiao e modalidade." },
+              { icon: Zap, title: "Early Bird automatico", desc: "Precos escalonados que incentivam inscricoes antecipadas sem esforco manual." },
+              { icon: Users, title: "Vagas limitadas com urgencia", desc: "Contagem regressiva e vagas limitadas para aumentar conversoes de inscricao." },
+              { icon: CreditCard, title: "Check-in via app", desc: "Atletas fazem check-in pelo celular. Sem filas, sem listas impressas." },
+              { icon: BarChart3, title: "Placar ao vivo", desc: "Resultados atualizados em tempo real para todos os participantes e torcedores." },
+            ].map((tool) => (
+              <div key={tool.title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                  <tool.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{tool.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{tool.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Modelo de Receita */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Multiplas Fontes de Receita
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Nao dependa so de inscricoes. Monetize cada aspecto do seu evento.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { icon: CreditCard, title: "Taxa de inscricao", desc: "Cobranca automatica via PIX e cartao. Sem inadimplencia." },
+              { icon: Building2, title: "Patrocinios", desc: "Logo, banner, stands — conecte marcas ao seu evento e receba receita extra." },
+              { icon: Camera, title: "Upsells", desc: "Foto, video, medalha e kit premium para participantes. Receita adicional por evento." },
+              { icon: Repeat, title: "Ligas anuais", desc: "Crie circuitos mensais com ranking acumulado e receita recorrente." },
+              { icon: Briefcase, title: "Eventos corporativos", desc: "Team building esportivo para empresas com precificacao premium." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-green-600">
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Earnings Potential */}
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
