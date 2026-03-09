@@ -1,4 +1,8 @@
 import { NextResponse } from "next/server";
+import { db } from "@/server/db";
+import { matches, bets } from "@/server/db/schema";
+import { eq, and } from "drizzle-orm";
+import { settleBets } from "@/server/services/bet-settlement";
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
@@ -6,15 +10,42 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // TODO: Implement bet settlement logic
-  // 1. Get completed matches that have unsettled bets
-  // 2. For each match, get the final result
-  // 3. Settle all bets for that match
-  // 4. Credit/debit GCoins accordingly
+  try {
+    // Find completed matches
+    const completedMatches = await db.query.matches.findMany({
+      where: eq(matches.status, "completed"),
+      columns: { id: true, winnerId: true, score1: true, score2: true },
+    });
 
-  return NextResponse.json({
-    settled: 0,
-    message: "Bet settlement cron - ready for implementation",
-    timestamp: new Date().toISOString()
-  });
+    let settled = 0;
+    for (const match of completedMatches) {
+      if (!match.winnerId) continue;
+
+      // Check if there are pending bets for this match
+      const pendingBets = await db.query.bets.findMany({
+        where: and(eq(bets.matchId, match.id), eq(bets.result, "pending")),
+        columns: { id: true },
+        limit: 1,
+      });
+      if (pendingBets.length === 0) continue;
+
+      await settleBets(match.id, match.winnerId, {
+        score1: match.score1 ?? 0,
+        score2: match.score2 ?? 0,
+      });
+      settled++;
+    }
+
+    return NextResponse.json({
+      settled,
+      message: `Settled bets for ${settled} matches`,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Bet settlement error:", error);
+    return NextResponse.json(
+      { error: "Settlement failed", message: String(error) },
+      { status: 500 }
+    );
+  }
 }

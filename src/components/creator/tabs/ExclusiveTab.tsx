@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { CreatorPost, SubscriptionTier } from "@/lib/mock/creator-data";
+import type { CreatorPost, SubscriptionTier } from "@/lib/types/creator";
 import { formatDistanceToNow } from "@/lib/utils";
 
 interface ExclusiveTabProps {

@@ -6,7 +6,7 @@ import { Send, Coins } from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { formatGCoins } from "@/lib/utils";
-import type { GiftType } from "@/lib/mock/creator-data";
+import type { GiftType } from "@/lib/types/creator";
 
 interface GiftPickerModalProps {
   isOpen: boolean;

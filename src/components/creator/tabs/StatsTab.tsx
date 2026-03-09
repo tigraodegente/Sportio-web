@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card, CardTitle } from "@/components/ui/card";
-import type { CreatorStat } from "@/lib/mock/creator-data";
+import type { CreatorStat } from "@/lib/types/creator";
 import { Activity, TrendingUp, Timer, Trophy } from "lucide-react";
 
 interface StatsTabProps {

@@ -5,7 +5,7 @@ import { ExternalLink, ShoppingBag, Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import type { EquipmentProduct, CreatorProfile } from "@/lib/mock/creator-data";
+import type { EquipmentProduct, CreatorProfile } from "@/lib/types/creator";
 
 interface EquipmentTabProps {
   products: EquipmentProduct[];

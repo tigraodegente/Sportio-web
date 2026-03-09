@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
-import type { CreatorPost, CreatorProfile } from "@/lib/mock/creator-data";
+import type { CreatorPost, CreatorProfile } from "@/lib/types/creator";
 import { formatDistanceToNow } from "@/lib/utils";
 
 interface PostsTabProps {

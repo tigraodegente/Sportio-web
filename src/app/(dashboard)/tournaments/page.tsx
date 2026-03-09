@@ -255,6 +255,7 @@ export default function TournamentsPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [sport, setSport] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
@@ -289,7 +290,19 @@ export default function TournamentsPage() {
     retry: false,
   });
 
-  const allTournaments = allQuery.data?.pages.flatMap((page) => page.items) ?? [];
+  const allTournamentsRaw = allQuery.data?.pages.flatMap((page) => page.items) ?? [];
+
+  // Client-side sport filter: match option value (slug) to sport name
+  const sportLabelMap: Record<string, string> = Object.fromEntries(
+    sportOptions.filter((o) => o.value).map((o) => [o.value, o.label])
+  );
+
+  const allTournaments = sport
+    ? allTournamentsRaw.filter((t) => {
+        const sportName = t.sport?.name ?? "";
+        return sportName.toLowerCase() === (sportLabelMap[sport] ?? "").toLowerCase();
+      })
+    : allTournamentsRaw;
 
   // Infinite scroll observer
   const handleObserver = useCallback(
@@ -351,6 +364,8 @@ export default function TournamentsPage() {
           options={sportOptions}
           placeholder="Esporte"
           className="sm:w-48"
+          value={sport}
+          onChange={(e) => setSport(e.target.value)}
         />
         <Select
           options={[

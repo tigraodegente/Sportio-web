@@ -16,6 +16,8 @@ export const matchRouter = createTRPCRouter({
         where: eq(matches.id, input.id),
         with: {
           tournament: { with: { sport: true } },
+          player1: { columns: { id: true, name: true, image: true } },
+          player2: { columns: { id: true, name: true, image: true } },
           bets: true,
         },
       });
@@ -143,6 +145,8 @@ export const matchRouter = createTRPCRouter({
       where: eq(matches.status, "live"),
       with: {
         tournament: { with: { sport: true } },
+        player1: { columns: { id: true, name: true, image: true } },
+        player2: { columns: { id: true, name: true, image: true } },
       },
     });
   }),

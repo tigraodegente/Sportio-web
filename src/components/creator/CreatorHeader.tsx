@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { CreatorProfile, SubscriptionTier } from "@/lib/mock/creator-data";
+import type { CreatorProfile, SubscriptionTier } from "@/lib/types/creator";
 import { formatGCoins } from "@/lib/utils";
 
 interface CreatorHeaderProps {

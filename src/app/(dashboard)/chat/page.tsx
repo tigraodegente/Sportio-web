@@ -391,14 +391,14 @@ export default function ChatPage() {
               </div>
             </div>
             <div className="flex items-center gap-0.5">
-              <button className="p-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <button disabled title="Em breve" className="p-2.5 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                 <Phone className="w-[18px] h-[18px]" />
               </button>
-              <button className="p-2.5 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <button disabled title="Em breve" className="p-2.5 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                 <Video className="w-[18px] h-[18px]" />
               </button>
               <div className="w-px h-5 bg-slate-100 mx-1" />
-              <button className="p-2.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all duration-200">
+              <button disabled title="Em breve" className="p-2.5 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                 <MoreVertical className="w-[18px] h-[18px]" />
               </button>
             </div>
@@ -509,13 +509,13 @@ export default function ChatPage() {
           <div className="p-3 sm:p-4 border-t border-slate-100 bg-white/80 backdrop-blur-sm">
             <div className="flex items-center gap-2 bg-slate-50 rounded-2xl p-1.5 border border-slate-200/80 shadow-sm shadow-slate-200/30 focus-within:border-blue-300 focus-within:shadow-md focus-within:shadow-blue-500/5 transition-all duration-300">
               <div className="flex items-center gap-0.5 pl-1">
-                <button className="p-2 rounded-xl text-slate-400 hover:text-blue-600 hover:bg-white transition-all duration-200">
+                <button disabled title="Em breve" className="p-2 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                   <ImageIcon className="w-5 h-5" />
                 </button>
-                <button className="p-2 rounded-xl text-slate-400 hover:text-amber-500 hover:bg-white transition-all duration-200">
+                <button disabled title="Em breve" className="p-2 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                   <Smile className="w-5 h-5" />
                 </button>
-                <button className="p-2 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-white transition-all duration-200">
+                <button disabled title="Em breve" className="p-2 rounded-xl text-slate-400 opacity-40 cursor-not-allowed transition-all duration-200">
                   <Mic className="w-5 h-5" />
                 </button>
               </div>

@@ -2,7 +2,7 @@
 
 import { Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CreatorProfile } from "@/lib/mock/creator-data";
+import type { CreatorProfile } from "@/lib/types/creator";
 
 interface CreatorBannerProps {
   creator: CreatorProfile;

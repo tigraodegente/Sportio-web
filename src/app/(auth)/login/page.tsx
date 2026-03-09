@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
+    signIn("google", { callbackUrl: "/social" });
   };
 
   return (
@@ -110,9 +110,13 @@ export default function LoginPage() {
             <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
             <span className="text-sm text-slate-600">Lembrar-me</span>
           </label>
-          <Link href="/login" className="text-sm text-blue-600 hover:text-blue-700">
+          <button
+            type="button"
+            onClick={() => toast.info("Funcionalidade em breve. Use a opcao 'Alterar Senha' nas Configuracoes.")}
+            className="text-sm text-blue-600 hover:text-blue-700"
+          >
             Esqueceu a senha?
-          </Link>
+          </button>
         </div>
 
         <Button type="submit" size="lg" loading={loading} className="w-full font-bold tracking-wide">

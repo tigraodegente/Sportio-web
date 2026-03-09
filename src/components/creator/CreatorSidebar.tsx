@@ -7,12 +7,18 @@ import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatGCoins } from "@/lib/utils";
-import type { SubscriptionTier, FanEntry } from "@/lib/mock/creator-data";
-import { MOCK_SPONSORS } from "@/lib/mock/creator-data";
+import type { SubscriptionTier, FanEntry } from "@/lib/types/creator";
+
+interface Sponsor {
+  name: string;
+  logoUrl: string | null;
+  category: string;
+}
 
 interface CreatorSidebarProps {
   tiers: SubscriptionTier[];
   fans: FanEntry[];
+  sponsors?: Sponsor[];
 }
 
 const tierColors: Record<string, { bg: string; border: string; button: string }> = {
@@ -28,7 +34,7 @@ const fanTierBadges: Record<string, { emoji: string; label: string; color: strin
   bronze: { emoji: "\uD83E\uDD49", label: "Bronze", color: "bg-orange-50 text-orange-700" },
 };
 
-export function CreatorSidebar({ tiers, fans }: CreatorSidebarProps) {
+export function CreatorSidebar({ tiers, fans, sponsors = [] }: CreatorSidebarProps) {
   return (
     <div className="space-y-6">
       {/* Subscription Tiers */}
@@ -113,34 +119,36 @@ export function CreatorSidebar({ tiers, fans }: CreatorSidebarProps) {
       </Card>
 
       {/* Sponsors */}
-      <Card>
-        <div className="flex items-center gap-2 mb-4">
-          <Crown className="w-4 h-4 text-amber-500" />
-          <CardTitle>Patrocinadores</CardTitle>
-        </div>
-        <div className="space-y-3">
-          {MOCK_SPONSORS.map((sponsor) => (
-            <div key={sponsor.name} className="flex items-center gap-3 p-2 rounded-lg border border-slate-100">
-              <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
-                {sponsor.logoUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={sponsor.logoUrl} alt={sponsor.name} className="w-full h-full rounded-lg object-contain" />
-                ) : (
-                  <Crown className="w-4 h-4 text-slate-400" />
-                )}
+      {sponsors.length > 0 && (
+        <Card>
+          <div className="flex items-center gap-2 mb-4">
+            <Crown className="w-4 h-4 text-amber-500" />
+            <CardTitle>Patrocinadores</CardTitle>
+          </div>
+          <div className="space-y-3">
+            {sponsors.map((sponsor) => (
+              <div key={sponsor.name} className="flex items-center gap-3 p-2 rounded-lg border border-slate-100">
+                <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                  {sponsor.logoUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={sponsor.logoUrl} alt={sponsor.name} className="w-full h-full rounded-lg object-contain" />
+                  ) : (
+                    <Crown className="w-4 h-4 text-slate-400" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-900 truncate">{sponsor.name}</p>
+                  <p className="text-xs text-slate-500">{sponsor.category}</p>
+                </div>
               </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900 truncate">{sponsor.name}</p>
-                <p className="text-xs text-slate-500">{sponsor.category}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <button className="w-full mt-3 flex items-center justify-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium py-2 rounded-lg hover:bg-blue-50 transition-colors">
-          <ExternalLink className="w-3.5 h-3.5" />
-          Quer patrocinar? Saiba Mais
-        </button>
-      </Card>
+            ))}
+          </div>
+          <button className="w-full mt-3 flex items-center justify-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium py-2 rounded-lg hover:bg-blue-50 transition-colors">
+            <ExternalLink className="w-3.5 h-3.5" />
+            Quer patrocinar? Saiba Mais
+          </button>
+        </Card>
+      )}
     </div>
   );
 }

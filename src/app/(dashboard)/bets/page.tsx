@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Target, TrendingUp, Trophy, Clock, CheckCircle2, XCircle, Swords, Flame, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
@@ -38,8 +38,8 @@ const resultIcons: Record<string, React.ReactNode> = {
 
 const HOT_THRESHOLD = 100;
 
-// Fixed odds shown in the UI (the backend uses a simple 1.8x for winner bets)
-const WINNER_ODDS = 1.8;
+// Default odds shown before dynamic odds are fetched
+const DEFAULT_ODDS = 2.0;
 
 // ---------------------------------------------------------------------------
 // Types derived from DB schema (matches & bets with their relations)
@@ -67,6 +67,8 @@ interface LiveMatch {
     sport: { id: string; name: string; slug: string } | null;
     [key: string]: unknown;
   } | null;
+  player1?: { id: string; name: string; image: string | null } | null;
+  player2?: { id: string; name: string; image: string | null } | null;
   [key: string]: unknown;
 }
 
@@ -119,9 +121,11 @@ function getMatchTournamentName(match: LiveMatch): string {
 /** Display name for a side of the match. Falls back to "Jogador N" / "Time N". */
 function getPlayerLabel(match: LiveMatch, side: 1 | 2): string {
   if (side === 1) {
+    if (match.player1?.name) return match.player1.name;
     if (match.team1Id) return "Time 1";
     return match.player1Id ? "Jogador 1" : "TBD";
   }
+  if (match.player2?.name) return match.player2.name;
   if (match.team2Id) return "Time 2";
   return match.player2Id ? "Jogador 2" : "TBD";
 }
@@ -138,13 +142,13 @@ function formatRelativeDate(date: Date | string | null | undefined): string {
 }
 
 function getBetPrediction(bet: MyBet): string {
-  const p = bet.prediction as Record<string, unknown> | null;
-  if (!p) return "";
-  if (typeof p.winner === "string") return p.winner;
-  if (typeof p.value === "string") return p.value;
-  const first = Object.values(p)[0];
-  if (typeof first === "string") return first;
-  return "";
+  const pred = bet.prediction as Record<string, unknown> | null;
+  if (!pred) return "";
+  if (pred.label) return String(pred.label);
+  if (pred.winner) return String(pred.winner);
+  if (pred.winnerId) return "Vencedor";
+  if (pred.score1 != null && pred.score2 != null) return `${pred.score1} x ${pred.score2}`;
+  return bet.betType;
 }
 
 function getBetMatchLabel(bet: MyBet): string {
@@ -165,12 +169,45 @@ export default function BetsPage() {
   const [selectedMatch, setSelectedMatch] = useState<LiveMatch | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<1 | 2 | null>(null);
   const [betAmount, setBetAmount] = useState("");
+  const [currentOdds, setCurrentOdds] = useState(DEFAULT_ODDS);
+  const [oddsLoading, setOddsLoading] = useState(false);
 
   // ---- tRPC queries -------------------------------------------------------
   const liveMatches = trpc.match.live.useQuery();
   const myBets = trpc.bet.myBets.useQuery({ limit: 50 });
   const balance = trpc.gcoin.balance.useQuery();
   const leaderboard = trpc.bet.leaderboard.useQuery({ limit: 50 });
+
+  const utils = trpc.useUtils();
+
+  // Fetch dynamic odds when user selects a player in the bet modal
+  useEffect(() => {
+    if (!selectedMatch || !selectedPlayer) {
+      setCurrentOdds(DEFAULT_ODDS);
+      return;
+    }
+    const playerId = selectedPlayer === 1
+      ? (selectedMatch.player1Id ?? selectedMatch.team1Id)
+      : (selectedMatch.player2Id ?? selectedMatch.team2Id);
+    if (!playerId) return;
+
+    setOddsLoading(true);
+    utils.bet.getOdds
+      .fetch({
+        matchId: selectedMatch.id,
+        betType: "winner",
+        prediction: { winnerId: playerId },
+      })
+      .then((result) => {
+        setCurrentOdds(result.odds);
+      })
+      .catch(() => {
+        setCurrentOdds(DEFAULT_ODDS);
+      })
+      .finally(() => {
+        setOddsLoading(false);
+      });
+  }, [selectedMatch, selectedPlayer, utils.bet.getOdds]);
 
   const placeBet = trpc.bet.place.useMutation({
     onSuccess: () => {
@@ -211,20 +248,23 @@ export default function BetsPage() {
     const amount = Number(betAmount);
     if (amount <= 0) return;
 
+    const playerId = selectedPlayer === 1
+      ? (selectedMatch.player1Id ?? selectedMatch.team1Id)
+      : (selectedMatch.player2Id ?? selectedMatch.team2Id);
     const playerLabel = getPlayerLabel(selectedMatch, selectedPlayer);
 
     placeBet.mutate({
       matchId: selectedMatch.id,
       tournamentId: selectedMatch.tournamentId,
       betType: "winner",
-      prediction: { winner: playerLabel },
+      prediction: { winnerId: playerId, label: playerLabel },
       amount,
     });
   };
 
   const potentialReturn =
     betAmount && selectedPlayer
-      ? Math.round(Number(betAmount) * WINNER_ODDS * 100) / 100
+      ? Math.round(Number(betAmount) * currentOdds * 100) / 100
       : 0;
 
   // ---- Shorthand ----------------------------------------------------------
@@ -367,7 +407,7 @@ export default function BetsPage() {
                         <p className="text-sm font-semibold text-slate-900 truncate">{player1}</p>
                         <div className="flex items-center justify-end gap-1 mt-0.5">
                           <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 border border-blue-200/50 rounded-md text-xs font-bold text-blue-700">
-                            {WINNER_ODDS.toFixed(2)}x
+                            {DEFAULT_ODDS.toFixed(2)}x
                           </span>
                         </div>
                       </div>
@@ -382,7 +422,7 @@ export default function BetsPage() {
                         <p className="text-sm font-semibold text-slate-900 truncate">{player2}</p>
                         <div className="flex items-center gap-1 mt-0.5">
                           <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 border border-blue-200/50 rounded-md text-xs font-bold text-blue-700">
-                            {WINNER_ODDS.toFixed(2)}x
+                            {DEFAULT_ODDS.toFixed(2)}x
                           </span>
                         </div>
                       </div>
@@ -585,7 +625,15 @@ export default function BetsPage() {
                     {player1}
                   </p>
                   <div className="flex items-center justify-center gap-1 mt-1">
-                    <p className="text-lg font-bold text-blue-600">{WINNER_ODDS.toFixed(2)}x</p>
+                    <p className="text-lg font-bold text-blue-600">
+                      {selectedPlayer === 1 && oddsLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin inline" />
+                      ) : selectedPlayer === 1 ? (
+                        `${currentOdds.toFixed(2)}x`
+                      ) : (
+                        `${DEFAULT_ODDS.toFixed(2)}x`
+                      )}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -607,7 +655,15 @@ export default function BetsPage() {
                     {player2}
                   </p>
                   <div className="flex items-center justify-center gap-1 mt-1">
-                    <p className="text-lg font-bold text-blue-600">{WINNER_ODDS.toFixed(2)}x</p>
+                    <p className="text-lg font-bold text-blue-600">
+                      {selectedPlayer === 2 && oddsLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin inline" />
+                      ) : selectedPlayer === 2 ? (
+                        `${currentOdds.toFixed(2)}x`
+                      ) : (
+                        `${DEFAULT_ODDS.toFixed(2)}x`
+                      )}
+                    </p>
                   </div>
                 </button>
               </div>
@@ -633,7 +689,19 @@ export default function BetsPage() {
                 )}
               </div>
 
-              <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-xl p-4 border border-blue-200/50 space-y-2">
+                {selectedPlayer && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-600">Odds:</span>
+                    <span className="font-bold text-blue-700">
+                      {oddsLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin inline" />
+                      ) : (
+                        `${currentOdds.toFixed(2)}x`
+                      )}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-600">Retorno potencial:</span>
                   <span className="font-bold text-blue-700">

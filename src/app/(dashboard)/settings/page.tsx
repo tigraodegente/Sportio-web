@@ -127,12 +127,49 @@ export default function SettingsPage() {
         alert("Arquivo muito grande. Maximo 5MB.");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
-        updateProfile.mutate({ image: base64 });
-      };
-      reader.readAsDataURL(file);
+
+      try {
+        // Get presigned URL
+        const res = await fetch("/api/upload/presign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fileName: file.name,
+            contentType: file.type,
+            fileSize: file.size,
+            category: "avatar",
+          }),
+        });
+
+        if (!res.ok) {
+          // Fallback to base64 if presign fails (R2 not configured)
+          const reader = new FileReader();
+          reader.onload = () => {
+            updateProfile.mutate({ image: reader.result as string });
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+
+        const { uploadUrl, publicUrl } = await res.json();
+
+        // Upload directly to R2
+        await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": file.type },
+        });
+
+        // Save public URL to profile
+        updateProfile.mutate({ image: publicUrl });
+      } catch {
+        // Fallback to base64
+        const reader = new FileReader();
+        reader.onload = () => {
+          updateProfile.mutate({ image: reader.result as string });
+        };
+        reader.readAsDataURL(file);
+      }
     };
     input.click();
   };
