@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import { TRPCProvider } from "@/lib/trpc-provider";
+import { GiftProvider } from "@/contexts/GiftContext";
 import { LayoutWrapper } from "@/components/shared/layout-wrapper";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -55,8 +56,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-white text-gray-900 antialiased">
         <SessionProvider>
           <TRPCProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-            <Toaster richColors position="top-right" />
+            <GiftProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+              <Toaster richColors position="top-right" />
+            </GiftProvider>
           </TRPCProvider>
         </SessionProvider>
       </body>
