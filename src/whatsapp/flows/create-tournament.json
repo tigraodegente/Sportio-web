@@ -1,0 +1,128 @@
+{
+  "version": "4.0",
+  "screens": [
+    {
+      "id": "TOURNAMENT_FORM",
+      "title": "Criar Torneio",
+      "data": {
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [
+            { "id": "bt", "title": "Beach Tennis" },
+            { "id": "pd", "title": "Padel" }
+          ]
+        },
+        "formats": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [
+            { "id": "single_elimination", "title": "Eliminacao simples" },
+            { "id": "double_elimination", "title": "Eliminacao dupla" },
+            { "id": "round_robin", "title": "Todos contra todos" },
+            { "id": "swiss", "title": "Sistema suico" }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Novo Torneio"
+          },
+          {
+            "type": "TextInput",
+            "name": "name",
+            "label": "Nome do torneio",
+            "required": true
+          },
+          {
+            "type": "Dropdown",
+            "name": "sport",
+            "label": "Esporte",
+            "required": true,
+            "data-source": "${data.sports}"
+          },
+          {
+            "type": "Dropdown",
+            "name": "format",
+            "label": "Formato",
+            "required": true,
+            "data-source": "${data.formats}"
+          },
+          {
+            "type": "TextInput",
+            "name": "city",
+            "label": "Cidade",
+            "required": true
+          },
+          {
+            "type": "TextInput",
+            "name": "location",
+            "label": "Local (endereco)",
+            "required": false
+          },
+          {
+            "type": "DatePicker",
+            "name": "start_date",
+            "label": "Data de inicio",
+            "required": true
+          },
+          {
+            "type": "TextInput",
+            "name": "entry_fee",
+            "label": "Taxa de inscricao (GCoins)",
+            "required": true,
+            "input-type": "number",
+            "helper-text": "0 para torneio gratuito"
+          },
+          {
+            "type": "TextInput",
+            "name": "max_participants",
+            "label": "Maximo de participantes",
+            "required": true,
+            "input-type": "number"
+          },
+          {
+            "type": "TextInput",
+            "name": "prize_description",
+            "label": "Premiacao (descricao)",
+            "required": false,
+            "helper-text": "Ex: 1o lugar: 500 GCoins"
+          },
+          {
+            "type": "Footer",
+            "label": "Criar Torneio",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "name": "${form.name}",
+                "sport": "${form.sport}",
+                "format": "${form.format}",
+                "city": "${form.city}",
+                "location": "${form.location}",
+                "start_date": "${form.start_date}",
+                "entry_fee": "${form.entry_fee}",
+                "max_participants": "${form.max_participants}",
+                "prize_description": "${form.prize_description}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

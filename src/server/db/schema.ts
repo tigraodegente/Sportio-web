@@ -715,6 +715,7 @@ export const notifications = pgTable(
     message: text("message"),
     data: jsonb("data"),
     isRead: boolean("is_read").default(false),
+    whatsappSent: boolean("whatsapp_sent").default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [

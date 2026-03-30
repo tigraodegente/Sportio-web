@@ -1,0 +1,82 @@
+{
+  "version": "4.0",
+  "screens": [
+    {
+      "id": "ENROLLMENT",
+      "title": "Inscricao no Torneio",
+      "data": {
+        "tournament_name": { "type": "string", "__example__": "Beach Tennis Open SP" },
+        "entry_fee": { "type": "string", "__example__": "50 GCoins" },
+        "spots_available": { "type": "string", "__example__": "12/16" },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [
+            { "id": "A", "title": "Nivel A - Avancado" },
+            { "id": "B", "title": "Nivel B - Intermediario" },
+            { "id": "C", "title": "Nivel C - Iniciante" }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "${data.tournament_name}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Taxa: ${data.entry_fee} | Vagas: ${data.spots_available}"
+          },
+          {
+            "type": "Dropdown",
+            "name": "level",
+            "label": "Seu nivel",
+            "required": true,
+            "data-source": "${data.levels}"
+          },
+          {
+            "type": "TextInput",
+            "name": "partner_name",
+            "label": "Nome do parceiro(a) (se dupla)",
+            "required": false,
+            "helper-text": "Deixe vazio se individual"
+          },
+          {
+            "type": "TextInput",
+            "name": "partner_phone",
+            "label": "Telefone do parceiro(a)",
+            "required": false,
+            "input-type": "phone"
+          },
+          {
+            "type": "OptIn",
+            "name": "accept_rules",
+            "label": "Li e aceito as regras do torneio",
+            "required": true
+          },
+          {
+            "type": "Footer",
+            "label": "Confirmar Inscricao",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "level": "${form.level}",
+                "partner_name": "${form.partner_name}",
+                "partner_phone": "${form.partner_phone}",
+                "accept_rules": "${form.accept_rules}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

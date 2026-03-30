@@ -1,0 +1,91 @@
+{
+  "version": "4.0",
+  "screens": [
+    {
+      "id": "CHALLENGE_FORM",
+      "title": "Criar Desafio",
+      "data": {
+        "sports": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" }
+            }
+          },
+          "__example__": [
+            { "id": "bt", "title": "Beach Tennis" },
+            { "id": "pd", "title": "Padel" },
+            { "id": "tn", "title": "Tenis" },
+            { "id": "fv", "title": "Futevolei" }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Novo Desafio 1v1"
+          },
+          {
+            "type": "TextInput",
+            "name": "opponent_name",
+            "label": "Nome do oponente",
+            "required": true,
+            "helper-text": "Buscaremos no Sportio"
+          },
+          {
+            "type": "Dropdown",
+            "name": "sport",
+            "label": "Esporte",
+            "required": true,
+            "data-source": "${data.sports}"
+          },
+          {
+            "type": "TextInput",
+            "name": "bet_amount",
+            "label": "Aposta (GCoins por jogador)",
+            "required": true,
+            "input-type": "number"
+          },
+          {
+            "type": "TextInput",
+            "name": "location",
+            "label": "Local",
+            "required": false,
+            "helper-text": "Onde sera o desafio?"
+          },
+          {
+            "type": "DatePicker",
+            "name": "date",
+            "label": "Data do desafio",
+            "required": false
+          },
+          {
+            "type": "OptIn",
+            "name": "open_bets",
+            "label": "Abrir apostas para a comunidade",
+            "required": false
+          },
+          {
+            "type": "Footer",
+            "label": "Enviar Desafio",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "opponent_name": "${form.opponent_name}",
+                "sport": "${form.sport}",
+                "bet_amount": "${form.bet_amount}",
+                "location": "${form.location}",
+                "date": "${form.date}",
+                "open_bets": "${form.open_bets}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
