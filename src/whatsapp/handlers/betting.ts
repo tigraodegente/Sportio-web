@@ -42,7 +42,7 @@ export async function handleBetting(
     const activeChallenges = await db.query.challenges.findMany({
       where: eq(challenges.status, "betting_open"),
       with: {
-        challenger: { columns: { name: true } },
+        creator: { columns: { name: true } },
         opponent: { columns: { name: true } },
         sport: { columns: { name: true } },
       },
@@ -73,7 +73,7 @@ export async function handleBetting(
     for (const c of activeChallenges) {
       rows.push({
         id: `bet_challenge_${c.id}`,
-        title: `${c.challenger?.name ?? "?"} vs ${c.opponent?.name ?? "?"}`.substring(0, 24),
+        title: `${c.creator?.name ?? "?"} vs ${c.opponent?.name ?? "?"}`.substring(0, 24),
         description: `Desafio ${c.sport?.name ?? ""} | Apostas abertas`.substring(0, 72),
       });
     }
@@ -144,7 +144,7 @@ export async function handleBetting(
     const challenge = await db.query.challenges.findFirst({
       where: eq(challenges.id, challengeId),
       with: {
-        challenger: { columns: { id: true, name: true } },
+        creator: { columns: { id: true, name: true } },
         opponent: { columns: { id: true, name: true } },
         sport: { columns: { name: true } },
       },
@@ -155,7 +155,7 @@ export async function handleBetting(
       return;
     }
 
-    const c = challenge.challenger!;
+    const c = challenge.creator!;
     const o = challenge.opponent!;
 
     sessionManager.setState(phone, "bet_select_match", {

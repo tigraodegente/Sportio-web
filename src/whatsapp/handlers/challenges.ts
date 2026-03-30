@@ -26,7 +26,7 @@ export async function handleChallenges(
     const activeChallenges = await db.query.challenges.findMany({
       where: eq(challenges.status, "betting_open"),
       with: {
-        challenger: { columns: { name: true } },
+        creator: { columns: { name: true } },
         opponent: { columns: { name: true } },
         sport: { columns: { name: true } },
       },
@@ -44,8 +44,8 @@ export async function handleChallenges(
 
     const rows = activeChallenges.map((c) => ({
       id: `challenge_view_${c.id}`,
-      title: `${c.challenger?.name ?? "?"} vs ${c.opponent?.name ?? "?"}`.substring(0, 24),
-      description: `${c.sport?.name ?? ""} | ${Number(c.betAmount ?? 0)} GCoins`.substring(0, 72),
+      title: `${c.creator?.name ?? "?"} vs ${c.opponent?.name ?? "?"}`.substring(0, 24),
+      description: `${c.sport?.name ?? ""} | ${Number(c.wagerAmount ?? 0)} GCoins`.substring(0, 72),
     }));
 
     await whatsapp.sendList(
@@ -62,11 +62,11 @@ export async function handleChallenges(
   if (action === "challenges_mine") {
     const myChallenges = await db.query.challenges.findMany({
       where: or(
-        eq(challenges.challengerId, userId),
+        eq(challenges.creatorId, userId),
         eq(challenges.opponentId, userId)
       ),
       with: {
-        challenger: { columns: { name: true } },
+        creator: { columns: { name: true } },
         opponent: { columns: { name: true } },
         sport: { columns: { name: true } },
       },
@@ -93,9 +93,9 @@ export async function handleChallenges(
 
     let text = "*MEUS DESAFIOS*\n\n";
     for (const c of myChallenges) {
-      text += `*${c.challenger?.name ?? "?"} vs ${c.opponent?.name ?? "?"}*\n`;
+      text += `*${c.creator?.name ?? "?"} vs ${c.opponent?.name ?? "?"}*\n`;
       text += `${c.sport?.name ?? ""} | ${statusMap[c.status] ?? c.status}\n`;
-      text += `Aposta: ${Number(c.betAmount ?? 0)} GCoins\n\n`;
+      text += `Aposta: ${Number(c.wagerAmount ?? 0)} GCoins\n\n`;
     }
 
     await whatsapp.sendButtons(phone, text, [
@@ -247,11 +247,11 @@ export async function handleChallenges(
       .insert(challenges)
       .values({
         type: "duel",
-        challengerId: userId,
+        creatorId: userId,
         opponentId: data.opponentId as string,
         sportId: sport?.id,
         status: "pending",
-        betAmount: amount.toString(),
+        wagerAmount: amount.toString(),
         title: `Desafio: ${data.sportName}`,
       })
       .returning();
@@ -328,7 +328,7 @@ export async function handleChallenges(
 
     // Notify challenger
     const challenger = await db.query.users.findFirst({
-      where: eq(users.id, challenge.challengerId),
+      where: eq(users.id, challenge.creatorId),
       columns: { phone: true },
     });
 

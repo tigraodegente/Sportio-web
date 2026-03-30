@@ -29,30 +29,37 @@ export class WhatsAppClient {
         });
         break;
 
-      case "buttons":
-        await this.evolutionPost(`${base}/sendButtons/${instanceName}`, apiKey, {
+      case "buttons": {
+        // Convert buttons to plain text for maximum compatibility
+        const btnHeader = message.header ? `*${message.header}*\n\n` : "";
+        const btnList = message.buttons.map((b, i) => `${i + 1}. ${b.title}`).join("\n");
+        const btnFooter = message.footer ? `\n\n${message.footer}` : "";
+        const btnText = `${btnHeader}${message.text}\n\n${btnList}${btnFooter}\n\n_Responda com o numero da opcao_`;
+        await this.evolutionPost(`${base}/sendText/${instanceName}`, apiKey, {
           number: to,
-          title: message.header ?? "",
-          description: message.text,
-          footer: message.footer ?? "",
-          buttons: message.buttons.map((b) => ({
-            type: "reply",
-            buttonId: b.id,
-            buttonText: { displayText: b.title },
-          })),
+          text: btnText,
         });
         break;
+      }
 
-      case "list":
-        await this.evolutionPost(`${base}/sendList/${instanceName}`, apiKey, {
+      case "list": {
+        // Convert list to plain text for maximum compatibility
+        const listHeader = message.header ? `*${message.header}*\n\n` : "";
+        let listItems = "";
+        for (const section of message.sections) {
+          if (section.title) listItems += `*${section.title}*\n`;
+          listItems += section.rows.map((r: { title: string; description?: string }, i: number) =>
+            `${i + 1}. ${r.title}${r.description ? ` - ${r.description}` : ""}`
+          ).join("\n");
+          listItems += "\n";
+        }
+        const listText = `${listHeader}${message.text}\n\n${listItems}\n_Responda com o numero da opcao_`;
+        await this.evolutionPost(`${base}/sendText/${instanceName}`, apiKey, {
           number: to,
-          title: message.header ?? "",
-          description: message.text,
-          buttonText: message.buttonText,
-          footerText: message.footer ?? "",
-          sections: message.sections,
+          text: listText,
         });
         break;
+      }
 
       case "image":
         await this.evolutionPost(`${base}/sendMedia/${instanceName}`, apiKey, {

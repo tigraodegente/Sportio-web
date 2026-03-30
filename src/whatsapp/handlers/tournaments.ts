@@ -8,6 +8,7 @@ import {
   tournaments,
   enrollments,
   users,
+  sports,
   gcoinTransactions,
 } from "@/server/db/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -357,6 +358,3 @@ export async function handleTournaments(
   // Default
   await whatsapp.sendMessage(phone, menus.tournamentsMenu());
 }
-
-// Import sports table
-import { sports } from "@/server/db/schema";
